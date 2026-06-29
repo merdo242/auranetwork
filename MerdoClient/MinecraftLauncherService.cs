@@ -13,6 +13,7 @@ public class MinecraftLauncherService
         _settingsService = settingsService;
     }
 
+    /// <summary>Minecraft'ı başlatır. Arka planda (Task.Run) çağrılmalıdır.</summary>
     public LauncherResult StartMinecraft(string username)
     {
         if (string.IsNullOrWhiteSpace(username))
@@ -24,7 +25,7 @@ public class MinecraftLauncherService
             var launcher = new MinecraftLauncher(path);
             var settings = _settingsService.Settings;
 
-            // Versiyon seç
+            // --- Sürüm seç ---
             string launchVersion;
             if (!string.IsNullOrEmpty(settings.SelectedVersion))
             {
@@ -32,42 +33,72 @@ public class MinecraftLauncherService
             }
             else
             {
-                var allVersions = launcher.GetAllVersionsAsync().AsTask().GetAwaiter().GetResult().ToList();
-                if (allVersions.Count == 0)
-                    return new LauncherResult(false, "Bilgisayarınızda yüklü bir Minecraft sürümü bulunamadı.\n.minecraft/versions klasöründe kurulu bir sürüm olduğundan emin olun.");
+                // Yerel sürümleri listele (senkron)
+                var allVersions = launcher.GetAllVersionsAsync()
+                                          .AsTask()
+                                          .ConfigureAwait(false)
+                                          .GetAwaiter()
+                                          .GetResult()
+                                          .ToList();
 
-                launchVersion = allVersions.FirstOrDefault(v =>
-                    v.Name.Contains("OptiFine", StringComparison.OrdinalIgnoreCase) ||
-                    v.Name.Contains("Fabric", StringComparison.OrdinalIgnoreCase))?.Name
+                if (allVersions.Count == 0)
+                    return new LauncherResult(false,
+                        "Bilgisayarınızda yüklü bir Minecraft sürümü bulunamadı.\n" +
+                        ".minecraft/versions klasöründe kurulu bir sürüm olduğundan emin olun.");
+
+                // OptiFine > Fabric > ilk sürüm
+                launchVersion =
+                    allVersions.FirstOrDefault(v => v.Name.Contains("OptiFine", StringComparison.OrdinalIgnoreCase))?.Name
+                    ?? allVersions.FirstOrDefault(v => v.Name.Contains("Fabric", StringComparison.OrdinalIgnoreCase))?.Name
                     ?? allVersions[0].Name;
             }
 
-            // Java yolu
+            // --- Java yolu ---
             string javaPath = !string.IsNullOrEmpty(settings.JavaPath) && File.Exists(settings.JavaPath)
                 ? settings.JavaPath
                 : FindSystemJavaPath();
 
-            var session      = new MSession(username, "offline_token", Guid.NewGuid().ToString("N"));
+            if (string.IsNullOrEmpty(javaPath))
+                return new LauncherResult(false,
+                    "Java bulunamadı!\n\n" +
+                    "Ayarlar menüsünden Java yolunu manuel olarak seçin.\n" +
+                    "Genellikle şu konumdadır:\n" +
+                    @"%AppData%\.minecraft\runtime\java-runtime-delta\windows\java-runtime-delta\bin\javaw.exe");
+
+            // --- Oturum ve başlatma seçenekleri ---
+            var session = new MSession(username, "offline_token", Guid.NewGuid().ToString("N"));
             var launchOptions = new MLaunchOption
             {
                 Session      = session,
                 MaximumRamMb = settings.MaxRamMb,
-                JavaPath     = string.IsNullOrEmpty(javaPath) ? null : javaPath
+                JavaPath     = javaPath
             };
 
-            var process = launcher.BuildProcessAsync(launchVersion, launchOptions, default).AsTask().GetAwaiter().GetResult();
+            // Process'i oluştur (senkron çağrı — Task.Run içinde güvenli)
+            var process = launcher.BuildProcessAsync(launchVersion, launchOptions, default)
+                                  .AsTask()
+                                  .ConfigureAwait(false)
+                                  .GetAwaiter()
+                                  .GetResult();
 
             // Konsol göster / gizle
-            if (!settings.ShowConsole)
-                process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.CreateNoWindow  = !settings.ShowConsole;
+            process.StartInfo.UseShellExecute = false;
 
-            process.Start();
+            bool started = process.Start();
+            if (!started)
+                return new LauncherResult(false, "Minecraft prosesi başlatılamadı (process.Start() false döndürdü).");
 
             return new LauncherResult(true, $"Minecraft {launchVersion} başarıyla başlatıldı!");
         }
         catch (Exception ex)
         {
-            return new LauncherResult(false, "Minecraft başlatılamadı: " + ex.Message);
+            return new LauncherResult(false,
+                $"Minecraft başlatılamadı:\n{ex.Message}\n\n" +
+                "İpuçları:\n" +
+                "• Ayarlar'dan doğru Java yolunu seçin\n" +
+                "• Ayarlar'dan oynatmak istediğiniz sürümü seçin\n" +
+                "• Minecraft Launcher ile en az bir kez oynamış olduğunuzdan emin olun");
         }
     }
 
@@ -93,10 +124,22 @@ public class MinecraftLauncherService
             }
         }
 
-        // 3) Bilinen kurulum dizinleri
+        // 3) Minecraft runtime (Türkçe 'ı' içeren 'wındows' klasörü dahil)
+        string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        string mcRuntime = Path.Combine(appData, ".minecraft", "runtime");
+        if (Directory.Exists(mcRuntime))
+        {
+            try
+            {
+                foreach (var found in Directory.EnumerateFiles(mcRuntime, "javaw.exe", SearchOption.AllDirectories))
+                    return found;
+            }
+            catch { }
+        }
+
+        // 4) Bilinen kurulum dizinleri
         string pf   = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
         string pf86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-        string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
         string[] roots =
         {
@@ -107,7 +150,6 @@ public class MinecraftLauncherService
             Path.Combine(pf,   "Zulu"),
             Path.Combine(pf86, "Java"),
             Path.Combine(pf86, "Eclipse Adoptium"),
-            Path.Combine(appData, ".minecraft", "runtime")
         };
 
         foreach (var root in roots)

@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "2.1",
+  "LatestVersion": "2.2",
   "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe",
-  "Changelog": "- Canlı oyuncu sayısı gösterme sorunu giderildi.\n- Güncelleme sistemi ve Inno Setup otomatik yükleyici entegre edildi."
+  "Changelog": "- Minecraft başlatma sorunu düzeltildi (oyun artık açılıyor).\n- Java otomatik algılama iyileştirildi.\n- Güncelleme bildirimi düzeltildi."
 }
