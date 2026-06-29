@@ -1,0 +1,15 @@
+# Build folders
+[Bb]in/
+[Oo]bj/
+publish/
+installer/
+
+# IDE files
+.vs/
+*.user
+*.suo
+*.sln.docstates
+
+# System files
+.DS_Store
+Thumbs.db

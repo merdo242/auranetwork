@@ -1,0 +1,689 @@
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Windows.Forms;
+
+namespace MerdoClient;
+
+public partial class Form1 : Form
+{
+    private readonly AccountService _accountService = new();
+    private readonly SettingsService _settingsService = new();
+    private readonly MinecraftLauncherService _minecraftLauncherService;
+
+    private readonly System.Windows.Forms.Timer _transitionTimer = new();
+    private readonly System.Windows.Forms.Timer _launchTimer = new();
+    
+    private string _currentUser = string.Empty;
+    private double _transitionProgress;
+    private int _launchProgress;
+    private bool _isRegisterMode = false;
+    private bool _isFromSavedAccount = false;
+
+    private struct NewsSlide
+    {
+        public string Title;
+        public string Subtitle;
+        public string Text;
+        
+        public NewsSlide(string title, string subtitle, string text)
+        {
+            Title = title;
+            Subtitle = subtitle;
+            Text = text;
+        }
+    }
+
+    private readonly NewsSlide[] _newsSlides = new[]
+    {
+        new NewsSlide("TURNUVALAR", "KAZANMAYA HAZIR OL", "Haftalık turnuvalara katıl, rakiplerinle yarış ve büyük ödüllerin sahibi ol!"),
+        new NewsSlide("GÜNCELLEME", "YENİ SÜRÜM YAYINLANDI", "Merdo Launcher v2.0 ile daha yüksek FPS ve optimize edilmiş ram kullanımı sizleri bekliyor."),
+        new NewsSlide("ETKİNLİKLER", "BU HAFTA SONU %50 EKSTRA", "Hafta sonu boyunca geçerli tüm etkinliklerde ekstra kredi kazanma şansını kaçırma!")
+    };
+    
+    private int _currentSlideIndex = 0;
+
+    public Form1()
+    {
+        _minecraftLauncherService = new MinecraftLauncherService(_settingsService);
+        InitializeComponent();
+        
+        // Setup Form properties
+        Text = "Merdo Launcher - Giriş Yap";
+        StartPosition = FormStartPosition.CenterScreen;
+        FormBorderStyle = FormBorderStyle.FixedSingle;
+        MaximizeBox = false;
+        DoubleBuffered = true;
+        BackColor = Color.FromArgb(8, 8, 10);
+        
+        // Setup Panels
+        pnlHome.Visible = false;
+        pnlLogin.Visible = true;
+        
+        // Paint events for Logo Badge
+        pnlLogin.Paint += Panel_Paint;
+        pnlHome.Paint += Panel_Paint;
+
+        // Custom Paint for cards and inputs to have anti-aliased rounded corners
+        pnlLeftNewsCard.Paint += CardPanel_Paint;
+        pnlRightLoginCard.Paint += CardPanel_Paint;
+        pnlHomeLeftCard.Paint += CardPanel_Paint;
+        pnlHomeRightCard.Paint += CardPanel_Paint;
+        
+        pnlUserContainer.Paint += InputPanel_Paint;
+        pnlPassContainer.Paint += InputPanel_Paint;
+        pnlSavedAccounts.Paint += InputPanel_Paint;
+
+        // Custom Paint for Home card inner containers
+        pnlOnlinePlayers.Paint += OnlinePlayers_Paint;
+        pnlAvatar.Paint += pnlAvatar_Paint;
+        pnlRoleBadge.Paint += RoleBadge_Paint;
+
+        // Slide events
+        btnNewsPrev.Click += (s, e) =>
+        {
+            _currentSlideIndex = (_currentSlideIndex - 1 + _newsSlides.Length) % _newsSlides.Length;
+            UpdateNewsSlide();
+        };
+        
+        btnNewsNext.Click += (s, e) =>
+        {
+            _currentSlideIndex = (_currentSlideIndex + 1) % _newsSlides.Length;
+            UpdateNewsSlide();
+        };
+
+        // Transition Timer
+        _transitionTimer.Interval = 16;
+        _transitionTimer.Tick += TransitionTimer_Tick;
+
+        // Launch Timer
+        _launchTimer.Interval = 16;
+        _launchTimer.Tick += LaunchTimer_Tick;
+
+        // Setup Placeholders
+        SetupPlaceholder(txtUsername, "Kullanıcı Adı");
+        SetupPlaceholder(txtPassword, "Şifre", true);
+
+        // Checkbox Flat Style
+        chkRemember.FlatStyle = FlatStyle.Flat;
+        chkRemember.FlatAppearance.BorderSize = 1;
+        chkRemember.FlatAppearance.CheckedBackColor = Color.FromArgb(0, 120, 215);
+
+        // Apply Hover Effects
+        ApplyHoverEffect(btnLogin, Color.FromArgb(255, 220, 50), Color.Black);
+        ApplyHoverEffect(btnPlay, Color.FromArgb(255, 220, 50), Color.Black);
+        ApplyHoverEffect(btnWebsiteLink, Color.FromArgb(255, 220, 50), Color.Black);
+
+        ApplyHoverEffect(btnShop, Color.FromArgb(35, 35, 40), Color.White);
+        ApplyHoverEffect(btnWeb, Color.FromArgb(35, 35, 40), Color.White);
+        ApplyHoverEffect(btnDiscord, Color.FromArgb(35, 35, 40), Color.White);
+        ApplyHoverEffect(btnSettings, Color.FromArgb(35, 35, 40), Color.White);
+
+        ApplyHoverEffect(btnNewsPrev, Color.FromArgb(255, 204, 0), Color.Black);
+        ApplyHoverEffect(btnNewsNext, Color.FromArgb(255, 204, 0), Color.Black);
+
+        ApplyHoverEffect(btnRules, Color.FromArgb(55, 55, 60), Color.White);
+        ApplyHoverEffect(btnWebsite, Color.FromArgb(55, 55, 60), Color.White);
+        ApplyHoverEffect(btnDiscordLink, Color.FromArgb(55, 55, 60), Color.White);
+        ApplyHoverEffect(btnExit, Color.FromArgb(220, 50, 50), Color.White);
+
+        // Settings button click
+        btnSettings.Click += (s, e) =>
+        {
+            using var settingsForm = new SettingsForm(_settingsService);
+            settingsForm.ShowDialog(this);
+        };
+
+        // Initial Saved Accounts UI Load
+        UpdateSavedAccountsUI();
+    }
+
+    protected override void OnLoad(EventArgs e)
+    {
+        base.OnLoad(e);
+        
+        // Check for updates asynchronously
+        UpdateCheckerService.CheckForUpdates(this);
+        
+        // Rounding only buttons and shapes (panels render smoothly through Paint events)
+        MakeControlRounded(btnLogin, 8);
+        MakeControlRounded(btnPlay, 8);
+        MakeControlRounded(btnWebsiteLink, 17); // Pill shape (height is 34)
+        
+        MakeControlRounded(btnNewsPrev, 6);
+        MakeControlRounded(btnNewsNext, 6);
+        
+        MakeControlRounded(btnShop, 18); // Circle (36x36)
+        MakeControlRounded(btnWeb, 18);
+        MakeControlRounded(btnDiscord, 18);
+        MakeControlRounded(btnSettings, 18);
+
+        MakeControlRounded(btnRules, 6);
+        MakeControlRounded(btnWebsite, 6);
+        MakeControlRounded(btnDiscordLink, 6);
+        MakeControlRounded(btnExit, 6);
+    }
+
+    private void MakeControlRounded(Control control, int radius)
+    {
+        var rect = new Rectangle(0, 0, control.Width, control.Height);
+        using var path = GetRoundedRectanglePath(rect, radius);
+        control.Region = new Region(path);
+    }
+
+    public static GraphicsPath GetRoundedRectanglePath(Rectangle rect, int cornerRadius)
+    {
+        GraphicsPath path = new GraphicsPath();
+        int diameter = cornerRadius * 2;
+        path.AddArc(rect.X, rect.Y, diameter, diameter, 180, 90);
+        path.AddArc(rect.Right - diameter, rect.Y, diameter, diameter, 270, 90);
+        path.AddArc(rect.Right - diameter, rect.Bottom - diameter, diameter, diameter, 0, 90);
+        path.AddArc(rect.X, rect.Bottom - diameter, diameter, diameter, 90, 90);
+        path.CloseFigure();
+        return path;
+    }
+
+    private void Panel_Paint(object? sender, PaintEventArgs e)
+    {
+        DrawLogoBadge(e.Graphics, 50, 60);
+    }
+
+    private void CardPanel_Paint(object? sender, PaintEventArgs e)
+    {
+        var panel = (Panel)sender!;
+        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        using var brush = new SolidBrush(Color.FromArgb(21, 21, 24)); // Card BG
+        using var path = GetRoundedRectanglePath(new Rectangle(0, 0, panel.Width - 1, panel.Height - 1), 12);
+        e.Graphics.FillPath(brush, path);
+    }
+
+    private void InputPanel_Paint(object? sender, PaintEventArgs e)
+    {
+        var panel = (Panel)sender!;
+        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        using var brush = new SolidBrush(Color.FromArgb(13, 13, 15)); // Input BG
+        using var path = GetRoundedRectanglePath(new Rectangle(0, 0, panel.Width - 1, panel.Height - 1), 8);
+        e.Graphics.FillPath(brush, path);
+    }
+
+    private void OnlinePlayers_Paint(object? sender, PaintEventArgs e)
+    {
+        var panel = (Panel)sender!;
+        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        using var brush = new SolidBrush(Color.FromArgb(13, 13, 15)); // Dark BG
+        using var pen = new Pen(Color.FromArgb(30, 80, 140), 1); // Blue border
+        using var path = GetRoundedRectanglePath(new Rectangle(0, 0, panel.Width - 1, panel.Height - 1), 17);
+        
+        e.Graphics.FillPath(brush, path);
+        e.Graphics.DrawPath(pen, path);
+
+        // Draw green dot
+        using (var greenBrush = new SolidBrush(Color.FromArgb(40, 220, 80)))
+        {
+            e.Graphics.FillEllipse(greenBrush, 18, 12, 10, 10);
+        }
+
+        // Draw text
+        using (var font = new Font("Segoe UI", 9.5F, FontStyle.Regular))
+        using (var brushText = new SolidBrush(Color.FromArgb(180, 180, 190)))
+        {
+            e.Graphics.DrawString("1529 /10000 Çevrimiçi Oyuncu", font, brushText, 35, 7);
+        }
+    }
+
+    private void pnlAvatar_Paint(object? sender, PaintEventArgs e)
+    {
+        var panel = (Panel)sender!;
+        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        
+        // Draw gold outer border
+        using (var goldPen = new Pen(Color.FromArgb(255, 204, 0), 3))
+        {
+            e.Graphics.DrawEllipse(goldPen, 1, 1, panel.Width - 3, panel.Height - 3);
+        }
+        
+        // Create circle clipping path for face
+        using (var path = new GraphicsPath())
+        {
+            path.AddEllipse(4, 4, panel.Width - 8, panel.Height - 8);
+            e.Graphics.SetClip(path);
+        }
+        
+        // Draw Steve face
+        Rectangle faceRect = new Rectangle(4, 4, panel.Width - 8, panel.Height - 8);
+        DrawSteveFace(e.Graphics, faceRect);
+        
+        e.Graphics.ResetClip();
+    }
+
+    private void DrawSteveFace(Graphics g, Rectangle rect)
+    {
+        g.SmoothingMode = SmoothingMode.None; // Pixelated block face
+        
+        int pixelSize = rect.Width / 8;
+        
+        int[,] colors = new int[8, 8] {
+            { 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 1, 1, 1, 1, 1, 1, 0 },
+            { 1, 1, 3, 4, 4, 3, 1, 1 },
+            { 1, 1, 1, 2, 2, 1, 1, 1 },
+            { 1, 1, 2, 1, 1, 2, 1, 1 },
+            { 1, 1, 2, 2, 2, 2, 1, 1 },
+            { 1, 1, 1, 1, 1, 1, 1, 1 }
+        };
+        
+        Color[] palette = new Color[] {
+            Color.FromArgb(80, 50, 30),   // 0: Hair (Dark Brown)
+            Color.FromArgb(220, 160, 125), // 1: Skin (Tan)
+            Color.FromArgb(170, 110, 80),  // 2: Nose/Lip (Dark Tan)
+            Color.White,                   // 3: Eye White
+            Color.FromArgb(70, 70, 200)    // 4: Eye Pupil (Blue)
+        };
+        
+        for (int r = 0; r < 8; r++)
+        {
+            for (int c = 0; c < 8; c++)
+            {
+                int colorIndex = colors[r, c];
+                using (var brush = new SolidBrush(palette[colorIndex]))
+                {
+                    g.FillRectangle(brush, rect.X + c * pixelSize, rect.Y + r * pixelSize, pixelSize, pixelSize);
+                }
+            }
+        }
+    }
+
+    private void RoleBadge_Paint(object? sender, PaintEventArgs e)
+    {
+        var panel = (Panel)sender!;
+        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        using var brush = new SolidBrush(Color.FromArgb(255, 204, 0)); // Yellow bg
+        using var path = GetRoundedRectanglePath(new Rectangle(0, 0, panel.Width - 1, panel.Height - 1), 4);
+        e.Graphics.FillPath(brush, path);
+    }
+
+    private void DrawLogoBadge(Graphics g, int x, int y)
+    {
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+
+        // Draw chicken vector logo (32x32 size)
+        int logoSize = 32;
+        Rectangle logoRect = new Rectangle(x, y, logoSize, logoSize);
+        
+        // White head base
+        using (var whiteBrush = new SolidBrush(Color.White))
+        {
+            g.FillEllipse(whiteBrush, logoRect.X + 4, logoRect.Y + 4, 24, 24);
+        }
+        
+        // Red comb at top
+        using (var redBrush = new SolidBrush(Color.FromArgb(230, 40, 40)))
+        {
+            g.FillEllipse(redBrush, logoRect.X + 2, logoRect.Y + 1, 10, 10);
+            g.FillEllipse(redBrush, logoRect.X + 10, logoRect.Y + 0, 10, 10);
+            g.FillEllipse(redBrush, logoRect.X + 18, logoRect.Y + 2, 8, 8);
+        }
+        
+        // Yellow beak pointing right
+        using (var yellowBrush = new SolidBrush(Color.FromArgb(255, 204, 0)))
+        {
+            Point[] beakPoints = {
+                new Point(logoRect.X + 22, logoRect.Y + 14),
+                new Point(logoRect.X + 31, logoRect.Y + 18),
+                new Point(logoRect.X + 22, logoRect.Y + 22)
+            };
+            g.FillPolygon(yellowBrush, beakPoints);
+        }
+        
+        // Black eye
+        using (var blackBrush = new SolidBrush(Color.Black))
+        {
+            g.FillEllipse(blackBrush, logoRect.X + 16, logoRect.Y + 11, 4, 4);
+        }
+
+        // Red wattle (gidi)
+        using (var redBrush = new SolidBrush(Color.FromArgb(230, 40, 40)))
+        {
+            g.FillEllipse(redBrush, logoRect.X + 20, logoRect.Y + 21, 6, 9);
+        }
+
+        // "MERDO" text
+        using (var font = new Font("Segoe UI", 16F, FontStyle.Bold))
+        using (var brush = new SolidBrush(Color.White))
+        {
+            g.DrawString("MERDO", font, brush, x + 40, y + 2);
+        }
+
+        // "LAUNCHER" badge
+        int badgeX = x + 130;
+        int badgeY = y + 7;
+        int badgeW = 85;
+        int badgeH = 22;
+        Rectangle badgeRect = new Rectangle(badgeX, badgeY, badgeW, badgeH);
+        using (var badgePath = GetRoundedRectanglePath(badgeRect, 5))
+        {
+            using (var yellowBrush = new SolidBrush(Color.FromArgb(255, 204, 0)))
+            {
+                g.FillPath(yellowBrush, badgePath);
+            }
+        }
+
+        using (var font = new Font("Segoe UI", 8.5F, FontStyle.Bold))
+        using (var brush = new SolidBrush(Color.Black))
+        {
+            var size = g.MeasureString("LAUNCHER", font);
+            float tx = badgeX + (badgeW - size.Width) / 2;
+            float ty = badgeY + (badgeH - size.Height) / 2;
+            g.DrawString("LAUNCHER", font, brush, tx, ty);
+        }
+    }
+
+    private void SetupPlaceholder(TextBox textBox, string placeholder, bool isPassword = false)
+    {
+        textBox.Text = placeholder;
+        textBox.ForeColor = Color.FromArgb(85, 85, 94);
+        if (isPassword) textBox.UseSystemPasswordChar = false;
+
+        textBox.Enter += (s, e) =>
+        {
+            if (textBox.Text == placeholder)
+            {
+                textBox.Text = "";
+                textBox.ForeColor = Color.White;
+                if (isPassword) textBox.UseSystemPasswordChar = true;
+            }
+        };
+
+        textBox.Leave += (s, e) =>
+        {
+            if (string.IsNullOrWhiteSpace(textBox.Text))
+            {
+                textBox.Text = placeholder;
+                textBox.ForeColor = Color.FromArgb(85, 85, 94);
+                if (isPassword) textBox.UseSystemPasswordChar = false;
+            }
+        };
+    }
+
+    private void UpdateNewsSlide()
+    {
+        var slide = _newsSlides[_currentSlideIndex];
+        lblNewsTitle.Text = slide.Title;
+        lblNewsSubtitle.Text = slide.Subtitle;
+        lblNewsText.Text = slide.Text;
+    }
+
+    private void UpdateSavedAccountsUI()
+    {
+        pnlSavedAccounts.Controls.Clear();
+        var saved = _accountService.GetSavedAccounts();
+        if (saved.Count == 0)
+        {
+            pnlSavedAccounts.Controls.Add(lblSavedAccountsPlaceholder);
+            lblSavedAccountsPlaceholder.Visible = true;
+        }
+        else
+        {
+            lblSavedAccountsPlaceholder.Visible = false;
+            
+            int xOffset = 10;
+            int btnWidth = 115;
+            int btnHeight = 28;
+            int count = Math.Min(saved.Count, 2);
+            
+            for (int i = 0; i < count; i++)
+            {
+                var acc = saved[i];
+                var btnAcc = new Button
+                {
+                    Text = acc.Username,
+                    Size = new Size(btnWidth, btnHeight),
+                    Location = new Point(xOffset, 8),
+                    BackColor = Color.FromArgb(28, 28, 32),
+                    ForeColor = Color.White,
+                    FlatStyle = FlatStyle.Flat,
+                    Font = new Font("Segoe UI", 8.5F, FontStyle.Bold)
+                };
+                btnAcc.FlatAppearance.BorderSize = 0;
+                
+                // Click handler — kayıtlı hesapla doğrudan giriş (UI alanları atlanır)
+                btnAcc.Click += (s, ev) => LoginDirect(acc.Username, acc.Password);
+                
+                pnlSavedAccounts.Controls.Add(btnAcc);
+                MakeControlRounded(btnAcc, 6);
+                ApplyHoverEffect(btnAcc, Color.FromArgb(45, 45, 50), Color.FromArgb(255, 204, 0));
+                
+                xOffset += 125;
+            }
+        }
+    }
+
+    private void btnLogin_Click(object sender, EventArgs e)
+    {
+        string username = txtUsername.Text == "Kullanıcı Adı" ? "" : txtUsername.Text.Trim();
+        string password = txtPassword.Text == "Şifre" ? "" : txtPassword.Text;
+
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+        {
+            ShowMessage("Kullanıcı adı ve şifre gerekli.", MessageBoxIcon.Warning);
+            return;
+        }
+
+        if (_isRegisterMode)
+        {
+            if (_accountService.HasAccountRegistered())
+            {
+                ShowMessage("Bu cihazda zaten bir hesap oluşturulmuş. Yalnızca bir hesap oluşturabilirsiniz.", MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (_accountService.Register(username, password))
+            {
+                _currentUser = username;
+                lblWelcome.Text = username.ToUpper();
+                lblStatus.Text = "Hesap oluşturuldu. Oynamaya hazırsın.";
+                
+                if (chkRemember.Checked)
+                {
+                    _accountService.SaveAccountCredential(username, password);
+                }
+                
+                ToggleRegisterMode(false);
+                StartTransition();
+                ShowMessage("Kayıt başarılı. Ana sayfaya yönlendiriliyorsun.", MessageBoxIcon.Information);
+            }
+            else
+            {
+                ShowMessage("Bu kullanıcı adı zaten kayıtlı.", MessageBoxIcon.Error);
+            }
+        }
+        else
+        {
+            if (_accountService.Login(username, password))
+            {
+                _currentUser = username;
+                lblWelcome.Text = username.ToUpper();
+                lblStatus.Text = "Hazır. Oynamaya başlamak için Oyna butonuna basın.";
+                
+                if (chkRemember.Checked)
+                {
+                    _accountService.SaveAccountCredential(username, password);
+                }
+                else if (!_isFromSavedAccount)
+                {
+                    // Kayıtlı hesap butonuyla giriş yapılıyorsa hesabı silme
+                    _accountService.RemoveSavedAccount(username);
+                }
+                
+                StartTransition();
+            }
+            else
+            {
+                ShowMessage("Giriş başarısız. Kayıtlı kullanıcı bilgilerini kontrol edin.", MessageBoxIcon.Error);
+            }
+        }
+        
+        UpdateSavedAccountsUI();
+    }
+
+    // Kayıtlı hesap butonlarından çağrılır — textbox placeholder mantığını tamamen atlatır
+    private void LoginDirect(string username, string password)
+    {
+        if (_accountService.Login(username, password))
+        {
+            _currentUser = username;
+            lblWelcome.Text = username.ToUpper();
+            lblStatus.Text = "Hazır. Oynamaya başlamak için Oyna butonuna basın.";
+
+            // Giriş alanlarını da güncelle (görsel tutarlılık)
+            txtUsername.Text = username;
+            txtUsername.ForeColor = Color.White;
+            txtPassword.Text = password;
+            txtPassword.ForeColor = Color.White;
+            txtPassword.UseSystemPasswordChar = true;
+
+            StartTransition();
+        }
+        else
+        {
+            ShowMessage($"Giriş başarısız: '{username}' için kayıtlı bilgiler doğrulanamadı.", MessageBoxIcon.Error);
+        }
+    }
+
+    private void lblRegister_Click(object sender, EventArgs e)
+    {
+        ToggleRegisterMode(!_isRegisterMode);
+    }
+
+    private void ToggleRegisterMode(bool register)
+    {
+        _isRegisterMode = register;
+        if (_isRegisterMode)
+        {
+            lblLoginTitle.Text = "KAYIT OL";
+            btnLogin.Text = "Kayıt Ol";
+            lblRegister.Text = "Zaten hesabın var mı? Giriş yap";
+        }
+        else
+        {
+            lblLoginTitle.Text = "GİRİŞ";
+            btnLogin.Text = "Giriş Yap";
+            lblRegister.Text = "Yeni hesap oluştur";
+        }
+    }
+
+    private void btnExit_Click(object sender, EventArgs e)
+    {
+        _currentUser = "";
+        txtUsername.Text = "";
+        txtPassword.Text = "";
+        SetupPlaceholder(txtUsername, "Kullanıcı Adı");
+        SetupPlaceholder(txtPassword, "Şifre", true);
+        
+        Text = "Chicken Launcher - Giriş Yap";
+        pnlHome.Visible = false;
+        pnlLogin.Visible = true;
+        
+        UpdateSavedAccountsUI();
+    }
+
+    private void btnPlay_Click(object sender, EventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(_currentUser))
+        {
+            ShowMessage("Önce giriş yapmanız gerekiyor.", MessageBoxIcon.Warning);
+            return;
+        }
+
+        lblStatus.Text = "Minecraft açılıyor, lütfen bekleyin...";
+        pbLaunch.Value = 4;
+        _launchProgress = 4;
+        _launchTimer.Start();
+
+        var result = _minecraftLauncherService.StartMinecraft(_currentUser);
+        if (result.Success)
+        {
+            lblStatus.Text = "Minecraft başlatıldı. Hazır!";
+            ShowMessage($"Minecraft başlatıldı, hoş geldin {_currentUser}!", MessageBoxIcon.Information);
+
+            if (_settingsService.Settings.CloseOnLaunch)
+                Application.Exit();
+        }
+        else
+        {
+            lblStatus.Text = result.Message;
+            pbLaunch.Value = 0;
+            _launchTimer.Stop();
+            ShowMessage(result.Message, MessageBoxIcon.Error);
+        }
+    }
+
+    private void StartTransition()
+    {
+        pnlHome.Visible = true;
+        Text = "Merdo Launcher - Oyun Ekranı";
+        _transitionProgress = 0;
+        _transitionTimer.Start();
+    }
+
+    private void TransitionTimer_Tick(object? sender, EventArgs e)
+    {
+        _transitionProgress += 0.08;
+        if (_transitionProgress >= 1)
+        {
+            _transitionProgress = 1;
+            _transitionTimer.Stop();
+        }
+
+        int loginAlpha = (int)(255 * (1 - _transitionProgress));
+        int homeAlpha = (int)(255 * _transitionProgress);
+        pnlLogin.BackColor = Color.FromArgb(loginAlpha, 8, 8, 10);
+        pnlHome.BackColor = Color.FromArgb(homeAlpha, 8, 8, 10);
+        if (_transitionProgress >= 1)
+        {
+            pnlLogin.Visible = false;
+        }
+        else
+        {
+            pnlLogin.Visible = true;
+            pnlHome.Visible = true;
+        }
+    }
+
+    private void LaunchTimer_Tick(object? sender, EventArgs e)
+    {
+        if (_launchProgress < 100)
+        {
+            _launchProgress += 3;
+            pbLaunch.Value = Math.Min(_launchProgress, 100);
+        }
+        else
+        {
+            _launchTimer.Stop();
+        }
+    }
+
+    private void ApplyHoverEffect(Button button, Color hoverBg, Color hoverFg)
+    {
+        Color originalBg = button.BackColor;
+        Color originalFg = button.ForeColor;
+        button.Cursor = Cursors.Hand;
+        
+        button.MouseEnter += (_, _) =>
+        {
+            button.BackColor = hoverBg;
+            button.ForeColor = hoverFg;
+        };
+
+        button.MouseLeave += (_, _) =>
+        {
+            button.BackColor = originalBg;
+            button.ForeColor = originalFg;
+        };
+    }
+
+    private void ShowMessage(string message, MessageBoxIcon icon)
+    {
+        MessageBox.Show(message, "Merdo Launcher", MessageBoxButtons.OK, icon);
+    }
+}
