@@ -143,7 +143,7 @@ partial class Form1
         this.MaximizeBox = false;
         this.Name = "Form1";
         this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-        this.Text = "Chicken Launcher - Giriş Yap";
+        this.Text = "Merdo Launcher - Giriş Yap";
         this.BackColor = System.Drawing.Color.FromArgb(8, 8, 10);
 
         // 

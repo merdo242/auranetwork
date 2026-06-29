@@ -643,7 +643,7 @@ public partial class Form1 : Form
         UpdateSavedAccountsUI();
     }
 
-    private void btnPlay_Click(object sender, EventArgs e)
+    private async void btnPlay_Click(object sender, EventArgs e)
     {
         if (string.IsNullOrWhiteSpace(_currentUser))
         {
@@ -651,25 +651,32 @@ public partial class Form1 : Form
             return;
         }
 
-        lblStatus.Text = "Minecraft açılıyor, lütfen bekleyin...";
-        pbLaunch.Value = 4;
+        // UI'ı kilitle, ilerleme çubuğunu başlat
+        btnPlay.Enabled = false;
+        lblStatus.Text  = "Minecraft açılıyor, lütfen bekleyin...";
+        pbLaunch.Value  = 4;
         _launchProgress = 4;
         _launchTimer.Start();
 
-        var result = _minecraftLauncherService.StartMinecraft(_currentUser);
+        // Minecraft'ı arka planda başlat — UI donmasın
+        var result = await System.Threading.Tasks.Task.Run(
+            () => _minecraftLauncherService.StartMinecraft(_currentUser));
+
+        _launchTimer.Stop();
+        btnPlay.Enabled = true;
+
         if (result.Success)
         {
-            lblStatus.Text = "Minecraft başlatıldı. Hazır!";
-            ShowMessage($"Minecraft başlatıldı, hoş geldin {_currentUser}!", MessageBoxIcon.Information);
+            pbLaunch.Value = 100;
+            lblStatus.Text = "Minecraft başlatıldı. İyi oyunlar!";
 
             if (_settingsService.Settings.CloseOnLaunch)
                 Application.Exit();
         }
         else
         {
-            lblStatus.Text = result.Message;
             pbLaunch.Value = 0;
-            _launchTimer.Stop();
+            lblStatus.Text = "Başlatma başarısız.";
             ShowMessage(result.Message, MessageBoxIcon.Error);
         }
     }
