@@ -12,12 +12,15 @@ public partial class Form1 : Form
 
     private readonly System.Windows.Forms.Timer _transitionTimer = new();
     private readonly System.Windows.Forms.Timer _launchTimer = new();
+    private readonly System.Windows.Forms.Timer _onlineCheckTimer = new();
     
     private string _currentUser = string.Empty;
     private double _transitionProgress;
     private int _launchProgress;
     private bool _isRegisterMode = false;
     private bool _isFromSavedAccount = false;
+    private int _onlinePlayers = 0;
+    private int _maxPlayers = 10000;
 
     private struct NewsSlide
     {
@@ -135,6 +138,12 @@ public partial class Form1 : Form
 
         // Initial Saved Accounts UI Load
         UpdateSavedAccountsUI();
+
+        // Online players check timer
+        _onlineCheckTimer.Interval = 20000;
+        _onlineCheckTimer.Tick += (s, e) => UpdateOnlinePlayerCount();
+        _onlineCheckTimer.Start();
+        UpdateOnlinePlayerCount();
     }
 
     protected override void OnLoad(EventArgs e)
@@ -226,8 +235,40 @@ public partial class Form1 : Form
         using (var font = new Font("Segoe UI", 9.5F, FontStyle.Regular))
         using (var brushText = new SolidBrush(Color.FromArgb(180, 180, 190)))
         {
-            e.Graphics.DrawString("1529 /10000 Çevrimiçi Oyuncu", font, brushText, 35, 7);
+            e.Graphics.DrawString($"{_onlinePlayers} /{_maxPlayers} Çevrimiçi Oyuncu", font, brushText, 35, 7);
         }
+    }
+
+    private void UpdateOnlinePlayerCount()
+    {
+        System.Threading.Tasks.Task.Run(async () =>
+        {
+            try
+            {
+                using var client = new System.Net.Http.HttpClient();
+                client.Timeout = TimeSpan.FromSeconds(5);
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("MerdoLauncher/2.0");
+
+                var response = await client.GetStringAsync("https://api.mcsrvstat.us/2/91.132.49.16");
+                using var doc = System.Text.Json.JsonDocument.Parse(response);
+                if (doc.RootElement.TryGetProperty("players", out var playersElement))
+                {
+                    if (playersElement.TryGetProperty("online", out var onlineProp))
+                        _onlinePlayers = onlineProp.GetInt32();
+                    if (playersElement.TryGetProperty("max", out var maxProp))
+                        _maxPlayers = maxProp.GetInt32();
+
+                    if (pnlOnlinePlayers != null && !pnlOnlinePlayers.IsDisposed)
+                    {
+                        this.BeginInvoke(new Action(() => pnlOnlinePlayers.Invalidate()));
+                    }
+                }
+            }
+            catch
+            {
+                // Silent catch
+            }
+        });
     }
 
     private void pnlAvatar_Paint(object? sender, PaintEventArgs e)
