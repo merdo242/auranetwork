@@ -5,13 +5,10 @@ namespace MerdoClient;
 
 public class AccountService
 {
-    private static readonly string AppDataPath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "MerdoLauncher"
-    );
-    private static readonly string AccountsFilePath = Path.Combine(AppDataPath, "accounts.json");
-    private static readonly string SavedAccountsFilePath = Path.Combine(AppDataPath, "saved_accounts.json");
-    private static readonly string ErrorLogFilePath = Path.Combine(AppDataPath, "error.log");
+    private readonly string AppDataPath;
+    private readonly string AccountsFilePath;
+    private readonly string SavedAccountsFilePath;
+    private readonly string ErrorLogFilePath;
 
     private readonly Dictionary<string, string> _accounts = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<SavedAccount> _savedAccounts = new();
@@ -22,8 +19,16 @@ public class AccountService
         WriteIndented = true
     };
 
-    public AccountService()
+    public AccountService(string? customPath = null)
     {
+        AppDataPath = customPath ?? Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "MerdoLauncher"
+        );
+        AccountsFilePath = Path.Combine(AppDataPath, "accounts.json");
+        SavedAccountsFilePath = Path.Combine(AppDataPath, "saved_accounts.json");
+        ErrorLogFilePath = Path.Combine(AppDataPath, "error.log");
+
         LoadData();
     }
 

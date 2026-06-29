@@ -10,9 +10,8 @@ public class UpdateCheckerService
     // Mevcut launcher sürümü
     public const string CurrentVersion = "2.0";
 
-    // Sunucundaki update.json adresi — bunu kendi GitHub raw URL'inle değiştir:
-    // Örnek: https://raw.githubusercontent.com/KULLANICI_ADI/MerdoClient/main/update.json
-    private const string UpdateUrl = "https://api.merdonetwork.com/launcher/update.json";
+    // Güncelleme kontrolü için doğrudan bu GitHub deposundaki update.json dosyasını kullanıyoruz (100% ücretsiz & hızlı)
+    private const string UpdateUrl = "https://raw.githubusercontent.com/merdo242/merdoclient/main/update.json";
 
     public static void CheckForUpdates(Form parentForm)
     {
