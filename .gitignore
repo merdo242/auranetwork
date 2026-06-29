@@ -2,7 +2,6 @@
 [Bb]in/
 [Oo]bj/
 publish/
-installer/
 
 # IDE files
 .vs/

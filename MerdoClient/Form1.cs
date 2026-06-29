@@ -253,10 +253,25 @@ public partial class Form1 : Form
                 using var doc = System.Text.Json.JsonDocument.Parse(response);
                 if (doc.RootElement.TryGetProperty("players", out var playersElement))
                 {
+                    int online = 0;
                     if (playersElement.TryGetProperty("online", out var onlineProp))
-                        _onlinePlayers = onlineProp.GetInt32();
+                        online = onlineProp.GetInt32();
+                    
+                    if (playersElement.TryGetProperty("list", out var listProp) && listProp.ValueKind == System.Text.Json.JsonValueKind.Array)
+                    {
+                        int listCount = listProp.GetArrayLength();
+                        if (listCount > online)
+                            online = listCount;
+                    }
+                    _onlinePlayers = online;
+
+                    int maxVal = 10000;
                     if (playersElement.TryGetProperty("max", out var maxProp))
-                        _maxPlayers = maxProp.GetInt32();
+                    {
+                        int m = maxProp.GetInt32();
+                        if (m > 0) maxVal = m;
+                    }
+                    _maxPlayers = maxVal;
 
                     if (pnlOnlinePlayers != null && !pnlOnlinePlayers.IsDisposed)
                     {
