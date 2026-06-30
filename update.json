@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "3.0",
+  "LatestVersion": "3.1",
   "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe",
-  "Changelog": "- 1.21.8 OptiFine dosyası bulunamazsa otomatik ve arka planda indirilme eklendi.\n- Başlatıcıyı güncellemek zorunlu hale getirildi, güncellemeyi reddedenler başlatıcıya giremez.\n- Oyun indirilirken / doğrulanırken ekranda ilerleme durumunu gösteren bilgi mesajları eklendi."
+  "Changelog": "- Yeni M logosu eklendi (balkabağı temalı, şeffaf PNG).\n- Özel koyu uyarı pencereleri (MerdoDialog) eklendi.\n- Launcher boyutu 1200x700 olarak güncellendi.\n- Header tasarımı yenilendi: küçük logo + MERDO + LAUNCHER badge.\n- Splash ekranı logo hizalama düzeltildi.\n- Uygulama ikonu güncellendi."
 }
