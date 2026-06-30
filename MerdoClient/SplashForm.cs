@@ -130,6 +130,8 @@ public class SplashForm : Form
 
     protected override void OnPaint(PaintEventArgs e)
     {
+        if (ClientRectangle.Width <= 0 || ClientRectangle.Height <= 0) return;
+
         var g = e.Graphics;
         g.SmoothingMode      = SmoothingMode.AntiAlias;
         g.TextRenderingHint  = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;

@@ -253,6 +253,7 @@ public partial class Form1 : Form
     private void Panel_Paint(object? sender, PaintEventArgs e)
     {
         var panel = (Panel)sender!;
+        if (panel.Width <= 0 || panel.Height <= 0) return;
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
         // Background Gradient
@@ -270,6 +271,7 @@ public partial class Form1 : Form
     private void CardPanel_Paint(object? sender, PaintEventArgs e)
     {
         var panel = (Panel)sender!;
+        if (panel.Width <= 0 || panel.Height <= 0) return;
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
         using var brush = new SolidBrush(Color.FromArgb(21, 21, 24)); // Card BG
         using var path = GetRoundedRectanglePath(new Rectangle(0, 0, panel.Width - 1, panel.Height - 1), 12);
@@ -279,6 +281,7 @@ public partial class Form1 : Form
     private void InputPanel_Paint(object? sender, PaintEventArgs e)
     {
         var panel = (Panel)sender!;
+        if (panel.Width <= 0 || panel.Height <= 0) return;
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
         using var brush = new SolidBrush(Color.FromArgb(13, 13, 15)); // Input BG
         using var path = GetRoundedRectanglePath(new Rectangle(0, 0, panel.Width - 1, panel.Height - 1), 8);
@@ -288,6 +291,7 @@ public partial class Form1 : Form
     private void OnlinePlayers_Paint(object? sender, PaintEventArgs e)
     {
         var panel = (Panel)sender!;
+        if (panel.Width <= 0 || panel.Height <= 0) return;
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
         using var brush = new SolidBrush(Color.FromArgb(13, 13, 15)); // Dark BG
         using var pen = new Pen(Color.FromArgb(30, 80, 140), 1); // Blue border
@@ -361,6 +365,7 @@ public partial class Form1 : Form
     private void pnlAvatar_Paint(object? sender, PaintEventArgs e)
     {
         var panel = (Panel)sender!;
+        if (panel.Width <= 0 || panel.Height <= 0) return;
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
         
         // Draw gold outer border
@@ -395,6 +400,7 @@ public partial class Form1 : Form
     private void RoleBadge_Paint(object? sender, PaintEventArgs e)
     {
         var panel = (Panel)sender!;
+        if (panel.Width <= 0 || panel.Height <= 0) return;
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
         var bgColor = panel.Tag is Color c ? c : Color.FromArgb(255, 204, 0); // Use tag color or default yellow
         using var brush = new SolidBrush(bgColor);

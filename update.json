@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "4.2",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe?v=4.2",
-  "Changelog": "- Çevrimdışı (offline) olan oyuncuların sunucu etiketlerinin (Tag/Prefix) yüklenememesi sorunu giderildi.\n- Launcher logosunun ve arka plan müziğinin görünmeme/çalmama hatası giderildi."
+  "LatestVersion": "4.3",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe?v=4.3",
+  "Changelog": "- Launcher simge durumuna küçültüldüğünde (alta alındığında) ortaya çıkan çökme (hata) sorunu giderildi."
 }
