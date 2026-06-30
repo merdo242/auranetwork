@@ -539,7 +539,7 @@ public partial class Form1 : Form
             client.Timeout = System.TimeSpan.FromSeconds(5);
             client.DefaultRequestHeaders.UserAgent.ParseAdd("MerdoLauncher/2.0");
 
-            var response = await client.GetStringAsync($"http://91.132.49.16:8080/check?username={System.Uri.EscapeDataString(username)}");
+            var response = await client.GetStringAsync($"http://91.132.49.16:8080/check?username={System.Uri.EscapeDataString(username.ToLower())}");
             using var doc = System.Text.Json.JsonDocument.Parse(response);
             if (doc.RootElement.TryGetProperty("registered", out var registeredProp))
             {
@@ -761,7 +761,7 @@ public partial class Form1 : Form
             // 1. Fetch Rank from 8080 API
             try
             {
-                    var response = await client.GetStringAsync($"http://91.132.49.16:8080/check?username={System.Uri.EscapeDataString(username)}");
+                    var response = await client.GetStringAsync($"http://91.132.49.16:8080/check?username={System.Uri.EscapeDataString(username.ToLower())}");
                     using var doc = System.Text.Json.JsonDocument.Parse(response);
                     if (doc.RootElement.TryGetProperty("role", out var roleProp))
                     {
