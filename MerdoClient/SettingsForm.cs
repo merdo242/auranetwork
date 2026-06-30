@@ -93,7 +93,8 @@ public class SettingsForm : Form
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             var r = new Rectangle(0, 0, pnl.Width - 1, pnl.Height - 1);
-            using var bg  = new SolidBrush(Color.FromArgb(CARD_BG));
+            // Linear gradient for a more premium look
+            using var bg = new LinearGradientBrush(r, Color.FromArgb(CARD_BG), Color.FromArgb(26, 26, 30), LinearGradientMode.Vertical);
             using var path = RoundedRect(r, 12);
             e.Graphics.FillPath(bg, path);
             using var pen = new Pen(Color.FromArgb(BORDER_CLR), 1);
@@ -393,14 +394,45 @@ public class SettingsForm : Form
             Cursor    = Cursors.Hand
         };
         btn.FlatAppearance.BorderSize = 0;
+        btn.FlatAppearance.MouseOverBackColor = Color.Transparent;
+        btn.FlatAppearance.MouseDownBackColor = Color.Transparent;
+        
+        bool isHovered = false;
+        bool isPressed = false;
+        btn.MouseEnter += (s, e) => { isHovered = true; btn.Invalidate(); };
+        btn.MouseLeave += (s, e) => { isHovered = false; btn.Invalidate(); };
+        btn.MouseDown  += (s, e) => { isPressed = true; btn.Invalidate(); };
+        btn.MouseUp    += (s, e) => { isPressed = false; btn.Invalidate(); };
+
         // Rounded region
         btn.Paint += (s, e) =>
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            e.Graphics.Clear(btn.Parent?.BackColor ?? Color.Transparent);
+            
             var r = new Rectangle(0, 0, btn.Width - 1, btn.Height - 1);
             using var path = RoundedRect(r, 8);
-            using var brush = new SolidBrush(bg);
+            
+            Color currentColor = bg;
+            if (isPressed)
+            {
+                currentColor = ControlPaint.Dark(bg, 0.1f);
+            }
+            else if (isHovered)
+            {
+                currentColor = ControlPaint.Light(bg, 0.2f);
+            }
+            
+            using var brush = new SolidBrush(currentColor);
             e.Graphics.FillPath(brush, path);
+            
+            // Eğer buton border rengine sahipse (iptal/manuel seç gibi), onu çiz:
+            if (btn.FlatAppearance.BorderSize > 0 || bg.R < 40 && bg.G < 40 && bg.B < 50)
+            {
+                 using var penBorder = new Pen(Color.FromArgb(BORDER_CLR), 1.5f);
+                 e.Graphics.DrawPath(penBorder, path);
+            }
+            
             using var sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
             using var pen = new SolidBrush(fg);
             e.Graphics.DrawString(btn.Text, btn.Font, pen, new RectangleF(0, 0, btn.Width, btn.Height), sf);
@@ -554,6 +586,7 @@ public class CustomSlider : Control
     public event EventHandler? ValueChanged;
 
     private bool _isDragging = false;
+    private bool _isHovered = false;
 
     public CustomSlider()
     {
@@ -562,6 +595,20 @@ public class CustomSlider : Control
         DoubleBuffered = true;
         Cursor = Cursors.Hand;
         Size = new Size(200, 24);
+    }
+
+    protected override void OnMouseEnter(EventArgs e)
+    {
+        base.OnMouseEnter(e);
+        _isHovered = true;
+        Invalidate();
+    }
+
+    protected override void OnMouseLeave(EventArgs e)
+    {
+        base.OnMouseLeave(e);
+        _isHovered = false;
+        Invalidate();
     }
 
     protected override void OnMouseDown(MouseEventArgs e)
@@ -587,6 +634,7 @@ public class CustomSlider : Control
     {
         base.OnMouseUp(e);
         _isDragging = false;
+        Invalidate();
     }
 
     private void UpdateValueFromMouse(int x)
@@ -607,6 +655,14 @@ public class CustomSlider : Control
 
         int trackH = 6;
         int thumbW = 16;
+        
+        // Animasyon hissiyatı için hover veya sürüklerken boyutu büyüt
+        if (_isHovered || _isDragging)
+        {
+            thumbW = 20;
+            trackH = 8;
+        }
+
         int trackY = (Height - trackH) / 2;
         int trackX = thumbW / 2;
         int trackW = Width - thumbW;
