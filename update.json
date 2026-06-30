@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "4.6",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe?v=4.6",
-  "Changelog": "- Kayıtlı hesap satırı büyütüldü, simgeler düzgün gösterildi, silme (x) butonu sadece üzerine gelince göründü."
+  "LatestVersion": "4.7",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe?v=4.7",
+  "Changelog": "- Güncelleme döngüsü hatası giderildi: kurulum artık tamamlanmadan uygulama kapanmıyor."
 }

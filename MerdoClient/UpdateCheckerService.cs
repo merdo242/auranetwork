@@ -8,7 +8,7 @@ namespace MerdoClient;
 public class UpdateCheckerService
 {
     // Mevcut launcher sürümü
-    public const string CurrentVersion = "4.6";
+    public const string CurrentVersion = "4.7";
 
     // Güncelleme kontrolü için doğrudan bu GitHub deposundaki update.json dosyasını kullanıyoruz (100% ücretsiz & hızlı)
     private static readonly string UpdateUrl = $"https://raw.githubusercontent.com/merdo242/merdoclient/main/update.json?t={DateTime.UtcNow.Ticks}";
@@ -156,13 +156,16 @@ public class UpdateCheckerService
 
                 await Task.Delay(800);
 
-                // Inno Setup /SILENT bayrağıyla sessizce kur, ardından yeni launcher'ı aç
-                Process.Start(new ProcessStartInfo
+                // Inno Setup /SILENT ile kur — kurulum tamamlanana kadar bekle
+                var proc = Process.Start(new ProcessStartInfo
                 {
                     FileName  = tempPath,
-                    Arguments = "/SILENT /NORESTART",
+                    Arguments = "/SILENT /NORESTART /CLOSEAPPLICATIONS",
                     UseShellExecute = true
                 });
+
+                // Kurulumun bitmesini bekle (en fazla 3 dakika)
+                proc?.WaitForExit(180_000);
 
                 // Mevcut launcher'ı kapat
                 dlgForm.Invoke(() =>
