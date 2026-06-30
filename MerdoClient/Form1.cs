@@ -126,10 +126,11 @@ public partial class Form1 : Form
         SetupPlaceholder(txtUsername, "Kullanıcı Adı");
         SetupPlaceholder(txtPassword, "Şifre", true);
 
-        // Checkbox Flat Style
-        chkRemember.FlatStyle = FlatStyle.Flat;
-        chkRemember.FlatAppearance.BorderSize = 1;
-        chkRemember.FlatAppearance.CheckedBackColor = Color.FromArgb(0, 120, 215);
+        // Setup Saved Accounts Title Custom Paint
+        lblSavedAccountsTitle.AutoSize = false;
+        lblSavedAccountsTitle.Size = new Size(200, 20);
+        lblSavedAccountsTitle.Text = "";
+        lblSavedAccountsTitle.Paint += lblSavedAccountsTitle_Paint;
 
         // Apply Hover Effects
         ApplyHoverEffect(btnLogin, Color.FromArgb(255, 220, 50), Color.Black);
@@ -402,6 +403,29 @@ public partial class Form1 : Form
         e.Graphics.FillPath(brush, path);
     }
 
+    private void lblSavedAccountsTitle_Paint(object? sender, PaintEventArgs e)
+    {
+        var lbl = (Label)sender!;
+        var g = e.Graphics;
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+        g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+
+        // Draw icon: Segoe MDL2 Assets \uE716 (People)
+        using (var iconFont = new Font("Segoe MDL2 Assets", 10F))
+        using (var iconBrush = new SolidBrush(Color.FromArgb(200, 200, 200)))
+        {
+            g.DrawString("\uE716", iconFont, iconBrush, 0, (lbl.Height - 12) / 2);
+        }
+
+        // Draw text: "Kayıtlı Hesaplar"
+        using (var textFont = new Font("Segoe UI", 9F, FontStyle.Regular))
+        using (var textBrush = new SolidBrush(Color.FromArgb(200, 200, 200)))
+        {
+            float textY = (lbl.Height - g.MeasureString("Kayıtlı Hesaplar", textFont).Height) / 2;
+            g.DrawString("Kayıtlı Hesaplar", textFont, textBrush, 20, textY);
+        }
+    }
+
     private static Image? _largeLogo;
     private void DrawLogoBadge(Graphics g, int x, int y)
     {
@@ -502,38 +526,44 @@ public partial class Form1 : Form
         {
             lblSavedAccountsPlaceholder.Visible = false;
             
-            int yOffset = 0;
-            int itemHeight = 36;
+            int yOffset = 12;
+            int itemHeight = 40;
+            int paddingX = 12;
             
             for (int i = 0; i < saved.Count; i++)
             {
                 var acc = saved[i];
                 var pnlAcc = new Panel
                 {
-                    Size = new Size(pnlSavedAccounts.Width, itemHeight),
-                    Location = new Point(0, yOffset),
-                    BackColor = Color.FromArgb(28, 28, 32),
+                    Size = new Size(pnlSavedAccounts.Width - (paddingX * 2), itemHeight),
+                    Location = new Point(paddingX, yOffset),
+                    BackColor = Color.FromArgb(13, 13, 15),
                     Cursor = Cursors.Hand
                 };
 
                 pnlAcc.Paint += (s, ev) =>
                 {
-                    ev.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                    var graphics = ev.Graphics;
+                    graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
                     var rect = new Rectangle(0, 0, pnlAcc.Width - 1, pnlAcc.Height - 1);
-                    using var path = GetRoundedRectanglePath(rect, 6);
+                    using var path = GetRoundedRectanglePath(rect, 8);
+                    
+                    // Fill background
+                    using var bgBrush = new SolidBrush(Color.FromArgb(13, 13, 15));
+                    graphics.FillPath(bgBrush, path);
+                    
+                    // Draw gold border
                     using var pen = new Pen(Color.FromArgb(255, 204, 0), 1.5f);
-                    ev.Graphics.DrawPath(pen, path);
+                    graphics.DrawPath(pen, path);
                 };
-                
-                MakeControlRounded(pnlAcc, 6);
 
                 var lblIcon = new Label
                 {
-                    Text = "👤",
-                    Font = new Font("Segoe UI", 11F),
-                    ForeColor = Color.White,
+                    Text = "\uE77B", // Segoe MDL2 Assets Person silhouette
+                    Font = new Font("Segoe MDL2 Assets", 9.5F),
+                    ForeColor = Color.FromArgb(200, 200, 200),
                     AutoSize = true,
-                    Location = new Point(10, 7),
+                    Location = new Point(14, (itemHeight - 14) / 2),
                     BackColor = Color.Transparent,
                     Cursor = Cursors.Hand
                 };
@@ -544,7 +574,7 @@ public partial class Form1 : Form
                     Font = new Font("Segoe UI", 9.5F, FontStyle.Bold),
                     ForeColor = Color.White,
                     AutoSize = true,
-                    Location = new Point(35, 9),
+                    Location = new Point(36, (itemHeight - 16) / 2),
                     BackColor = Color.Transparent,
                     Cursor = Cursors.Hand
                 };
@@ -552,29 +582,32 @@ public partial class Form1 : Form
                 var lblArrow = new Label
                 {
                     Text = "→",
-                    Font = new Font("Segoe UI", 10F),
+                    Font = new Font("Segoe UI", 10F, FontStyle.Bold),
                     ForeColor = Color.FromArgb(255, 204, 0),
                     AutoSize = true,
-                    Location = new Point(lblUser.Right + 2, 8),
+                    Location = new Point(lblUser.Right + 4, (itemHeight - 16) / 2),
                     BackColor = Color.Transparent,
                     Cursor = Cursors.Hand
                 };
 
                 var lblDelete = new Label
                 {
-                    Text = "✖",
-                    Font = new Font("Segoe UI", 9F, FontStyle.Bold),
-                    ForeColor = Color.Red,
+                    Text = "\uE711", // Segoe MDL2 Assets Close/Cancel
+                    Font = new Font("Segoe MDL2 Assets", 9.5F),
+                    ForeColor = Color.FromArgb(100, 100, 105),
                     AutoSize = true,
                     BackColor = Color.Transparent,
                     Cursor = Cursors.Hand
                 };
-                lblDelete.Location = new Point(pnlAcc.Width - 25, 10);
+                lblDelete.Location = new Point(pnlAcc.Width - 28, (itemHeight - 14) / 2);
                 
-                pnlAcc.Layout += (s, ev) => 
+                lblUser.SizeChanged += (s, ev) => 
                 {
-                    lblArrow.Left = lblUser.Right + 2;
+                    lblArrow.Left = lblUser.Right + 4;
                 };
+
+                lblDelete.MouseEnter += (s, ev) => lblDelete.ForeColor = Color.White;
+                lblDelete.MouseLeave += (s, ev) => lblDelete.ForeColor = Color.FromArgb(100, 100, 105);
 
                 lblDelete.Click += (s, ev) => 
                 {
@@ -595,10 +628,10 @@ public partial class Form1 : Form
 
                 pnlSavedAccounts.Controls.Add(pnlAcc);
                 
-                yOffset += itemHeight + 6;
+                yOffset += itemHeight + 8;
             }
             
-            int totalHeight = Math.Max(44, yOffset);
+            int totalHeight = yOffset + 4; // Top 12px + Bottom 12px total padding structure
             pnlSavedAccounts.Height = totalHeight;
             
             int shift = Math.Max(0, totalHeight - 44);
@@ -967,5 +1000,76 @@ public partial class Form1 : Form
             MerdoDialog.ShowWarning(this, message);
         else
             MerdoDialog.ShowInfo(this, message);
+    }
+}
+
+public class CustomCheckBox : CheckBox
+{
+    public CustomCheckBox()
+    {
+        SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
+        DoubleBuffered = true;
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        var g = e.Graphics;
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+        g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+
+        // Clear background with parent's backcolor or parent's card backcolor
+        using (var bgBrush = new SolidBrush(Parent?.BackColor ?? Color.FromArgb(21, 21, 24)))
+        {
+            g.FillRectangle(bgBrush, ClientRectangle);
+        }
+
+        // Draw checkbox box
+        int boxSize = 14;
+        int boxX = 2;
+        int boxY = (Height - boxSize) / 2;
+        var boxRect = new Rectangle(boxX, boxY, boxSize, boxSize);
+
+        using (var path = Form1.GetRoundedRectanglePath(boxRect, 3))
+        {
+            // Box BG
+            using (var boxBg = new SolidBrush(Color.FromArgb(13, 13, 15)))
+            {
+                g.FillPath(boxBg, path);
+            }
+            // Box Border
+            using (var borderPen = new Pen(Color.FromArgb(45, 45, 50), 1.5f))
+            {
+                g.DrawPath(borderPen, path);
+            }
+        }
+
+        // Draw checkmark if checked
+        if (Checked)
+        {
+            using (var checkPen = new Pen(Color.FromArgb(255, 204, 0), 2f))
+            {
+                // Draw a simple checkmark
+                g.DrawLine(checkPen, boxX + 3, boxY + boxSize / 2 + 1, boxX + boxSize / 2, boxY + boxSize - 3);
+                g.DrawLine(checkPen, boxX + boxSize / 2, boxY + boxSize - 3, boxX + boxSize - 3, boxY + 3);
+            }
+        }
+
+        // Draw lock icon (Segoe MDL2 Assets \uE72E)
+        int lockX = boxX + boxSize + 8;
+        int lockY = (Height - 12) / 2; // Center lock vertically
+        using (var iconFont = new Font("Segoe MDL2 Assets", 9.5F))
+        using (var iconBrush = new SolidBrush(Color.FromArgb(200, 200, 200)))
+        {
+            g.DrawString("\uE72E", iconFont, iconBrush, lockX, lockY);
+        }
+
+        // Draw Text
+        int textX = lockX + 16;
+        using (var textBrush = new SolidBrush(Color.FromArgb(200, 200, 200)))
+        {
+            // Center text vertically
+            var sz = g.MeasureString(Text, Font);
+            g.DrawString(Text, Font, textBrush, textX, (Height - sz.Height) / 2);
+        }
     }
 }
