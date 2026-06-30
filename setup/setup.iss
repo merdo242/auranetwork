@@ -25,6 +25,8 @@ Name: "startmenu"; Description: "Başlat menüsüne kısayol ekle"; GroupDescrip
 
 [Files]
 Source: "..\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\publish\Resources\logo_small.png"; DestDir: "{app}\Resources"; Flags: ignoreversion
+Source: "..\publish\Resources\news_bg.jpg"; DestDir: "{app}\Resources"; Flags: ignoreversion
 Source: "..\MerdoClient\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
