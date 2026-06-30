@@ -8,12 +8,15 @@ public class MinecraftLauncherService
 {
     private readonly SettingsService _settingsService;
 
+    // Sunucuyla uyumlu sabit sürüm
+    public const string FixedVersion = "1.21.8";
+
     public MinecraftLauncherService(SettingsService settingsService)
     {
         _settingsService = settingsService;
     }
 
-    /// <summary>Minecraft'ı başlatır. Arka planda (Task.Run) çağrılmalıdır.</summary>
+    /// <summary>Minecraft'ı başlatır. Arka planda (Task.Run içinde) çağrılmalıdır.</summary>
     public LauncherResult StartMinecraft(string username)
     {
         if (string.IsNullOrWhiteSpace(username))
@@ -25,35 +28,10 @@ public class MinecraftLauncherService
             var launcher = new MinecraftLauncher(path);
             var settings = _settingsService.Settings;
 
-            // --- Sürüm seç ---
-            string launchVersion;
-            if (!string.IsNullOrEmpty(settings.SelectedVersion))
-            {
-                launchVersion = settings.SelectedVersion;
-            }
-            else
-            {
-                // Yerel sürümleri listele (senkron)
-                var allVersions = launcher.GetAllVersionsAsync()
-                                          .AsTask()
-                                          .ConfigureAwait(false)
-                                          .GetAwaiter()
-                                          .GetResult()
-                                          .ToList();
+            // --- Sabit sürüm 1.21.8 ---
+            string launchVersion = FixedVersion;
 
-                if (allVersions.Count == 0)
-                    return new LauncherResult(false,
-                        "Bilgisayarınızda yüklü bir Minecraft sürümü bulunamadı.\n" +
-                        ".minecraft/versions klasöründe kurulu bir sürüm olduğundan emin olun.");
-
-                // OptiFine > Fabric > ilk sürüm
-                launchVersion =
-                    allVersions.FirstOrDefault(v => v.Name.Contains("OptiFine", StringComparison.OrdinalIgnoreCase))?.Name
-                    ?? allVersions.FirstOrDefault(v => v.Name.Contains("Fabric", StringComparison.OrdinalIgnoreCase))?.Name
-                    ?? allVersions[0].Name;
-            }
-
-            // --- Java yolu ---
+            // --- Java yolunu bul ---
             string javaPath = !string.IsNullOrEmpty(settings.JavaPath) && File.Exists(settings.JavaPath)
                 ? settings.JavaPath
                 : FindSystemJavaPath();
@@ -61,11 +39,11 @@ public class MinecraftLauncherService
             if (string.IsNullOrEmpty(javaPath))
                 return new LauncherResult(false,
                     "Java bulunamadı!\n\n" +
-                    "Ayarlar menüsünden Java yolunu manuel olarak seçin.\n" +
-                    "Genellikle şu konumdadır:\n" +
+                    "Ayarlar menüsünden Java yolunu manuel olarak seçin.\n\n" +
+                    "Tipik konum:\n" +
                     @"%AppData%\.minecraft\runtime\java-runtime-delta\windows\java-runtime-delta\bin\javaw.exe");
 
-            // --- Oturum ve başlatma seçenekleri ---
+            // --- Session ve başlatma seçenekleri ---
             var session = new MSession(username, "offline_token", Guid.NewGuid().ToString("N"));
             var launchOptions = new MLaunchOption
             {
@@ -74,20 +52,19 @@ public class MinecraftLauncherService
                 JavaPath     = javaPath
             };
 
-            // Process'i oluştur (senkron çağrı — Task.Run içinde güvenli)
+            // Process'i oluştur (Task.Run içinde çalıştığından deadlock yok)
             var process = launcher.BuildProcessAsync(launchVersion, launchOptions, default)
                                   .AsTask()
                                   .ConfigureAwait(false)
                                   .GetAwaiter()
                                   .GetResult();
 
-            // Konsol göster / gizle
-            process.StartInfo.CreateNoWindow  = !settings.ShowConsole;
             process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow  = !settings.ShowConsole;
 
             bool started = process.Start();
             if (!started)
-                return new LauncherResult(false, "Minecraft prosesi başlatılamadı (process.Start() false döndürdü).");
+                return new LauncherResult(false, "Minecraft prosesi başlatılamadı.");
 
             return new LauncherResult(true, $"Minecraft {launchVersion} başarıyla başlatıldı!");
         }
@@ -95,14 +72,12 @@ public class MinecraftLauncherService
         {
             return new LauncherResult(false,
                 $"Minecraft başlatılamadı:\n{ex.Message}\n\n" +
-                "İpuçları:\n" +
-                "• Ayarlar'dan doğru Java yolunu seçin\n" +
-                "• Ayarlar'dan oynatmak istediğiniz sürümü seçin\n" +
-                "• Minecraft Launcher ile en az bir kez oynamış olduğunuzdan emin olun");
+                "• Minecraft Launcher ile en az bir kez oynamış olduğunuzdan emin olun\n" +
+                "• Ayarlar'dan Java yolunu manuel seçin");
         }
     }
 
-    /// <summary>Sistemde kurulu javaw.exe'yi arar. SettingsForm'dan da çağrılır.</summary>
+    /// <summary>Sistemde kurulu javaw.exe'yi arar.</summary>
     public static string FindSystemJavaPath()
     {
         // 1) JAVA_HOME
@@ -124,8 +99,9 @@ public class MinecraftLauncherService
             }
         }
 
-        // 3) Minecraft runtime (Türkçe 'ı' içeren 'wındows' klasörü dahil)
-        string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        // 3) Minecraft'ın kendi runtime dizini — ÖNCE ARANIR
+        //    (Türkçe 'ı' içeren 'wındows' klasörü dahil EnumerateFiles ile bulunur)
+        string appData   = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         string mcRuntime = Path.Combine(appData, ".minecraft", "runtime");
         if (Directory.Exists(mcRuntime))
         {
@@ -137,11 +113,11 @@ public class MinecraftLauncherService
             catch { }
         }
 
-        // 4) Bilinen kurulum dizinleri
+        // 4) Bilinen Java kurulum dizinleri
         string pf   = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
         string pf86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
 
-        string[] roots =
+        foreach (var root in new[]
         {
             Path.Combine(pf,   "Eclipse Adoptium"),
             Path.Combine(pf,   "Java"),
@@ -150,9 +126,7 @@ public class MinecraftLauncherService
             Path.Combine(pf,   "Zulu"),
             Path.Combine(pf86, "Java"),
             Path.Combine(pf86, "Eclipse Adoptium"),
-        };
-
-        foreach (var root in roots)
+        })
         {
             if (!Directory.Exists(root)) continue;
             try

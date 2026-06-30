@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "2.2",
+  "LatestVersion": "2.3",
   "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe",
-  "Changelog": "- Minecraft başlatma sorunu düzeltildi (oyun artık açılıyor).\n- Java otomatik algılama iyileştirildi.\n- Güncelleme bildirimi düzeltildi."
+  "Changelog": "- Minecraft başlatma sorunu kesin olarak düzeltildi (sabit 1.21.8 sürümü).\n- Launcher'a kısık sesli arkaplan müziği eklendi.\n- Java otomatik algılama iyileştirildi."
 }

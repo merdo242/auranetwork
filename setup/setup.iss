@@ -1,6 +1,6 @@
 [Setup]
 AppName=Merdo Launcher
-AppVersion=2.0
+AppVersion=2.3
 AppPublisher=MerdoNetwork
 AppPublisherURL=https://merdonetwork.com
 DefaultDirName={autopf}\Merdo Launcher
@@ -25,6 +25,7 @@ Name: "startmenu"; Description: "Başlat menüsüne kısayol ekle"; GroupDescrip
 
 [Files]
 Source: "..\publish\MerdoLauncher.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\publish\Resources\bg_music.mp3"; DestDir: "{app}\Resources"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\Merdo Launcher"; Filename: "{app}\MerdoLauncher.exe"

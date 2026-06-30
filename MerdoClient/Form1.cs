@@ -13,6 +13,8 @@ public partial class Form1 : Form
     private readonly System.Windows.Forms.Timer _transitionTimer = new();
     private readonly System.Windows.Forms.Timer _launchTimer = new();
     private readonly System.Windows.Forms.Timer _onlineCheckTimer = new();
+
+    private dynamic? _musicPlayer; // Windows Media Player COM
     
     private string _currentUser = string.Empty;
     private double _transitionProgress;
@@ -149,7 +151,10 @@ public partial class Form1 : Form
     protected override void OnLoad(EventArgs e)
     {
         base.OnLoad(e);
-        
+
+        // Arkaplan müziğini başlat
+        StartBackgroundMusic();
+
         // Check for updates asynchronously
         UpdateCheckerService.CheckForUpdates(this);
         
@@ -170,6 +175,34 @@ public partial class Form1 : Form
         MakeControlRounded(btnWebsite, 6);
         MakeControlRounded(btnDiscordLink, 6);
         MakeControlRounded(btnExit, 6);
+    }
+
+    private void StartBackgroundMusic()
+    {
+        try
+        {
+            string musicFile = Path.Combine(
+                Path.GetDirectoryName(Application.ExecutablePath) ?? AppDomain.CurrentDomain.BaseDirectory,
+                "Resources", "bg_music.mp3");
+
+            if (!File.Exists(musicFile)) return;
+
+            // Windows Media Player COM nesnesi — hiç ek paket gerektirmez
+            var type = Type.GetTypeFromProgID("WMPlayer.OCX");
+            if (type == null) return;
+
+            _musicPlayer = Activator.CreateInstance(type);
+            _musicPlayer.settings.volume   = 25;        // %25 kısık ses
+            _musicPlayer.settings.setMode("loop", true); // döngü
+            _musicPlayer.URL = musicFile;
+        }
+        catch { /* WMP yüklü değilse sessizce geç */ }
+    }
+
+    protected override void OnFormClosed(FormClosedEventArgs e)
+    {
+        try { _musicPlayer?.controls.stop(); } catch { }
+        base.OnFormClosed(e);
     }
 
     private void MakeControlRounded(Control control, int radius)
