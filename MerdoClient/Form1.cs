@@ -552,8 +552,8 @@ public partial class Form1 : Form
                     using var bgBrush = new SolidBrush(Color.FromArgb(13, 13, 15));
                     graphics.FillPath(bgBrush, path);
                     
-                    // Draw gold border
-                    using var pen = new Pen(Color.FromArgb(255, 204, 0), 1.5f);
+                    // Draw dark border to match exactly
+                    using var pen = new Pen(Color.FromArgb(30, 30, 35), 1.0f);
                     graphics.DrawPath(pen, path);
                 };
 
@@ -594,7 +594,7 @@ public partial class Form1 : Form
                 {
                     Text = "\uE711", // Segoe MDL2 Assets Close/Cancel
                     Font = new Font("Segoe MDL2 Assets", 9.5F),
-                    ForeColor = Color.FromArgb(100, 100, 105),
+                    ForeColor = Color.Transparent, // Hidden until hovered, matching image exactly
                     AutoSize = true,
                     BackColor = Color.Transparent,
                     Cursor = Cursors.Hand
@@ -607,7 +607,7 @@ public partial class Form1 : Form
                 };
 
                 lblDelete.MouseEnter += (s, ev) => lblDelete.ForeColor = Color.White;
-                lblDelete.MouseLeave += (s, ev) => lblDelete.ForeColor = Color.FromArgb(100, 100, 105);
+                lblDelete.MouseLeave += (s, ev) => lblDelete.ForeColor = Color.Transparent;
 
                 lblDelete.Click += (s, ev) => 
                 {
@@ -801,7 +801,7 @@ public partial class Form1 : Form
         SetupPlaceholder(txtUsername, "Kullanıcı Adı");
         SetupPlaceholder(txtPassword, "Şifre", true);
         
-        Text = "Chicken Launcher - Giriş Yap";
+        Text = "Merdo Launcher - Giriş Yap";
         pnlHome.Visible = false;
         pnlLogin.Visible = true;
         
@@ -1031,22 +1031,33 @@ public class CustomCheckBox : CheckBox
 
         using (var path = Form1.GetRoundedRectanglePath(boxRect, 3))
         {
-            // Box BG
-            using (var boxBg = new SolidBrush(Color.FromArgb(13, 13, 15)))
+            if (Checked)
             {
-                g.FillPath(boxBg, path);
+                // Windows Blue Box
+                using (var boxBg = new SolidBrush(Color.FromArgb(0, 120, 215)))
+                {
+                    g.FillPath(boxBg, path);
+                }
             }
-            // Box Border
-            using (var borderPen = new Pen(Color.FromArgb(45, 45, 50), 1.5f))
+            else
             {
-                g.DrawPath(borderPen, path);
+                // Dark Unchecked Box
+                using (var boxBg = new SolidBrush(Color.FromArgb(13, 13, 15)))
+                {
+                    g.FillPath(boxBg, path);
+                }
+                // Box Border
+                using (var borderPen = new Pen(Color.FromArgb(45, 45, 50), 1.5f))
+                {
+                    g.DrawPath(borderPen, path);
+                }
             }
         }
 
         // Draw checkmark if checked
         if (Checked)
         {
-            using (var checkPen = new Pen(Color.FromArgb(255, 204, 0), 2f))
+            using (var checkPen = new Pen(Color.White, 2f))
             {
                 // Draw a simple checkmark
                 g.DrawLine(checkPen, boxX + 3, boxY + boxSize / 2 + 1, boxX + boxSize / 2, boxY + boxSize - 3);
@@ -1054,17 +1065,8 @@ public class CustomCheckBox : CheckBox
             }
         }
 
-        // Draw lock icon (Segoe MDL2 Assets \uE72E)
-        int lockX = boxX + boxSize + 8;
-        int lockY = (Height - 12) / 2; // Center lock vertically
-        using (var iconFont = new Font("Segoe MDL2 Assets", 9.5F))
-        using (var iconBrush = new SolidBrush(Color.FromArgb(200, 200, 200)))
-        {
-            g.DrawString("\uE72E", iconFont, iconBrush, lockX, lockY);
-        }
-
-        // Draw Text
-        int textX = lockX + 16;
+        // Draw Text (No lock icon to match image exactly)
+        int textX = boxX + boxSize + 6;
         using (var textBrush = new SolidBrush(Color.FromArgb(200, 200, 200)))
         {
             // Center text vertically

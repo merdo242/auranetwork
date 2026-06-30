@@ -22,7 +22,9 @@ public class UpdateCheckerService
                 using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(8) };
                 client.DefaultRequestHeaders.UserAgent.ParseAdd("MerdoLauncher/2.0");
 
-                var response = await client.GetStringAsync(UpdateUrl);
+                // Cache buster ekleyerek GitHub CDN önbelleğini bypass ediyoruz
+                string requestUrl = UpdateUrl + "?t=" + DateTime.UtcNow.Ticks;
+                var response = await client.GetStringAsync(requestUrl);
                 var data = JsonSerializer.Deserialize<UpdateResponse>(response,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 

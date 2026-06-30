@@ -17,7 +17,7 @@ static class Program
         if (!IsInternetAvailable())
         {
             MessageBox.Show(
-                "Chicken Launcher'a erişmek için internet bağlantısı gereklidir.\n\nLütfen bağlantınızı kontrol edip tekrar deneyin.",
+                "Merdo Launcher'a erişmek için internet bağlantısı gereklidir.\n\nLütfen bağlantınızı kontrol edip tekrar deneyin.",
                 "Bağlantı Yok",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
