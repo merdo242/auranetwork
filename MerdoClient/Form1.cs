@@ -727,21 +727,10 @@ public partial class Form1 : Form
             client.Timeout = System.TimeSpan.FromSeconds(5);
             client.DefaultRequestHeaders.UserAgent.ParseAdd("MerdoLauncher/2.0");
 
-            // 1. Instant override for known staff to avoid API delays
-            string? instantRole = null;
-            var lowerUser = username.ToLower();
-            if (lowerUser == "merdo" || lowerUser == "merdo242")
-                instantRole = "KURUCU";
-
-            if (instantRole != null)
+            // 1. Fetch Rank from 8080 API
+            try
             {
-                UpdateRoleBadge(instantRole);
-            }
-            else
-            {
-                try
-                {
-                    var response = await client.GetStringAsync($"http://91.132.49.16:24454/check?username={System.Uri.EscapeDataString(username)}");
+                    var response = await client.GetStringAsync($"http://91.132.49.16:8080/check?username={System.Uri.EscapeDataString(username)}");
                     using var doc = System.Text.Json.JsonDocument.Parse(response);
                     if (doc.RootElement.TryGetProperty("role", out var roleProp))
                     {
@@ -753,7 +742,6 @@ public partial class Form1 : Form
                     }
                 }
                 catch { }
-            }
 
             // 2. Fetch Avatar
             try
