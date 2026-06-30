@@ -152,34 +152,33 @@ public class SplashForm : Form
             g.FillEllipse(brush, p.X - p.Size / 2, p.Y - p.Size / 2, p.Size, p.Size);
         }
 
-        // --- Logo çizimi ---
-        DrawLogo(g, 10, 52);
+        // --- Logo + Başlık ---
+        DrawLogo(g, 16, 30);
 
-        // --- Başlık ---
+        // "MERDO" bold yazısı
         using (var titleFont = new Font("Segoe UI", 22F, FontStyle.Bold))
         using (var titleBrush = new SolidBrush(Color.White))
-            g.DrawString("MERDO", titleFont, titleBrush, 100, 50);
+            g.DrawString("MERDO", titleFont, titleBrush, 112, 30);
 
         // LAUNCHER badge
-        Rectangle badge = new Rectangle(220, 57, 90, 22);
+        Rectangle badge = new Rectangle(232, 38, 90, 22);
         using (var badgePath = RoundedRect(badge, 5))
         using (var yellowBrush = new SolidBrush(Color.FromArgb(255, 204, 0)))
-        {
             g.FillPath(yellowBrush, badgePath);
-        }
+
         using (var bFont = new Font("Segoe UI", 8F, FontStyle.Bold))
         using (var bBrush = new SolidBrush(Color.Black))
         {
             var sz = g.MeasureString("LAUNCHER", bFont);
             g.DrawString("LAUNCHER", bFont, bBrush,
-                badge.X + (badge.Width - sz.Width) / 2,
+                badge.X + (badge.Width  - sz.Width)  / 2,
                 badge.Y + (badge.Height - sz.Height) / 2);
         }
 
         // --- Altyazı ---
-        using (var subFont = new Font("Segoe UI", 9F, FontStyle.Regular))
+        using (var subFont  = new Font("Segoe UI", 9F, FontStyle.Regular))
         using (var subBrush = new SolidBrush(Color.FromArgb(100, 100, 110)))
-            g.DrawString("Minecraft Launcher v2.0", subFont, subBrush, 100, 80);
+            g.DrawString("Minecraft Launcher v2.0", subFont, subBrush, 114, 62);
 
         // --- Divider ---
         using (var divPen = new Pen(Color.FromArgb(30, 30, 35), 1))
@@ -271,8 +270,11 @@ public class SplashForm : Form
         }
         if (_largeLogo != null)
         {
-            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-            g.DrawImage(_largeLogo, x - 20, y - 20, 100, 100);
+            g.InterpolationMode  = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+            g.CompositingMode    = System.Drawing.Drawing2D.CompositingMode.SourceOver;
+            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+            // Draw directly at x,y – no negative offset
+            g.DrawImage(_largeLogo, x, y, 90, 90);
         }
     }
 }
