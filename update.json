@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "3.1",
+  "LatestVersion": "3.2",
   "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe",
-  "Changelog": "- Yeni M logosu eklendi (balkabağı temalı, şeffaf PNG).\n- Özel koyu uyarı pencereleri (MerdoDialog) eklendi.\n- Launcher boyutu 1200x700 olarak güncellendi.\n- Header tasarımı yenilendi: küçük logo + MERDO + LAUNCHER badge.\n- Splash ekranı logo hizalama düzeltildi.\n- Uygulama ikonu güncellendi."
+  "Changelog": "- Form başlığındaki (title bar) ikon yeni M logosu ile değiştirildi.\n- Splash ekranı başlık tasarımı ana sayfayla aynı olacak şekilde güncellendi.\n- Oyuncu yetkilerine (Kurucu, Admin, Mod, VIP vs.) göre dinamik renkli rozet sistemi eklendi."
 }
