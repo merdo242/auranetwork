@@ -207,8 +207,29 @@ public partial class Form1 : Form
         // Arkaplan müziğini başlat
         StartBackgroundMusic();
 
-        // Check for updates asynchronously
-        UpdateCheckerService.CheckForUpdates(this);
+        // Check for updates asynchronously and update news slide if data arrives
+        UpdateCheckerService.CheckForUpdates(this, updateInfo =>
+        {
+            if (updateInfo != null && !string.IsNullOrEmpty(updateInfo.Changelog))
+            {
+                for (int i = 0; i < _newsSlides.Length; i++)
+                {
+                    if (_newsSlides[i].Title == "GÜNCELLEME")
+                    {
+                        _newsSlides[i].Subtitle = $"YENİ SÜRÜM (v{updateInfo.LatestVersion})";
+                        _newsSlides[i].Text = updateInfo.Changelog;
+                    }
+                }
+                
+                Invoke(() =>
+                {
+                    if (_newsSlides[_currentSlideIndex].Title == "GÜNCELLEME")
+                    {
+                        pnlLeftNewsCard.Invalidate();
+                    }
+                });
+            }
+        });
         
         // Rounding only buttons and shapes (panels render smoothly through Paint events)
         MakeControlRounded(btnLogin, 8);

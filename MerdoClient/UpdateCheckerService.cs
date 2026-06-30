@@ -13,7 +13,7 @@ public class UpdateCheckerService
     // Güncelleme kontrolü için doğrudan bu GitHub deposundaki update.json dosyasını kullanıyoruz (100% ücretsiz & hızlı)
     private static readonly string UpdateUrl = $"https://raw.githubusercontent.com/merdo242/merdoclient/main/update.json?t={DateTime.UtcNow.Ticks}";
 
-    public static void CheckForUpdates(Form parentForm)
+    public static void CheckForUpdates(Form parentForm, Action<UpdateResponse>? onFetchCompleted = null)
     {
         Task.Run(async () =>
         {
@@ -26,10 +26,14 @@ public class UpdateCheckerService
                 var data = JsonSerializer.Deserialize<UpdateResponse>(response,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                if (data == null || !IsNewerVersion(data.LatestVersion, CurrentVersion))
-                    return;
-
-                parentForm.Invoke(() => ShowUpdateDialog(parentForm, data));
+                if (data != null)
+                {
+                    onFetchCompleted?.Invoke(data);
+                    if (IsNewerVersion(data.LatestVersion, CurrentVersion))
+                    {
+                        parentForm.Invoke(() => ShowUpdateDialog(parentForm, data));
+                    }
+                }
             }
             catch
             {
