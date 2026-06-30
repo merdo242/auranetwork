@@ -61,6 +61,7 @@ public partial class Form1 : Form
         MaximizeBox = false;
         DoubleBuffered = true;
         BackColor = Color.FromArgb(8, 8, 10);
+        StartPosition = FormStartPosition.CenterScreen;
         
         // Setup Panels
         pnlHome.Visible = false;
@@ -232,7 +233,7 @@ public partial class Form1 : Form
 
     private void Panel_Paint(object? sender, PaintEventArgs e)
     {
-        DrawLogoBadge(e.Graphics, 50, 60);
+        DrawLogoBadge(e.Graphics, 5, 5);
     }
 
     private void CardPanel_Paint(object? sender, PaintEventArgs e)
@@ -379,7 +380,9 @@ public partial class Form1 : Form
         if (_largeLogo != null)
         {
             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-            g.DrawImage(_largeLogo, x - 20, y - 20, 180, 180);
+            g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
+            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+            g.DrawImage(_largeLogo, x, y, 140, 140);
         }
     }
 
