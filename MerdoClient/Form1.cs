@@ -91,6 +91,11 @@ public partial class Form1 : Form
 
         // Custom Paint for cards and inputs to have anti-aliased rounded corners
         pnlLeftNewsCard.Paint += CardPanel_Paint;
+        pnlLeftNewsCard.Paint += PnlLeftNewsCard_Paint;
+        lblNewsTitle.Visible = false;
+        lblNewsSubtitle.Visible = false;
+        lblNewsText.Visible = false;
+
         pnlRightLoginCard.Paint += CardPanel_Paint;
         pnlHomeLeftCard.Paint += CardPanel_Paint;
         pnlHomeRightCard.Paint += CardPanel_Paint;
@@ -126,7 +131,7 @@ public partial class Form1 : Form
         _launchTimer.Tick += LaunchTimer_Tick;
 
         // News Timers
-        _newsAutoTimer.Interval = 10000;
+        _newsAutoTimer.Interval = 5000;
         _newsAutoTimer.Tick += (s, e) => 
         {
             _currentSlideIndex = (_currentSlideIndex + 1) % _newsSlides.Length;
@@ -560,13 +565,8 @@ public partial class Form1 : Form
 
     private void UpdateNewsSlide()
     {
-        var slide = _newsSlides[_currentSlideIndex];
-        lblNewsTitle.Text = slide.Title;
-        lblNewsSubtitle.Text = slide.Subtitle;
-        lblNewsText.Text = slide.Text;
-        
         _newsAutoTimer.Stop();
-        if (pnlHome.Visible) _newsAutoTimer.Start();
+        if (pnlHome.Visible || pnlLogin.Visible) _newsAutoTimer.Start();
         
         _newsAnimProgress = 0;
         _newsAnimTimer.Start();
@@ -574,34 +574,45 @@ public partial class Form1 : Form
 
     private void NewsAnimTimer_Tick(object? sender, EventArgs e)
     {
-        _newsAnimProgress += 0.08;
+        _newsAnimProgress += 0.05;
         if (_newsAnimProgress >= 1)
         {
             _newsAnimProgress = 1;
             _newsAnimTimer.Stop();
         }
-
-        double ease = Math.Sin(_newsAnimProgress * Math.PI / 2); // 0 to 1
-        
-        int offsetY = (int)(20 * (1 - ease));
-        
-        lblNewsTitle.Location = new Point(30, 30 + offsetY);
-        lblNewsSubtitle.Location = new Point(30, 85 + offsetY);
-        lblNewsText.Location = new Point(30, 120 + offsetY);
-
-        int rBg = 25, gBg = 25, bBg = 30; // panel bg color approx
-        
-        lblNewsTitle.ForeColor = InterpolateColor(Color.FromArgb(rBg, gBg, bBg), Color.FromArgb(255, 204, 0), ease);
-        lblNewsSubtitle.ForeColor = InterpolateColor(Color.FromArgb(rBg, gBg, bBg), Color.White, ease);
-        lblNewsText.ForeColor = InterpolateColor(Color.FromArgb(rBg, gBg, bBg), Color.FromArgb(170, 170, 180), ease);
+        pnlLeftNewsCard.Invalidate();
     }
     
-    private Color InterpolateColor(Color c1, Color c2, double ratio)
+    private void PnlLeftNewsCard_Paint(object? sender, PaintEventArgs e)
     {
-        int r = c1.R + (int)((c2.R - c1.R) * ratio);
-        int g = c1.G + (int)((c2.G - c1.G) * ratio);
-        int b = c1.B + (int)((c2.B - c1.B) * ratio);
-        return Color.FromArgb(r, g, b);
+        var slide = _newsSlides[_currentSlideIndex];
+        
+        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+        
+        double ease = Math.Sin(_newsAnimProgress * Math.PI / 2); // 0 to 1
+        int alpha = (int)(255 * ease);
+        if (alpha < 0) alpha = 0;
+        if (alpha > 255) alpha = 255;
+        
+        float scale = 0.85f + (0.15f * (float)ease);
+        
+        // Scale around center
+        e.Graphics.TranslateTransform(250, 150);
+        e.Graphics.ScaleTransform(scale, scale);
+        e.Graphics.TranslateTransform(-250, -150);
+        
+        using var titleBrush = new SolidBrush(Color.FromArgb(alpha, 255, 204, 0));
+        using var subBrush = new SolidBrush(Color.FromArgb(alpha, 255, 255, 255));
+        using var textBrush = new SolidBrush(Color.FromArgb(alpha, 170, 170, 180));
+        
+        e.Graphics.DrawString(slide.Title, lblNewsTitle.Font, titleBrush, new PointF(30, 30));
+        e.Graphics.DrawString(slide.Subtitle, lblNewsSubtitle.Font, subBrush, new PointF(30, 85));
+        
+        var textRect = new RectangleF(30, 120, 490, 180);
+        e.Graphics.DrawString(slide.Text, lblNewsText.Font, textBrush, textRect);
+        
+        e.Graphics.ResetTransform();
     }
 
     private void UpdateSavedAccountsUI()

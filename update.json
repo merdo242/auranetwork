@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "5.4",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v54.exe",
-  "Changelog": "- Ayarlar menüsündeki arka plan transparanlık hatası düzeltildi, kaydırma çubukları çok daha şık hale getirildi.\n- Turnuvalar (Haberler) kısmı artık 10 saniyede bir otomatik geçiş yapıyor ve arkadan geliyormuş gibi bir animasyona sahip."
+  "LatestVersion": "5.5",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v55.exe",
+  "Changelog": "- Turnuvalar (Haberler) kısmı tamamen yenilendi: Artık daha pürüzsüz donanım hızlandırmalı geçiş (yakınlaşarak belirme) efektine sahip ve otomatik süre 5 saniyeye düşürüldü."
 }
