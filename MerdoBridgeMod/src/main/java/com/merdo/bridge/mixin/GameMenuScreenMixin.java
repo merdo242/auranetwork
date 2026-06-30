@@ -20,6 +20,6 @@ public class GameMenuScreenMixin extends Screen {
     private void addChickenSettingsButton(CallbackInfo ci) {
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Chicken Client Ayarlari"), button -> {
             this.client.setScreen(new ChickenSettingsScreen(this));
-        }).dimensions(this.width / 2 - 102, this.height / 4 + 72 - 16, 204, 20).build());
+        }).dimensions(10, 10, 150, 20).build());
     }
 }

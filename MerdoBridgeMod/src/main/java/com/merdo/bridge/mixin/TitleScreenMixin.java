@@ -18,9 +18,8 @@ public class TitleScreenMixin extends Screen {
 
     @Inject(method = "init", at = @At("RETURN"))
     private void addChickenSettingsButton(CallbackInfo ci) {
-        int y = this.height / 4 + 48;
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Chicken Client Ayarlari"), button -> {
             this.client.setScreen(new ChickenSettingsScreen(this));
-        }).dimensions(this.width / 2 - 100, y + 72 + 24, 200, 20).build());
+        }).dimensions(10, 10, 150, 20).build());
     }
 }
