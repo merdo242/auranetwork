@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "6.0",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v60.exe",
-  "Changelog": "- Simple Voice Chat sürümü tam stabilize edildi (1.21.1-2.6.20)."
+  "LatestVersion": "6.1",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v61.exe",
+  "Changelog": "- Ayarlar menüsüne çok daha premium bir hissiyat katıldı (hover, renk geçişleri, animasyonlar)."
 }

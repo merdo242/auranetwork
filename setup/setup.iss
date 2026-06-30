@@ -1,6 +1,6 @@
 [Setup]
 AppName=Merdo Launcher
-AppVersion=6.0
+AppVersion=6.1
 AppPublisher=MerdoNetwork
 AppPublisherURL=https://merdonetwork.com
 DefaultDirName={autopf}\Merdo Launcher
