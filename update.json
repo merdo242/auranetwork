@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "5.8",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v58.exe",
-  "Changelog": "- Otomatik olarak indirilen Simple Voice Chat sürümü (1.21.1) düzeltildi."
+  "LatestVersion": "5.9",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v59.exe",
+  "Changelog": "- Otomatik olarak indirilen Simple Voice Chat sürümü sunucuyla tam uyumlu (2.6.x) hale getirildi."
 }

@@ -65,7 +65,7 @@ public class MinecraftLauncherService
             string modsDir = Path.Combine(path.BasePath, "mods");
             if (!Directory.Exists(modsDir)) Directory.CreateDirectory(modsDir);
 
-            string voiceChatName = "voicechat-fabric-1.21.1-2.5.36.jar";
+            string voiceChatName = "voicechat-fabric-1.21.1-2.6.19.jar";
             string voiceChatPath = Path.Combine(modsDir, voiceChatName);
             if (!File.Exists(voiceChatPath))
             {
@@ -80,7 +80,7 @@ public class MinecraftLauncherService
                 try
                 {
                     using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(2) };
-                    var voiceBytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/9eGKb6K1/versions/kr2JlY4d/voicechat-fabric-1.21.1-2.5.36.jar").GetAwaiter().GetResult();
+                    var voiceBytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/9eGKb6K1/versions/3W4o9QxV/voicechat-fabric-1.21.1-2.6.19.jar").GetAwaiter().GetResult();
                     File.WriteAllBytes(voiceChatPath, voiceBytes);
                 }
                 catch
