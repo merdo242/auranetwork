@@ -183,8 +183,9 @@ public partial class Form1 : Form
         MakeControlRounded(btnPlay, 8);
         MakeControlRounded(btnWebsiteLink, 17); // Pill shape (height is 34)
         
-        MakeControlRounded(btnNewsPrev, 6);
-        MakeControlRounded(btnNewsNext, 6);
+        // Önceki / Sonraki butonları — custom paint ile şık ok butonu
+        AttachNavButtonPaint(btnNewsPrev, "◀");
+        AttachNavButtonPaint(btnNewsNext, "▶");
         
         MakeControlRounded(btnShop, 18); // Circle (36x36)
         MakeControlRounded(btnWeb, 18);
@@ -195,6 +196,48 @@ public partial class Form1 : Form
         MakeControlRounded(btnWebsite, 6);
         MakeControlRounded(btnDiscordLink, 6);
         MakeControlRounded(btnExit, 6);
+    }
+
+    // Önceki/Sonraki butonlarına şık custom paint uygular
+    private void AttachNavButtonPaint(Button btn, string arrow)
+    {
+        btn.Text = "";
+        btn.FlatAppearance.BorderSize = 0;
+        btn.FlatStyle = FlatStyle.Flat;
+        btn.BackColor = Color.Transparent;
+
+        bool hovered = false;
+        btn.MouseEnter += (s, e) => { hovered = true;  btn.Invalidate(); };
+        btn.MouseLeave += (s, e) => { hovered = false; btn.Invalidate(); };
+
+        btn.Paint += (s, e) =>
+        {
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            var r = new Rectangle(1, 1, btn.Width - 3, btn.Height - 3);
+
+            // Arka plan: hover'da sarı dolu, normal şeffaf kenarlıklı
+            using var path = GetRoundedRectanglePath(r, 8);
+            if (hovered)
+            {
+                using var fillBrush = new SolidBrush(Color.FromArgb(255, 204, 0));
+                e.Graphics.FillPath(fillBrush, path);
+            }
+            else
+            {
+                using var fillBrush = new SolidBrush(Color.FromArgb(20, 255, 204, 0));
+                e.Graphics.FillPath(fillBrush, path);
+                using var borderPen = new Pen(Color.FromArgb(255, 204, 0), 1.5f);
+                e.Graphics.DrawPath(borderPen, path);
+            }
+
+            // Ok işareti
+            var arrowColor = hovered ? Color.Black : Color.FromArgb(255, 204, 0);
+            using var sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
+            using var arrowFont = new Font("Segoe UI", 11F, FontStyle.Bold);
+            using var arrowBrush = new SolidBrush(arrowColor);
+            e.Graphics.DrawString(arrow, arrowFont, arrowBrush,
+                new RectangleF(0, 0, btn.Width, btn.Height), sf);
+        };
     }
 
 
@@ -505,8 +548,8 @@ public partial class Form1 : Form
             pnlSavedAccounts.Controls.Add(lblSavedAccountsPlaceholder);
             lblSavedAccountsPlaceholder.Visible = true;
             pnlSavedAccounts.Height = 50;
-            lblForgotPassword.Top = 420;
-            lblRegister.Top = 445;
+            lblForgotPassword.Top = 445;
+            lblRegister.Top = 470;
         }
         else
         {
@@ -631,8 +674,8 @@ public partial class Form1 : Form
             pnlSavedAccounts.Height = totalHeight;
             
             int shift = Math.Max(0, totalHeight - 50);
-            lblForgotPassword.Top = 420 + shift;
-            lblRegister.Top = 445 + shift;
+            lblForgotPassword.Top = 445 + shift;
+            lblRegister.Top = 470 + shift;
         }
     }
 

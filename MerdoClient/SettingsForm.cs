@@ -8,9 +8,8 @@ namespace MerdoClient;
 public class SettingsForm : Form
 {
     private readonly SettingsService _settings;
-    private readonly Action<int>?    _onVolumeChanged; // Form1'deki müzik sesini anlık değiştirir
+    private readonly Action<int>?    _onVolumeChanged;
 
-    // Controls
     private TrackBar trkRam        = new();
     private Label    lblRamValue   = new();
     private TrackBar trkVolume     = new();
@@ -24,272 +23,377 @@ public class SettingsForm : Form
     private Button   btnCancel     = new();
     private Label    lblJavaStatus = new();
 
+    private const int ACCENT     = unchecked((int)0xFFFFCC00); // sarı
+    private const int BG         = unchecked((int)0xFF0C0C0F);
+    private const int CARD_BG    = unchecked((int)0xFF151518);
+    private const int BORDER_CLR = unchecked((int)0xFF252530);
+
     public SettingsForm(SettingsService settings, Action<int>? onVolumeChanged = null)
     {
-        _settings         = settings;
-        _onVolumeChanged  = onVolumeChanged;
+        _settings        = settings;
+        _onVolumeChanged = onVolumeChanged;
         BuildUI();
         LoadValues();
+    }
+
+    // ─── Rounded rectangle helper ───────────────────────────────────────
+    private static GraphicsPath RoundedRect(Rectangle r, int rad)
+    {
+        var p = new GraphicsPath();
+        int d = rad * 2;
+        p.AddArc(r.X,              r.Y,              d, d, 180, 90);
+        p.AddArc(r.Right - d,      r.Y,              d, d, 270, 90);
+        p.AddArc(r.Right - d,      r.Bottom - d,     d, d,   0, 90);
+        p.AddArc(r.X,              r.Bottom - d,     d, d,  90, 90);
+        p.CloseFigure();
+        return p;
+    }
+
+    // ─── Card panel helper ───────────────────────────────────────────────
+    private Panel Card(int x, int y, int w, int h)
+    {
+        var pnl = new Panel
+        {
+            Location = new Point(x, y),
+            Size     = new Size(w, h),
+            BackColor = Color.Transparent
+        };
+        pnl.Paint += (s, e) =>
+        {
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            var r = new Rectangle(0, 0, pnl.Width - 1, pnl.Height - 1);
+            using var bg  = new SolidBrush(Color.FromArgb(CARD_BG));
+            using var path = RoundedRect(r, 10);
+            e.Graphics.FillPath(bg, path);
+            using var pen = new Pen(Color.FromArgb(BORDER_CLR), 1);
+            e.Graphics.DrawPath(pen, path);
+        };
+        Controls.Add(pnl);
+        return pnl;
+    }
+
+    // ─── Section label helper ────────────────────────────────────────────
+    private void SectionHeader(Panel card, string icon, string title, int y)
+    {
+        var lbl = new Label
+        {
+            Text      = $"{icon}  {title}",
+            ForeColor = Color.FromArgb(ACCENT),
+            Font      = new Font("Segoe UI", 9.5F, FontStyle.Bold),
+            Location  = new Point(16, y),
+            AutoSize  = true,
+            BackColor = Color.Transparent
+        };
+        card.Controls.Add(lbl);
+
+        var line = new Panel
+        {
+            Location  = new Point(16, y + 22),
+            Size      = new Size(card.Width - 32, 1),
+            BackColor = Color.FromArgb(BORDER_CLR)
+        };
+        card.Controls.Add(line);
     }
 
     private void BuildUI()
     {
         Text            = "Merdo Launcher — Ayarlar";
-        Size            = new Size(540, 560);
-        FormBorderStyle = FormBorderStyle.FixedDialog;
+        Size            = new Size(560, 640);
+        FormBorderStyle = FormBorderStyle.None;     // borderless
         MaximizeBox     = false;
         MinimizeBox     = false;
         StartPosition   = FormStartPosition.CenterParent;
-        BackColor       = Color.FromArgb(12, 12, 15);
+        BackColor       = Color.FromArgb(BG);
         DoubleBuffered  = true;
 
-        // ── Section helper ──────────────────────────────
-        Label Section(string text, int y)
+        // Custom border + title paint
+        Paint += (s, e) =>
         {
-            var lbl = new Label
-            {
-                Text      = text,
-                ForeColor = Color.FromArgb(255, 204, 0),
-                Font      = new Font("Segoe UI", 10F, FontStyle.Bold),
-                Location  = new Point(30, y),
-                AutoSize  = true
-            };
-            Controls.Add(lbl);
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            var r = new Rectangle(0, 0, Width - 1, Height - 1);
+            using var path = RoundedRect(r, 12);
+            Region = new Region(path);
+            using var pen = new Pen(Color.FromArgb(BORDER_CLR), 1.5f);
+            e.Graphics.DrawPath(pen, path);
+        };
 
-            var line = new Panel
-            {
-                Location  = new Point(30, y + 22),
-                Size      = new Size(480, 1),
-                BackColor = Color.FromArgb(35, 35, 40)
-            };
-            Controls.Add(line);
-            return lbl;
-        }
+        // Drag to move
+        MouseDown += (s, e) => { if (e.Button == MouseButtons.Left) { ReleaseCapture(); SendMessage(Handle, 0xA1, 0x2, 0); } };
 
-        Label FieldLabel(string text, int y)
-        {
-            var lbl = new Label
-            {
-                Text      = text,
-                ForeColor = Color.FromArgb(160, 160, 170),
-                Font      = new Font("Segoe UI", 9F),
-                Location  = new Point(30, y),
-                AutoSize  = true
-            };
-            Controls.Add(lbl);
-            return lbl;
-        }
-
-        // ── BAŞLIK ──────────────────────────────────────
-        Controls.Add(new Label
+        // ── Başlık ──────────────────────────────────────────────────────
+        var lblTitle = new Label
         {
             Text      = "⚙  AYARLAR",
             ForeColor = Color.White,
             Font      = new Font("Segoe UI", 14F, FontStyle.Bold),
-            Location  = new Point(30, 20),
-            AutoSize  = true
+            Location  = new Point(24, 20),
+            AutoSize  = true,
+            BackColor = Color.Transparent
+        };
+        Controls.Add(lblTitle);
+
+        // Kapat butonu (X)
+        var btnClose = new Label
+        {
+            Text      = "✕",
+            ForeColor = Color.FromArgb(140, 140, 150),
+            Font      = new Font("Segoe UI", 13F, FontStyle.Bold),
+            Location  = new Point(Width - 44, 18),
+            AutoSize  = true,
+            BackColor = Color.Transparent,
+            Cursor    = Cursors.Hand
+        };
+        btnClose.MouseEnter += (s, e) => btnClose.ForeColor = Color.FromArgb(220, 60, 60);
+        btnClose.MouseLeave += (s, e) => btnClose.ForeColor = Color.FromArgb(140, 140, 150);
+        btnClose.Click      += (s, e) => Close();
+        Controls.Add(btnClose);
+
+        // Başlık ayırıcı
+        Controls.Add(new Panel
+        {
+            Location  = new Point(0, 55),
+            Size      = new Size(Width, 1),
+            BackColor = Color.FromArgb(BORDER_CLR)
         });
 
-        // ══════════════════════════════════════════════
-        // 1) PERFORMANS
-        // ══════════════════════════════════════════════
-        Section("PERFORMANS", 60);
+        int cardX = 18, cardW = Width - 36;
 
-        FieldLabel("Maksimum RAM", 95);
+        // ══════════════════════════════════════════════
+        // KART 1 — PERFORMANS + MÜZİK
+        // ══════════════════════════════════════════════
+        var card1 = Card(cardX, 68, cardW, 220);
+
+        SectionHeader(card1, "🎮", "PERFORMANS", 14);
+
+        var lblRamLbl = new Label
+        {
+            Text      = "Maksimum RAM",
+            ForeColor = Color.FromArgb(160, 160, 175),
+            Font      = new Font("Segoe UI", 9F),
+            Location  = new Point(16, 48),
+            AutoSize  = true,
+            BackColor = Color.Transparent
+        };
+        card1.Controls.Add(lblRamLbl);
+
         trkRam = new TrackBar
         {
-            Location      = new Point(30, 115),
-            Size          = new Size(390, 40),
+            Location      = new Point(12, 67),
+            Size          = new Size(card1.Width - 90, 36),
             Minimum       = 1024,
             Maximum       = 16384,
             TickFrequency = 1024,
             LargeChange   = 1024,
             SmallChange   = 512,
-            BackColor     = Color.FromArgb(12, 12, 15)
+            BackColor     = Color.FromArgb(CARD_BG)
         };
-        trkRam.ValueChanged += (s, e) =>
-            lblRamValue.Text = $"{trkRam.Value / 1024.0:0.#} GB";
-        Controls.Add(trkRam);
+        trkRam.ValueChanged += (s, e) => lblRamValue.Text = $"{trkRam.Value / 1024.0:0.#} GB";
+        card1.Controls.Add(trkRam);
 
         lblRamValue = new Label
         {
             Text      = "4 GB",
-            ForeColor = Color.FromArgb(255, 204, 0),
+            ForeColor = Color.FromArgb(ACCENT),
             Font      = new Font("Segoe UI", 11F, FontStyle.Bold),
-            Location  = new Point(430, 120),
-            AutoSize  = true
+            Location  = new Point(card1.Width - 70, 72),
+            AutoSize  = true,
+            BackColor = Color.Transparent
         };
-        Controls.Add(lblRamValue);
+        card1.Controls.Add(lblRamValue);
 
-        // ══════════════════════════════════════════════
-        // 2) MÜZİK
-        // ══════════════════════════════════════════════
-        Section("MÜZİK", 170);
+        // Müzik ayırıcı
+        card1.Controls.Add(new Panel
+        {
+            Location  = new Point(16, 112),
+            Size      = new Size(card1.Width - 32, 1),
+            BackColor = Color.FromArgb(BORDER_CLR)
+        });
 
-        FieldLabel("Arkaplan Müzik Sesi", 205);
+        SectionHeader(card1, "🎵", "MÜZİK", 120);
+
+        var lblVolLbl = new Label
+        {
+            Text      = "Arkaplan Müzik Sesi",
+            ForeColor = Color.FromArgb(160, 160, 175),
+            Font      = new Font("Segoe UI", 9F),
+            Location  = new Point(16, 155),
+            AutoSize  = true,
+            BackColor = Color.Transparent
+        };
+        card1.Controls.Add(lblVolLbl);
+
         trkVolume = new TrackBar
         {
-            Location      = new Point(30, 225),
-            Size          = new Size(390, 40),
+            Location      = new Point(12, 174),
+            Size          = new Size(card1.Width - 90, 36),
             Minimum       = 0,
             Maximum       = 100,
             TickFrequency = 10,
             LargeChange   = 10,
             SmallChange   = 5,
-            BackColor     = Color.FromArgb(12, 12, 15)
+            BackColor     = Color.FromArgb(CARD_BG)
         };
         trkVolume.ValueChanged += (s, e) =>
         {
             lblVolumeValue.Text = $"{trkVolume.Value}%";
-            _onVolumeChanged?.Invoke(trkVolume.Value); // anlık uygula
+            _onVolumeChanged?.Invoke(trkVolume.Value);
         };
-        Controls.Add(trkVolume);
+        card1.Controls.Add(trkVolume);
 
         lblVolumeValue = new Label
         {
             Text      = "25%",
-            ForeColor = Color.FromArgb(255, 204, 0),
+            ForeColor = Color.FromArgb(ACCENT),
             Font      = new Font("Segoe UI", 11F, FontStyle.Bold),
-            Location  = new Point(430, 230),
-            AutoSize  = true
-        };
-        Controls.Add(lblVolumeValue);
-
-        // ══════════════════════════════════════════════
-        // 3) BAŞLATICI
-        // ══════════════════════════════════════════════
-        Section("BAŞLATICI", 280);
-
-        chkClose = new CheckBox
-        {
-            Text      = "Oyun açılınca launcher'ı kapat",
-            ForeColor = Color.FromArgb(180, 180, 190),
-            Font      = new Font("Segoe UI", 9.5F),
-            Location  = new Point(30, 315),
+            Location  = new Point(card1.Width - 70, 179),
             AutoSize  = true,
             BackColor = Color.Transparent
         };
-        Controls.Add(chkClose);
+        card1.Controls.Add(lblVolumeValue);
 
-        chkConsole = new CheckBox
+        // ══════════════════════════════════════════════
+        // KART 2 — BAŞLATICI
+        // ══════════════════════════════════════════════
+        var card2 = Card(cardX, 300, cardW, 110);
+
+        SectionHeader(card2, "🚀", "BAŞLATICI", 14);
+
+        chkClose = StyledCheckBox("Oyun açılınca launcher'ı kapat", new Point(16, 48));
+        card2.Controls.Add(chkClose);
+
+        chkConsole = StyledCheckBox("Konsol penceresini göster (hata ayıklama)", new Point(16, 76));
+        card2.Controls.Add(chkConsole);
+
+        // ══════════════════════════════════════════════
+        // KART 3 — JAVA
+        // ══════════════════════════════════════════════
+        var card3 = Card(cardX, 424, cardW, 155);
+
+        SectionHeader(card3, "☕", "JAVA", 14);
+
+        var lblJavaLbl = new Label
         {
-            Text      = "Konsol penceresini göster (hata ayıklama)",
-            ForeColor = Color.FromArgb(180, 180, 190),
-            Font      = new Font("Segoe UI", 9.5F),
-            Location  = new Point(30, 342),
+            Text      = "Mevcut Java Yolu",
+            ForeColor = Color.FromArgb(160, 160, 175),
+            Font      = new Font("Segoe UI", 9F),
+            Location  = new Point(16, 48),
             AutoSize  = true,
             BackColor = Color.Transparent
         };
-        Controls.Add(chkConsole);
+        card3.Controls.Add(lblJavaLbl);
 
-        // ══════════════════════════════════════════════
-        // 4) JAVA
-        // ══════════════════════════════════════════════
-        Section("JAVA", 380);
-
-        FieldLabel("Mevcut Java Yolu", 415);
         lblJavaPath = new Label
         {
             Text         = "Algılanıyor...",
-            ForeColor    = Color.FromArgb(100, 100, 110),
+            ForeColor    = Color.FromArgb(100, 100, 115),
             Font         = new Font("Segoe UI", 8F),
-            Location     = new Point(30, 435),
-            Size         = new Size(480, 18),
-            AutoEllipsis = true
+            Location     = new Point(16, 66),
+            Size         = new Size(card3.Width - 32, 16),
+            AutoEllipsis = true,
+            BackColor    = Color.Transparent
         };
-        Controls.Add(lblJavaPath);
+        card3.Controls.Add(lblJavaPath);
 
         lblJavaStatus = new Label
         {
             Text      = "",
             ForeColor = Color.FromArgb(40, 200, 90),
             Font      = new Font("Segoe UI", 8.5F, FontStyle.Bold),
-            Location  = new Point(30, 455),
-            AutoSize  = true
+            Location  = new Point(16, 84),
+            AutoSize  = true,
+            BackColor = Color.Transparent
         };
-        Controls.Add(lblJavaStatus);
+        card3.Controls.Add(lblJavaStatus);
 
-        btnJavaAuto = new Button
-        {
-            Text      = "⬇  Java'yı Otomatik Kur",
-            Location  = new Point(30, 475),
-            Size      = new Size(220, 34),
-            BackColor = Color.FromArgb(0, 120, 60),
-            ForeColor = Color.White,
-            FlatStyle = FlatStyle.Flat,
-            Font      = new Font("Segoe UI", 9F, FontStyle.Bold),
-            Cursor    = Cursors.Hand
-        };
-        btnJavaAuto.FlatAppearance.BorderSize = 0;
+        btnJavaAuto = StyledButton("⬇  Java'yı Otomatik Kur", new Point(16, 108), new Size(210, 34),
+                                   Color.FromArgb(0, 130, 65), Color.White);
         btnJavaAuto.Click += BtnJavaAuto_Click;
-        Controls.Add(btnJavaAuto);
+        card3.Controls.Add(btnJavaAuto);
 
-        btnJavaManual = new Button
-        {
-            Text      = "📂  Manuel Seç",
-            Location  = new Point(260, 475),
-            Size      = new Size(140, 34),
-            BackColor = Color.FromArgb(30, 30, 40),
-            ForeColor = Color.White,
-            FlatStyle = FlatStyle.Flat,
-            Font      = new Font("Segoe UI", 9F),
-            Cursor    = Cursors.Hand
-        };
-        btnJavaManual.FlatAppearance.BorderSize = 0;
+        btnJavaManual = StyledButton("📂  Manuel Seç", new Point(236, 108), new Size(130, 34),
+                                     Color.FromArgb(30, 30, 42), Color.White);
+        btnJavaManual.FlatAppearance.BorderColor = Color.FromArgb(BORDER_CLR);
+        btnJavaManual.FlatAppearance.BorderSize  = 1;
         btnJavaManual.Click += BtnJavaManual_Click;
-        Controls.Add(btnJavaManual);
+        card3.Controls.Add(btnJavaManual);
 
-        // ══════════════════════════════════════════════
-        // Alt butonlar
-        // ══════════════════════════════════════════════
-        btnSave = new Button
-        {
-            Text      = "Kaydet",
-            Location  = new Point(310, 518),
-            Size      = new Size(100, 36),
-            BackColor = Color.FromArgb(255, 204, 0),
-            ForeColor = Color.Black,
-            FlatStyle = FlatStyle.Flat,
-            Font      = new Font("Segoe UI", 9.5F, FontStyle.Bold),
-            Cursor    = Cursors.Hand
-        };
-        btnSave.FlatAppearance.BorderSize = 0;
+        // ── Alt Kaydet / İptal ──────────────────────────────────────────
+        btnSave = StyledButton("✔  Kaydet", new Point(Width - 230, 592), new Size(110, 36),
+                               Color.FromArgb(ACCENT), Color.Black);
         btnSave.Click += BtnSave_Click;
         Controls.Add(btnSave);
 
-        btnCancel = new Button
-        {
-            Text      = "İptal",
-            Location  = new Point(420, 518),
-            Size      = new Size(90, 36),
-            BackColor = Color.FromArgb(35, 35, 42),
-            ForeColor = Color.White,
-            FlatStyle = FlatStyle.Flat,
-            Font      = new Font("Segoe UI", 9.5F),
-            Cursor    = Cursors.Hand
-        };
-        btnCancel.FlatAppearance.BorderSize = 0;
+        btnCancel = StyledButton("İptal", new Point(Width - 112, 592), new Size(90, 36),
+                                 Color.FromArgb(28, 28, 36), Color.White);
+        btnCancel.FlatAppearance.BorderColor = Color.FromArgb(BORDER_CLR);
+        btnCancel.FlatAppearance.BorderSize  = 1;
         btnCancel.Click += (s, e) => Close();
         Controls.Add(btnCancel);
     }
 
+    // ─── Helpers ────────────────────────────────────────────────────────
+    private static Button StyledButton(string text, Point loc, Size sz, Color bg, Color fg)
+    {
+        var btn = new Button
+        {
+            Text      = text,
+            Location  = loc,
+            Size      = sz,
+            BackColor = bg,
+            ForeColor = fg,
+            FlatStyle = FlatStyle.Flat,
+            Font      = new Font("Segoe UI", 9F, FontStyle.Bold),
+            Cursor    = Cursors.Hand
+        };
+        btn.FlatAppearance.BorderSize = 0;
+        // Rounded region
+        btn.Paint += (s, e) =>
+        {
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            var r = new Rectangle(0, 0, btn.Width - 1, btn.Height - 1);
+            using var path = RoundedRect(r, 7);
+            using var brush = new SolidBrush(bg);
+            e.Graphics.FillPath(brush, path);
+            using var sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
+            using var pen = new SolidBrush(fg);
+            e.Graphics.DrawString(btn.Text, btn.Font, pen, new RectangleF(0, 0, btn.Width, btn.Height), sf);
+        };
+        return btn;
+    }
+
+    private static CheckBox StyledCheckBox(string text, Point loc)
+    {
+        return new CheckBox
+        {
+            Text      = text,
+            ForeColor = Color.FromArgb(185, 185, 200),
+            Font      = new Font("Segoe UI", 9.5F),
+            Location  = loc,
+            AutoSize  = true,
+            BackColor = Color.Transparent
+        };
+    }
+
+    // ─── P/Invoke for dragging ───────────────────────────────────────────
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern int SendMessage(IntPtr hWnd, int msg, int wParam, int lParam);
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool ReleaseCapture();
+
+    // ─── Load / Save ─────────────────────────────────────────────────────
     private void LoadValues()
     {
         var s = _settings.Settings;
 
-        // RAM
-        trkRam.Value     = Math.Clamp(s.MaxRamMb, trkRam.Minimum, trkRam.Maximum);
-        lblRamValue.Text = $"{trkRam.Value / 1024.0:0.#} GB";
+        trkRam.Value      = Math.Clamp(s.MaxRamMb, trkRam.Minimum, trkRam.Maximum);
+        lblRamValue.Text  = $"{trkRam.Value / 1024.0:0.#} GB";
 
-        // Müzik sesi
-        trkVolume.Value     = Math.Clamp(s.MusicVolume, 0, 100);
-        lblVolumeValue.Text = $"{trkVolume.Value}%";
+        trkVolume.Value      = Math.Clamp(s.MusicVolume, 0, 100);
+        lblVolumeValue.Text  = $"{trkVolume.Value}%";
 
-        // Checkboxes
         chkClose.Checked   = s.CloseOnLaunch;
         chkConsole.Checked = s.ShowConsole;
 
-        // Java yolu
         string java = string.IsNullOrEmpty(s.JavaPath)
             ? MinecraftLauncherService.FindSystemJavaPath()
             : s.JavaPath;
@@ -311,10 +415,10 @@ public class SettingsForm : Form
     private void BtnSave_Click(object? sender, EventArgs e)
     {
         var s = _settings.Settings;
-        s.MaxRamMb     = trkRam.Value;
-        s.MusicVolume  = trkVolume.Value;
+        s.MaxRamMb      = trkRam.Value;
+        s.MusicVolume   = trkVolume.Value;
         s.CloseOnLaunch = chkClose.Checked;
-        s.ShowConsole  = chkConsole.Checked;
+        s.ShowConsole   = chkConsole.Checked;
         _settings.Save();
         Close();
     }

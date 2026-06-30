@@ -227,7 +227,7 @@ partial class Form1
         this.btnNewsPrev.ForeColor = System.Drawing.Color.FromArgb(255, 204, 0);
         this.btnNewsPrev.Location = new System.Drawing.Point(30, 320);
         this.btnNewsPrev.Name = "btnNewsPrev";
-        this.btnNewsPrev.Size = new System.Drawing.Size(38, 38);
+        this.btnNewsPrev.Size = new System.Drawing.Size(44, 44);
         this.btnNewsPrev.Text = "◀";
         this.btnNewsPrev.UseVisualStyleBackColor = false;
 
@@ -242,7 +242,7 @@ partial class Form1
         this.btnNewsNext.ForeColor = System.Drawing.Color.FromArgb(255, 204, 0);
         this.btnNewsNext.Location = new System.Drawing.Point(78, 320);
         this.btnNewsNext.Name = "btnNewsNext";
-        this.btnNewsNext.Size = new System.Drawing.Size(38, 38);
+        this.btnNewsNext.Size = new System.Drawing.Size(44, 44);
         this.btnNewsNext.Text = "▶";
         this.btnNewsNext.UseVisualStyleBackColor = false;
 
@@ -259,18 +259,18 @@ partial class Form1
         this.pnlRightLoginCard.Controls.Add(this.pnlSavedAccounts);
         this.pnlRightLoginCard.Controls.Add(this.lblForgotPassword);
         this.pnlRightLoginCard.Controls.Add(this.lblRegister);
-        this.pnlRightLoginCard.Location = new System.Drawing.Point(680, 100);
+        this.pnlRightLoginCard.Location = new System.Drawing.Point(650, 85);
         this.pnlRightLoginCard.Name = "pnlRightLoginCard";
-        this.pnlRightLoginCard.Size = new System.Drawing.Size(380, 480);
+        this.pnlRightLoginCard.Size = new System.Drawing.Size(420, 520);
 
         // 
         // lblLoginTitle
         // 
         this.lblLoginTitle.Font = new System.Drawing.Font("Segoe UI", 22F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.lblLoginTitle.ForeColor = System.Drawing.Color.White;
-        this.lblLoginTitle.Location = new System.Drawing.Point(0, 30);
+        this.lblLoginTitle.Location = new System.Drawing.Point(0, 35);
         this.lblLoginTitle.Name = "lblLoginTitle";
-        this.lblLoginTitle.Size = new System.Drawing.Size(380, 45);
+        this.lblLoginTitle.Size = new System.Drawing.Size(420, 48);
         this.lblLoginTitle.Text = "GİRİŞ";
         this.lblLoginTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 
@@ -279,9 +279,9 @@ partial class Form1
         // 
         this.pnlUserContainer.BackColor = System.Drawing.Color.Transparent;
         this.pnlUserContainer.Controls.Add(this.txtUsername);
-        this.pnlUserContainer.Location = new System.Drawing.Point(40, 100);
+        this.pnlUserContainer.Location = new System.Drawing.Point(45, 108);
         this.pnlUserContainer.Name = "pnlUserContainer";
-        this.pnlUserContainer.Size = new System.Drawing.Size(300, 45);
+        this.pnlUserContainer.Size = new System.Drawing.Size(330, 48);
 
         // 
         // txtUsername
@@ -290,18 +290,18 @@ partial class Form1
         this.txtUsername.BorderStyle = System.Windows.Forms.BorderStyle.None;
         this.txtUsername.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.txtUsername.ForeColor = System.Drawing.Color.White;
-        this.txtUsername.Location = new System.Drawing.Point(15, 13);
+        this.txtUsername.Location = new System.Drawing.Point(15, 14);
         this.txtUsername.Name = "txtUsername";
-        this.txtUsername.Size = new System.Drawing.Size(270, 18);
+        this.txtUsername.Size = new System.Drawing.Size(300, 18);
 
         // 
         // pnlPassContainer
         // 
         this.pnlPassContainer.BackColor = System.Drawing.Color.Transparent;
         this.pnlPassContainer.Controls.Add(this.txtPassword);
-        this.pnlPassContainer.Location = new System.Drawing.Point(40, 165);
+        this.pnlPassContainer.Location = new System.Drawing.Point(45, 175);
         this.pnlPassContainer.Name = "pnlPassContainer";
-        this.pnlPassContainer.Size = new System.Drawing.Size(300, 45);
+        this.pnlPassContainer.Size = new System.Drawing.Size(330, 48);
 
         // 
         // txtPassword
@@ -310,9 +310,9 @@ partial class Form1
         this.txtPassword.BorderStyle = System.Windows.Forms.BorderStyle.None;
         this.txtPassword.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.txtPassword.ForeColor = System.Drawing.Color.White;
-        this.txtPassword.Location = new System.Drawing.Point(15, 13);
+        this.txtPassword.Location = new System.Drawing.Point(15, 14);
         this.txtPassword.Name = "txtPassword";
-        this.txtPassword.Size = new System.Drawing.Size(270, 18);
+        this.txtPassword.Size = new System.Drawing.Size(300, 18);
         this.txtPassword.UseSystemPasswordChar = true;
 
         // 
@@ -323,9 +323,9 @@ partial class Form1
         this.btnLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this.btnLogin.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.btnLogin.ForeColor = System.Drawing.Color.Black;
-        this.btnLogin.Location = new System.Drawing.Point(40, 235);
+        this.btnLogin.Location = new System.Drawing.Point(45, 248);
         this.btnLogin.Name = "btnLogin";
-        this.btnLogin.Size = new System.Drawing.Size(300, 45);
+        this.btnLogin.Size = new System.Drawing.Size(330, 48);
         this.btnLogin.Text = "Giriş Yap";
         this.btnLogin.UseVisualStyleBackColor = false;
         this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
@@ -336,7 +336,7 @@ partial class Form1
         this.chkRemember.AutoSize = true;
         this.chkRemember.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.chkRemember.ForeColor = System.Drawing.Color.FromArgb(170, 170, 180);
-        this.chkRemember.Location = new System.Drawing.Point(40, 290);
+        this.chkRemember.Location = new System.Drawing.Point(45, 308);
         this.chkRemember.Name = "chkRemember";
         this.chkRemember.Size = new System.Drawing.Size(121, 19);
         this.chkRemember.Text = "🔒 Hesabı kaydet";
@@ -348,7 +348,7 @@ partial class Form1
         this.lblSavedAccountsTitle.AutoSize = true;
         this.lblSavedAccountsTitle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.lblSavedAccountsTitle.ForeColor = System.Drawing.Color.White;
-        this.lblSavedAccountsTitle.Location = new System.Drawing.Point(40, 325);
+        this.lblSavedAccountsTitle.Location = new System.Drawing.Point(45, 342);
         this.lblSavedAccountsTitle.Name = "lblSavedAccountsTitle";
         this.lblSavedAccountsTitle.Size = new System.Drawing.Size(106, 15);
         this.lblSavedAccountsTitle.Text = "👥 Kayıtlı Hesaplar";
@@ -358,9 +358,9 @@ partial class Form1
         // 
         this.pnlSavedAccounts.BackColor = System.Drawing.Color.Transparent;
         this.pnlSavedAccounts.Controls.Add(this.lblSavedAccountsPlaceholder);
-        this.pnlSavedAccounts.Location = new System.Drawing.Point(40, 350);
+        this.pnlSavedAccounts.Location = new System.Drawing.Point(45, 368);
         this.pnlSavedAccounts.Name = "pnlSavedAccounts";
-        this.pnlSavedAccounts.Size = new System.Drawing.Size(300, 50);
+        this.pnlSavedAccounts.Size = new System.Drawing.Size(330, 50);
 
         // 
         // lblSavedAccountsPlaceholder
@@ -369,7 +369,7 @@ partial class Form1
         this.lblSavedAccountsPlaceholder.ForeColor = System.Drawing.Color.FromArgb(100, 100, 110);
         this.lblSavedAccountsPlaceholder.Location = new System.Drawing.Point(0, 15);
         this.lblSavedAccountsPlaceholder.Name = "lblSavedAccountsPlaceholder";
-        this.lblSavedAccountsPlaceholder.Size = new System.Drawing.Size(300, 20);
+        this.lblSavedAccountsPlaceholder.Size = new System.Drawing.Size(330, 20);
         this.lblSavedAccountsPlaceholder.Text = "Henüz kayıtlı hesap bulunmuyor";
         this.lblSavedAccountsPlaceholder.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 
@@ -379,9 +379,9 @@ partial class Form1
         this.lblForgotPassword.Cursor = System.Windows.Forms.Cursors.Hand;
         this.lblForgotPassword.Font = new System.Drawing.Font("Segoe UI", 8.5F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point);
         this.lblForgotPassword.ForeColor = System.Drawing.Color.FromArgb(255, 204, 0);
-        this.lblForgotPassword.Location = new System.Drawing.Point(0, 420);
+        this.lblForgotPassword.Location = new System.Drawing.Point(0, 445);
         this.lblForgotPassword.Name = "lblForgotPassword";
-        this.lblForgotPassword.Size = new System.Drawing.Size(380, 18);
+        this.lblForgotPassword.Size = new System.Drawing.Size(420, 18);
         this.lblForgotPassword.Text = "Şifremi mi unuttun?";
         this.lblForgotPassword.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 
@@ -391,9 +391,9 @@ partial class Form1
         this.lblRegister.Cursor = System.Windows.Forms.Cursors.Hand;
         this.lblRegister.Font = new System.Drawing.Font("Segoe UI", 8.5F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point);
         this.lblRegister.ForeColor = System.Drawing.Color.FromArgb(255, 204, 0);
-        this.lblRegister.Location = new System.Drawing.Point(0, 445);
+        this.lblRegister.Location = new System.Drawing.Point(0, 470);
         this.lblRegister.Name = "lblRegister";
-        this.lblRegister.Size = new System.Drawing.Size(380, 18);
+        this.lblRegister.Size = new System.Drawing.Size(420, 18);
         this.lblRegister.Text = "Yeni hesap oluştur";
         this.lblRegister.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
         this.lblRegister.Click += new System.EventHandler(this.lblRegister_Click);
