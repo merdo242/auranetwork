@@ -134,7 +134,7 @@ public partial class Form1 : Form
         // Settings button click
         btnSettings.Click += (s, e) =>
         {
-            using var settingsForm = new SettingsForm(_settingsService);
+            using var settingsForm = new SettingsForm(_settingsService, SetMusicVolume);
             settingsForm.ShowDialog(this);
         };
 
@@ -187,16 +187,20 @@ public partial class Form1 : Form
 
             if (!File.Exists(musicFile)) return;
 
-            // Windows Media Player COM nesnesi — hiç ek paket gerektirmez
             var type = Type.GetTypeFromProgID("WMPlayer.OCX");
             if (type == null) return;
 
             _musicPlayer = Activator.CreateInstance(type);
-            _musicPlayer.settings.volume   = 25;        // %25 kısık ses
-            _musicPlayer.settings.setMode("loop", true); // döngü
+            _musicPlayer.settings.volume   = _settingsService.Settings.MusicVolume;
+            _musicPlayer.settings.setMode("loop", true);
             _musicPlayer.URL = musicFile;
         }
-        catch { /* WMP yüklü değilse sessizce geç */ }
+        catch { }
+    }
+
+    private void SetMusicVolume(int volume)
+    {
+        try { if (_musicPlayer != null) _musicPlayer.settings.volume = volume; } catch { }
     }
 
     protected override void OnFormClosed(FormClosedEventArgs e)

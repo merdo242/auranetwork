@@ -8,11 +8,13 @@ namespace MerdoClient;
 public class SettingsForm : Form
 {
     private readonly SettingsService _settings;
+    private readonly Action<int>?    _onVolumeChanged; // Form1'deki müzik sesini anlık değiştirir
 
     // Controls
-    private ComboBox cmbVersion     = new();
     private TrackBar trkRam        = new();
     private Label    lblRamValue   = new();
+    private TrackBar trkVolume     = new();
+    private Label    lblVolumeValue = new();
     private CheckBox chkClose      = new();
     private CheckBox chkConsole    = new();
     private Label    lblJavaPath   = new();
@@ -22,9 +24,10 @@ public class SettingsForm : Form
     private Button   btnCancel     = new();
     private Label    lblJavaStatus = new();
 
-    public SettingsForm(SettingsService settings)
+    public SettingsForm(SettingsService settings, Action<int>? onVolumeChanged = null)
     {
-        _settings = settings;
+        _settings         = settings;
+        _onVolumeChanged  = onVolumeChanged;
         BuildUI();
         LoadValues();
     }
@@ -32,7 +35,7 @@ public class SettingsForm : Form
     private void BuildUI()
     {
         Text            = "Merdo Launcher — Ayarlar";
-        Size            = new Size(540, 580);
+        Size            = new Size(540, 560);
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox     = false;
         MinimizeBox     = false;
@@ -78,81 +81,34 @@ public class SettingsForm : Form
         }
 
         // ── BAŞLIK ──────────────────────────────────────
-        var title = new Label
+        Controls.Add(new Label
         {
             Text      = "⚙  AYARLAR",
             ForeColor = Color.White,
             Font      = new Font("Segoe UI", 14F, FontStyle.Bold),
             Location  = new Point(30, 20),
             AutoSize  = true
-        };
-        Controls.Add(title);
+        });
 
         // ══════════════════════════════════════════════
-        // 1) OYUN
+        // 1) PERFORMANS
         // ══════════════════════════════════════════════
-        Section("OYUN", 60);
+        Section("PERFORMANS", 60);
 
-        FieldLabel("Minecraft Sürümü", 95);
-        cmbVersion = new ComboBox
-        {
-            Location      = new Point(30, 115),
-            Size          = new Size(480, 28),
-            BackColor     = Color.FromArgb(22, 22, 26),
-            ForeColor     = Color.White,
-            FlatStyle     = FlatStyle.Flat,
-            Font          = new Font("Segoe UI", 9.5F),
-            DropDownStyle = ComboBoxStyle.DropDownList
-        };
-        cmbVersion.Items.Add("— Otomatik (önerilen) —");
-        foreach (var v in _settings.GetAvailableVersions())
-            cmbVersion.Items.Add(v);
-        Controls.Add(cmbVersion);
-
-        var refreshBtn = new Button
-        {
-            Text      = "↺",
-            Location  = new Point(484, 115),
-            Size      = new Size(26, 26),
-            BackColor = Color.FromArgb(30, 30, 35),
-            ForeColor = Color.FromArgb(255, 204, 0),
-            FlatStyle = FlatStyle.Flat,
-            Font      = new Font("Segoe UI", 11F),
-            Cursor    = Cursors.Hand
-        };
-        refreshBtn.FlatAppearance.BorderSize = 0;
-        refreshBtn.Click += (s, e) =>
-        {
-            var sel = cmbVersion.SelectedItem?.ToString();
-            cmbVersion.Items.Clear();
-            cmbVersion.Items.Add("— Otomatik (önerilen) —");
-            foreach (var v in _settings.GetAvailableVersions())
-                cmbVersion.Items.Add(v);
-            cmbVersion.SelectedItem = sel ?? cmbVersion.Items[0];
-        };
-        Controls.Add(refreshBtn);
-
-        // ══════════════════════════════════════════════
-        // 2) PERFORMANS
-        // ══════════════════════════════════════════════
-        Section("PERFORMANS", 160);
-
-        FieldLabel("Maksimum RAM", 195);
+        FieldLabel("Maksimum RAM", 95);
         trkRam = new TrackBar
         {
-            Location  = new Point(30, 215),
-            Size      = new Size(390, 40),
-            Minimum   = 1024,
-            Maximum   = 16384,
+            Location      = new Point(30, 115),
+            Size          = new Size(390, 40),
+            Minimum       = 1024,
+            Maximum       = 16384,
             TickFrequency = 1024,
             LargeChange   = 1024,
             SmallChange   = 512,
-            BackColor = Color.FromArgb(12, 12, 15)
+            BackColor     = Color.FromArgb(12, 12, 15)
         };
         trkRam.ValueChanged += (s, e) =>
-        {
             lblRamValue.Text = $"{trkRam.Value / 1024.0:0.#} GB";
-        };
         Controls.Add(trkRam);
 
         lblRamValue = new Label
@@ -160,22 +116,56 @@ public class SettingsForm : Form
             Text      = "4 GB",
             ForeColor = Color.FromArgb(255, 204, 0),
             Font      = new Font("Segoe UI", 11F, FontStyle.Bold),
-            Location  = new Point(430, 220),
+            Location  = new Point(430, 120),
             AutoSize  = true
         };
         Controls.Add(lblRamValue);
 
         // ══════════════════════════════════════════════
+        // 2) MÜZİK
+        // ══════════════════════════════════════════════
+        Section("MÜZİK", 170);
+
+        FieldLabel("Arkaplan Müzik Sesi", 205);
+        trkVolume = new TrackBar
+        {
+            Location      = new Point(30, 225),
+            Size          = new Size(390, 40),
+            Minimum       = 0,
+            Maximum       = 100,
+            TickFrequency = 10,
+            LargeChange   = 10,
+            SmallChange   = 5,
+            BackColor     = Color.FromArgb(12, 12, 15)
+        };
+        trkVolume.ValueChanged += (s, e) =>
+        {
+            lblVolumeValue.Text = $"{trkVolume.Value}%";
+            _onVolumeChanged?.Invoke(trkVolume.Value); // anlık uygula
+        };
+        Controls.Add(trkVolume);
+
+        lblVolumeValue = new Label
+        {
+            Text      = "25%",
+            ForeColor = Color.FromArgb(255, 204, 0),
+            Font      = new Font("Segoe UI", 11F, FontStyle.Bold),
+            Location  = new Point(430, 230),
+            AutoSize  = true
+        };
+        Controls.Add(lblVolumeValue);
+
+        // ══════════════════════════════════════════════
         // 3) BAŞLATICI
         // ══════════════════════════════════════════════
-        Section("BAŞLATICI", 270);
+        Section("BAŞLATICI", 280);
 
         chkClose = new CheckBox
         {
             Text      = "Oyun açılınca launcher'ı kapat",
             ForeColor = Color.FromArgb(180, 180, 190),
             Font      = new Font("Segoe UI", 9.5F),
-            Location  = new Point(30, 305),
+            Location  = new Point(30, 315),
             AutoSize  = true,
             BackColor = Color.Transparent
         };
@@ -186,7 +176,7 @@ public class SettingsForm : Form
             Text      = "Konsol penceresini göster (hata ayıklama)",
             ForeColor = Color.FromArgb(180, 180, 190),
             Font      = new Font("Segoe UI", 9.5F),
-            Location  = new Point(30, 332),
+            Location  = new Point(30, 342),
             AutoSize  = true,
             BackColor = Color.Transparent
         };
@@ -195,16 +185,16 @@ public class SettingsForm : Form
         // ══════════════════════════════════════════════
         // 4) JAVA
         // ══════════════════════════════════════════════
-        Section("JAVA", 370);
+        Section("JAVA", 380);
 
-        FieldLabel("Mevcut Java Yolu", 405);
+        FieldLabel("Mevcut Java Yolu", 415);
         lblJavaPath = new Label
         {
-            Text      = "Algılanıyor...",
-            ForeColor = Color.FromArgb(100, 100, 110),
-            Font      = new Font("Segoe UI", 8F),
-            Location  = new Point(30, 425),
-            Size      = new Size(480, 18),
+            Text         = "Algılanıyor...",
+            ForeColor    = Color.FromArgb(100, 100, 110),
+            Font         = new Font("Segoe UI", 8F),
+            Location     = new Point(30, 435),
+            Size         = new Size(480, 18),
             AutoEllipsis = true
         };
         Controls.Add(lblJavaPath);
@@ -214,7 +204,7 @@ public class SettingsForm : Form
             Text      = "",
             ForeColor = Color.FromArgb(40, 200, 90),
             Font      = new Font("Segoe UI", 8.5F, FontStyle.Bold),
-            Location  = new Point(30, 445),
+            Location  = new Point(30, 455),
             AutoSize  = true
         };
         Controls.Add(lblJavaStatus);
@@ -222,7 +212,7 @@ public class SettingsForm : Form
         btnJavaAuto = new Button
         {
             Text      = "⬇  Java'yı Otomatik Kur",
-            Location  = new Point(30, 468),
+            Location  = new Point(30, 475),
             Size      = new Size(220, 34),
             BackColor = Color.FromArgb(0, 120, 60),
             ForeColor = Color.White,
@@ -237,7 +227,7 @@ public class SettingsForm : Form
         btnJavaManual = new Button
         {
             Text      = "📂  Manuel Seç",
-            Location  = new Point(260, 468),
+            Location  = new Point(260, 475),
             Size      = new Size(140, 34),
             BackColor = Color.FromArgb(30, 30, 40),
             ForeColor = Color.White,
@@ -255,7 +245,7 @@ public class SettingsForm : Form
         btnSave = new Button
         {
             Text      = "Kaydet",
-            Location  = new Point(310, 510),
+            Location  = new Point(310, 518),
             Size      = new Size(100, 36),
             BackColor = Color.FromArgb(255, 204, 0),
             ForeColor = Color.Black,
@@ -270,7 +260,7 @@ public class SettingsForm : Form
         btnCancel = new Button
         {
             Text      = "İptal",
-            Location  = new Point(420, 510),
+            Location  = new Point(420, 518),
             Size      = new Size(90, 36),
             BackColor = Color.FromArgb(35, 35, 42),
             ForeColor = Color.White,
@@ -287,15 +277,13 @@ public class SettingsForm : Form
     {
         var s = _settings.Settings;
 
-        // Versiyon
-        if (string.IsNullOrEmpty(s.SelectedVersion) || !cmbVersion.Items.Contains(s.SelectedVersion))
-            cmbVersion.SelectedIndex = 0;
-        else
-            cmbVersion.SelectedItem = s.SelectedVersion;
-
         // RAM
-        trkRam.Value = Math.Clamp(s.MaxRamMb, trkRam.Minimum, trkRam.Maximum);
+        trkRam.Value     = Math.Clamp(s.MaxRamMb, trkRam.Minimum, trkRam.Maximum);
         lblRamValue.Text = $"{trkRam.Value / 1024.0:0.#} GB";
+
+        // Müzik sesi
+        trkVolume.Value     = Math.Clamp(s.MusicVolume, 0, 100);
+        lblVolumeValue.Text = $"{trkVolume.Value}%";
 
         // Checkboxes
         chkClose.Checked   = s.CloseOnLaunch;
@@ -308,14 +296,14 @@ public class SettingsForm : Form
 
         if (!string.IsNullOrEmpty(java))
         {
-            lblJavaPath.Text   = java;
-            lblJavaStatus.Text = "✔  Java bulundu";
+            lblJavaPath.Text        = java;
+            lblJavaStatus.Text      = "✔  Java bulundu";
             lblJavaStatus.ForeColor = Color.FromArgb(40, 200, 90);
         }
         else
         {
-            lblJavaPath.Text   = "Java bulunamadı — otomatik kurulum önerilir";
-            lblJavaStatus.Text = "✘  Java yok";
+            lblJavaPath.Text        = "Java bulunamadı — otomatik kurulum önerilir";
+            lblJavaStatus.Text      = "✘  Java yok";
             lblJavaStatus.ForeColor = Color.FromArgb(220, 60, 60);
         }
     }
@@ -323,10 +311,10 @@ public class SettingsForm : Form
     private void BtnSave_Click(object? sender, EventArgs e)
     {
         var s = _settings.Settings;
-        s.SelectedVersion = cmbVersion.SelectedIndex == 0 ? string.Empty : cmbVersion.SelectedItem?.ToString() ?? string.Empty;
-        s.MaxRamMb        = trkRam.Value;
-        s.CloseOnLaunch   = chkClose.Checked;
-        s.ShowConsole     = chkConsole.Checked;
+        s.MaxRamMb     = trkRam.Value;
+        s.MusicVolume  = trkVolume.Value;
+        s.CloseOnLaunch = chkClose.Checked;
+        s.ShowConsole  = chkConsole.Checked;
         _settings.Save();
         Close();
     }
@@ -392,16 +380,16 @@ public class SettingsForm : Form
     {
         using var dlg = new OpenFileDialog
         {
-            Title       = "javaw.exe dosyasını seçin",
-            Filter      = "javaw.exe|javaw.exe|Tüm dosyalar|*.*",
-            FileName    = "javaw.exe"
+            Title    = "javaw.exe dosyasını seçin",
+            Filter   = "javaw.exe|javaw.exe|Tüm dosyalar|*.*",
+            FileName = "javaw.exe"
         };
 
         if (dlg.ShowDialog() == DialogResult.OK)
         {
             _settings.Settings.JavaPath = dlg.FileName;
-            lblJavaPath.Text   = dlg.FileName;
-            lblJavaStatus.Text = "✔  Manuel Java seçildi";
+            lblJavaPath.Text        = dlg.FileName;
+            lblJavaStatus.Text      = "✔  Manuel Java seçildi";
             lblJavaStatus.ForeColor = Color.FromArgb(40, 200, 90);
         }
     }

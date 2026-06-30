@@ -113,9 +113,9 @@ public class SettingsService
 
 public class LauncherSettings
 {
-    public string SelectedVersion { get; set; } = string.Empty;   // Boşsa → otomatik seç
-    public int MaxRamMb          { get; set; } = 4096;
-    public bool CloseOnLaunch    { get; set; } = false;            // Oyna'ya basınca launcher kapansın
-    public bool ShowConsole      { get; set; } = false;
-    public string JavaPath       { get; set; } = string.Empty;     // Boşsa → otomatik bul
+    public int MaxRamMb       { get; set; } = 4096;
+    public int MusicVolume    { get; set; } = 25;   // 0-100
+    public bool CloseOnLaunch { get; set; } = false;
+    public bool ShowConsole   { get; set; } = false;
+    public string JavaPath    { get; set; } = string.Empty;
 }
