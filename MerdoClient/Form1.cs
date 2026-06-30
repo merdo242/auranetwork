@@ -233,7 +233,7 @@ public partial class Form1 : Form
 
     private void Panel_Paint(object? sender, PaintEventArgs e)
     {
-        DrawLogoBadge(e.Graphics, 5, -10);
+        DrawLogoBadge(e.Graphics, 0, 0);
     }
 
     private void CardPanel_Paint(object? sender, PaintEventArgs e)
@@ -373,16 +373,57 @@ public partial class Form1 : Form
     private static Image? _largeLogo;
     private void DrawLogoBadge(Graphics g, int x, int y)
     {
+        g.SmoothingMode      = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+        g.InterpolationMode  = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+        g.CompositingMode    = System.Drawing.Drawing2D.CompositingMode.SourceOver;
+        g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+
+        // --- Small circular logo (40x40) ---
         if (_largeLogo == null)
-        {
             try { _largeLogo = Image.FromFile(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "logo_large_new.png")); } catch { }
-        }
+
+        int iconSize = 40;
+        int iconX = x + 8;
+        int iconY = y + 14;
+
         if (_largeLogo != null)
         {
-            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-            g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
-            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-            g.DrawImage(_largeLogo, x, y, 140, 140);
+            // Clip to circle
+            var clipPath = new System.Drawing.Drawing2D.GraphicsPath();
+            clipPath.AddEllipse(iconX, iconY, iconSize, iconSize);
+            var oldClip = g.Clip;
+            g.SetClip(clipPath, System.Drawing.Drawing2D.CombineMode.Replace);
+            g.DrawImage(_largeLogo, iconX, iconY, iconSize, iconSize);
+            g.Clip = oldClip;
+
+            // Circle border
+            using var borderPen = new Pen(Color.FromArgb(60, 60, 70), 1.5f);
+            g.DrawEllipse(borderPen, iconX, iconY, iconSize, iconSize);
+        }
+
+        // --- "MERDO" bold text ---
+        int textX = iconX + iconSize + 10;
+        int textY = y + 18;
+        using (var font  = new Font("Segoe UI", 14F, FontStyle.Bold))
+        using (var brush = new SolidBrush(Color.White))
+            g.DrawString("MERDO", font, brush, textX, textY);
+
+        // --- "LAUNCHER" yellow badge ---
+        int badgeX = textX + 82;
+        int badgeY = y + 22;
+        int badgeW = 78;
+        int badgeH = 20;
+        using (var badgePath = GetRoundedRectanglePath(new Rectangle(badgeX, badgeY, badgeW, badgeH), 5))
+        using (var yellowBrush = new SolidBrush(Color.FromArgb(255, 200, 0)))
+            g.FillPath(yellowBrush, badgePath);
+
+        using (var font  = new Font("Segoe UI", 7.5F, FontStyle.Bold))
+        using (var brush = new SolidBrush(Color.Black))
+        {
+            var sz = g.MeasureString("LAUNCHER", font);
+            g.DrawString("LAUNCHER", font, brush,
+                badgeX + (badgeW - sz.Width) / 2f,
+                badgeY + (badgeH - sz.Height) / 2f);
         }
     }
 
