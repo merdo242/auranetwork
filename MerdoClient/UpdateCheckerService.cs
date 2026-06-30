@@ -8,7 +8,7 @@ namespace MerdoClient;
 public class UpdateCheckerService
 {
     // Mevcut launcher sürümü
-    public const string CurrentVersion = "7.0";
+    public const string CurrentVersion = "7.1";
 
     // Güncelleme kontrolü için doğrudan bu GitHub deposundaki update.json dosyasını kullanıyoruz (100% ücretsiz & hızlı)
     private static readonly string UpdateUrl = $"https://raw.githubusercontent.com/merdo242/merdoclient/main/update.json?t={DateTime.UtcNow.Ticks}";
