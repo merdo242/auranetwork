@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "4.0",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe?v=4.0",
-  "Changelog": "- Kayıtlı hesaplar tasarımı ve 'Hesabı Kaydet' kutusu görsel olarak yenilendi.\n- Simge ve hizalamalar güncellendi."
+  "LatestVersion": "4.1",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe?v=4.1",
+  "Changelog": "- Giriş ekranı tasarımı birebir orijinal tasarıma uyacak şekilde güncellendi.\n- Görsel hatalar giderildi."
 }
