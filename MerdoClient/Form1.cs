@@ -20,6 +20,7 @@ public partial class Form1 : Form
     private string _currentPassword = string.Empty;
     private double _transitionProgress;
     private int _launchProgress;
+    private Image? _avatarImage = null;
     private bool _isRegisterMode = false;
     private bool _isFromSavedAccount = false;
     private int _onlinePlayers = 0;
@@ -324,6 +325,7 @@ public partial class Form1 : Form
         });
     }
 
+
     private void pnlAvatar_Paint(object? sender, PaintEventArgs e)
     {
         var panel = (Panel)sender!;
@@ -342,49 +344,20 @@ public partial class Form1 : Form
             e.Graphics.SetClip(path);
         }
         
-        // Draw Steve face
+        // Draw avatar image or default fallback
         Rectangle faceRect = new Rectangle(4, 4, panel.Width - 8, panel.Height - 8);
-        DrawSteveFace(e.Graphics, faceRect);
+        if (_avatarImage != null)
+        {
+            e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+            e.Graphics.DrawImage(_avatarImage, faceRect);
+        }
+        else
+        {
+            // Fallback clear if image not loaded
+            e.Graphics.Clear(Color.FromArgb(80, 50, 30));
+        }
         
         e.Graphics.ResetClip();
-    }
-
-    private void DrawSteveFace(Graphics g, Rectangle rect)
-    {
-        g.SmoothingMode = SmoothingMode.None; // Pixelated block face
-        
-        int pixelSize = rect.Width / 8;
-        
-        int[,] colors = new int[8, 8] {
-            { 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 1, 1, 1, 1, 1, 1, 0 },
-            { 1, 1, 3, 4, 4, 3, 1, 1 },
-            { 1, 1, 1, 2, 2, 1, 1, 1 },
-            { 1, 1, 2, 1, 1, 2, 1, 1 },
-            { 1, 1, 2, 2, 2, 2, 1, 1 },
-            { 1, 1, 1, 1, 1, 1, 1, 1 }
-        };
-        
-        Color[] palette = new Color[] {
-            Color.FromArgb(80, 50, 30),   // 0: Hair (Dark Brown)
-            Color.FromArgb(220, 160, 125), // 1: Skin (Tan)
-            Color.FromArgb(170, 110, 80),  // 2: Nose/Lip (Dark Tan)
-            Color.White,                   // 3: Eye White
-            Color.FromArgb(70, 70, 200)    // 4: Eye Pupil (Blue)
-        };
-        
-        for (int r = 0; r < 8; r++)
-        {
-            for (int c = 0; c < 8; c++)
-            {
-                int colorIndex = colors[r, c];
-                using (var brush = new SolidBrush(palette[colorIndex]))
-                {
-                    g.FillRectangle(brush, rect.X + c * pixelSize, rect.Y + r * pixelSize, pixelSize, pixelSize);
-                }
-            }
-        }
     }
 
     private void RoleBadge_Paint(object? sender, PaintEventArgs e)
@@ -560,7 +533,7 @@ public partial class Form1 : Form
             client.Timeout = System.TimeSpan.FromSeconds(5);
             client.DefaultRequestHeaders.UserAgent.ParseAdd("MerdoLauncher/2.0");
 
-            var response = await client.GetStringAsync($"http://91.132.49.16:24454/check?username={System.Uri.EscapeDataString(username)}");
+            var response = await client.GetStringAsync($"http://91.132.49.16:8080/check?username={System.Uri.EscapeDataString(username)}");
             using var doc = System.Text.Json.JsonDocument.Parse(response);
             if (doc.RootElement.TryGetProperty("registered", out var registeredProp))
             {
@@ -764,6 +737,55 @@ public partial class Form1 : Form
         Text = "Merdo Launcher - Oyun Ekranı";
         _transitionProgress = 0;
         _transitionTimer.Start();
+        
+        // Fetch avatar and role dynamically when entering home
+        _ = FetchPlayerAvatarAndRole(_currentUser);
+    }
+
+    private async System.Threading.Tasks.Task FetchPlayerAvatarAndRole(string username)
+    {
+        try
+        {
+            lblRole.Text = "OYUNCU"; // Default
+
+            using var client = new System.Net.Http.HttpClient();
+            client.Timeout = System.TimeSpan.FromSeconds(5);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("MerdoLauncher/2.0");
+
+            // 1. Fetch Rank
+            try
+            {
+                var response = await client.GetStringAsync($"http://91.132.49.16:24454/check?username={System.Uri.EscapeDataString(username)}");
+                using var doc = System.Text.Json.JsonDocument.Parse(response);
+                if (doc.RootElement.TryGetProperty("role", out var roleProp))
+                {
+                    var roleStr = roleProp.GetString();
+                    if (!string.IsNullOrEmpty(roleStr))
+                    {
+                        Invoke(() => lblRole.Text = roleStr.ToUpper());
+                    }
+                }
+            }
+            catch { }
+
+            // 2. Fetch Avatar
+            try
+            {
+                var imgBytes = await client.GetByteArrayAsync($"https://minotar.net/helm/{System.Uri.EscapeDataString(username)}/100.png");
+                using var ms = new System.IO.MemoryStream(imgBytes);
+                var img = Image.FromStream(ms);
+                
+                Invoke(() => 
+                {
+                    if (_avatarImage != null) _avatarImage.Dispose();
+                    _avatarImage = img;
+                    pnlAvatar.Invalidate();
+                });
+            }
+            catch { }
+        }
+        catch { }
+    }
     }
 
     private void TransitionTimer_Tick(object? sender, EventArgs e)

@@ -8,7 +8,7 @@ namespace MerdoClient;
 public class UpdateCheckerService
 {
     // Mevcut launcher sürümü
-    public const string CurrentVersion = "2.8";
+    public const string CurrentVersion = "2.9";
 
     // Güncelleme kontrolü için doğrudan bu GitHub deposundaki update.json dosyasını kullanıyoruz (100% ücretsiz & hızlı)
     private const string UpdateUrl = "https://raw.githubusercontent.com/merdo242/merdoclient/main/update.json";

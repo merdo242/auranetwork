@@ -15,6 +15,10 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.model.user.User;
+
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -67,15 +71,31 @@ public class MerdoServerPlugin extends JavaPlugin implements Listener {
                     }
 
                     boolean registered = false;
+                    String role = "OYUNCU";
                     if (username != null && !username.trim().isEmpty()) {
-                        registered = authMeApi.isRegistered(username.trim());
+                        String cleanUser = username.trim();
+                        registered = authMeApi.isRegistered(cleanUser);
+                        if (registered) {
+                            try {
+                                LuckPerms api = LuckPermsProvider.get();
+                                java.util.UUID uuid = api.getUserManager().lookupUniqueId(cleanUser).join();
+                                if (uuid != null) {
+                                    User user = api.getUserManager().loadUser(uuid).join();
+                                    if (user != null) {
+                                        role = user.getPrimaryGroup();
+                                        if (role.equalsIgnoreCase("default")) role = "OYUNCU";
+                                    }
+                                }
+                            } catch (Exception ignored) { }
+                        }
                     }
 
-                    String response = "{\"registered\":" + registered + "}";
-                    exchange.getResponseHeaders().set("Content-Type", "application/json");
-                    exchange.sendResponseHeaders(200, response.getBytes().length);
+                    String response = "{\"registered\":" + registered + ", \"role\":\"" + role.toUpperCase() + "\"}";
+                    exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
+                    byte[] responseBytes = response.getBytes("UTF-8");
+                    exchange.sendResponseHeaders(200, responseBytes.length);
                     OutputStream os = exchange.getResponseBody();
-                    os.write(response.getBytes());
+                    os.write(responseBytes);
                     os.close();
                 }
             });
