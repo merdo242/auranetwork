@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "5.1",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v51.exe",
-  "Changelog": "- Ayarlar menüsü baştan aşağı yenilendi: Yeni açılış animasyonu, özel tasarım kaydırıcılar (slider) ve iOS tarzı toggle butonları eklendi. Arka plan karatması (overlay) ile premium kart görünümü sağlandı."
+  "LatestVersion": "5.2",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v52.exe",
+  "Changelog": "- Güncelleme sistemi daha temiz bir yaklaşımla (anında kapanma) yeniden yazıldı."
 }
