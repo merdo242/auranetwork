@@ -40,9 +40,23 @@ public class MerdoServerPlugin extends JavaPlugin implements Listener {
         saveDefaultConfig();
         this.getServer().getPluginManager().registerEvents(this, this);
         this.authMeApi = AuthMeApi.getInstance();
+        setupEconomy();
         getLogger().info("MerdoServerPlugin aktif edildi!");
         
         startHttpServer();
+    }
+
+    private net.milkbowl.vault.economy.Economy econ = null;
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        org.bukkit.plugin.RegisteredServiceProvider<net.milkbowl.vault.economy.Economy> rsp = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return econ != null;
     }
 
     @Override
@@ -111,7 +125,15 @@ public class MerdoServerPlugin extends JavaPlugin implements Listener {
                         }
                     }
 
-                    String response = "{\"registered\":" + registered + ", \"role\":\"" + role.toUpperCase() + "\"}";
+                    double balance = 0.0;
+                    if (registered && econ != null && username != null) {
+                        org.bukkit.OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(username.trim());
+                        if (offlinePlayer != null) {
+                            balance = econ.getBalance(offlinePlayer);
+                        }
+                    }
+
+                    String response = "{\"registered\":" + registered + ", \"role\":\"" + role.toUpperCase() + "\", \"balance\":" + balance + "}";
                     exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
                     byte[] responseBytes = response.getBytes("UTF-8");
                     exchange.sendResponseHeaders(200, responseBytes.length);
