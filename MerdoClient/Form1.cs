@@ -81,6 +81,18 @@ public partial class Form1 : Form
         pnlHome.Visible = false;
         pnlLogin.Visible = true;
         
+        // Enable DoubleBuffered on panels via reflection to prevent flickering and aliasing
+        var prop = typeof(Control).GetProperty("DoubleBuffered", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        if (prop != null)
+        {
+            prop.SetValue(pnlLogin, true, null);
+            prop.SetValue(pnlHome, true, null);
+            prop.SetValue(pnlLeftNewsCard, true, null);
+            prop.SetValue(pnlRightLoginCard, true, null);
+            prop.SetValue(pnlHomeLeftCard, true, null);
+            prop.SetValue(pnlHomeRightCard, true, null);
+        }
+        
         // Paint events for Logo Badge
         pnlLogin.Paint += Panel_Paint;
         pnlHome.Paint += Panel_Paint;
@@ -457,6 +469,7 @@ public partial class Form1 : Form
         g.InterpolationMode  = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
         g.CompositingMode    = System.Drawing.Drawing2D.CompositingMode.SourceOver;
         g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+        g.TextRenderingHint  = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
 
         // --- Small circular logo (40x40) ---
         if (_largeLogo == null)
