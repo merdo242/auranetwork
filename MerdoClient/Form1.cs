@@ -152,8 +152,22 @@ public partial class Form1 : Form
         // Settings button click
         btnSettings.Click += (s, e) =>
         {
+            using var overlay = new Form
+            {
+                StartPosition = FormStartPosition.Manual,
+                Location = this.PointToScreen(Point.Empty),
+                Size = this.ClientSize,
+                FormBorderStyle = FormBorderStyle.None,
+                BackColor = Color.Black,
+                Opacity = 0.6,
+                ShowInTaskbar = false
+            };
+            overlay.Show(this);
+
             using var settingsForm = new SettingsForm(_settingsService, SetMusicVolume);
-            settingsForm.ShowDialog(this);
+            // Kartın formun ortasında çıkması için
+            settingsForm.StartPosition = FormStartPosition.CenterParent;
+            settingsForm.ShowDialog(overlay);
         };
 
         // Initial Saved Accounts UI Load

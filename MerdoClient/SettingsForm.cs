@@ -1,7 +1,9 @@
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Diagnostics;
 using System.Windows.Forms;
+using System.Threading.Tasks;
 
 namespace MerdoClient;
 
@@ -10,23 +12,26 @@ public class SettingsForm : Form
     private readonly SettingsService _settings;
     private readonly Action<int>?    _onVolumeChanged;
 
-    private TrackBar trkRam        = new();
-    private Label    lblRamValue   = new();
-    private TrackBar trkVolume     = new();
-    private Label    lblVolumeValue = new();
-    private CheckBox chkClose      = new();
-    private CheckBox chkConsole    = new();
-    private Label    lblJavaPath   = new();
-    private Button   btnJavaAuto   = new();
-    private Button   btnJavaManual = new();
-    private Button   btnSave       = new();
-    private Button   btnCancel     = new();
-    private Label    lblJavaStatus = new();
+    private CustomSlider trkRam        = new();
+    private Label        lblRamValue   = new();
+    private CustomSlider trkVolume     = new();
+    private Label        lblVolumeValue = new();
+    private CustomToggle chkClose      = new();
+    private CustomToggle chkConsole    = new();
+    private Label        lblJavaPath   = new();
+    private Button       btnJavaAuto   = new();
+    private Button       btnJavaManual = new();
+    private Button       btnSave       = new();
+    private Button       btnCancel     = new();
+    private Label        lblJavaStatus = new();
+    
+    private System.Windows.Forms.Timer _fadeTimer = new System.Windows.Forms.Timer { Interval = 15 };
 
     private const int ACCENT     = unchecked((int)0xFFFFCC00); // sarı
     private const int BG         = unchecked((int)0xFF0C0C0F);
     private const int CARD_BG    = unchecked((int)0xFF151518);
     private const int BORDER_CLR = unchecked((int)0xFF252530);
+    private const int TEXT_DIM   = unchecked((int)0xFF9595A0);
 
     public SettingsForm(SettingsService settings, Action<int>? onVolumeChanged = null)
     {
@@ -34,12 +39,38 @@ public class SettingsForm : Form
         _onVolumeChanged = onVolumeChanged;
         BuildUI();
         LoadValues();
+        
+        // Fade in animation setup
+        Opacity = 0;
+        _fadeTimer.Tick += (s, e) =>
+        {
+            if (Opacity >= 1)
+            {
+                Opacity = 1;
+                _fadeTimer.Stop();
+            }
+            else
+            {
+                Opacity += 0.08;
+            }
+        };
+    }
+
+    protected override void OnLoad(EventArgs e)
+    {
+        base.OnLoad(e);
+        _fadeTimer.Start();
     }
 
     // ─── Rounded rectangle helper ───────────────────────────────────────
-    private static GraphicsPath RoundedRect(Rectangle r, int rad)
+    public static GraphicsPath RoundedRect(Rectangle r, int rad)
     {
         var p = new GraphicsPath();
+        if (rad <= 0)
+        {
+            p.AddRectangle(r);
+            return p;
+        }
         int d = rad * 2;
         p.AddArc(r.X,              r.Y,              d, d, 180, 90);
         p.AddArc(r.Right - d,      r.Y,              d, d, 270, 90);
@@ -63,7 +94,7 @@ public class SettingsForm : Form
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             var r = new Rectangle(0, 0, pnl.Width - 1, pnl.Height - 1);
             using var bg  = new SolidBrush(Color.FromArgb(CARD_BG));
-            using var path = RoundedRect(r, 10);
+            using var path = RoundedRect(r, 12);
             e.Graphics.FillPath(bg, path);
             using var pen = new Pen(Color.FromArgb(BORDER_CLR), 1);
             e.Graphics.DrawPath(pen, path);
@@ -80,7 +111,7 @@ public class SettingsForm : Form
             Text      = $"{icon}  {title}",
             ForeColor = Color.FromArgb(ACCENT),
             Font      = new Font("Segoe UI", 9.5F, FontStyle.Bold),
-            Location  = new Point(16, y),
+            Location  = new Point(20, y),
             AutoSize  = true,
             BackColor = Color.Transparent
         };
@@ -88,8 +119,8 @@ public class SettingsForm : Form
 
         var line = new Panel
         {
-            Location  = new Point(16, y + 22),
-            Size      = new Size(card.Width - 32, 1),
+            Location  = new Point(20, y + 26),
+            Size      = new Size(card.Width - 40, 1),
             BackColor = Color.FromArgb(BORDER_CLR)
         };
         card.Controls.Add(line);
@@ -98,7 +129,7 @@ public class SettingsForm : Form
     private void BuildUI()
     {
         Text            = "Merdo Launcher — Ayarlar";
-        Size            = new Size(560, 640);
+        Size            = new Size(580, 680);
         FormBorderStyle = FormBorderStyle.None;     // borderless
         MaximizeBox     = false;
         MinimizeBox     = false;
@@ -111,7 +142,7 @@ public class SettingsForm : Form
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             var r = new Rectangle(0, 0, Width - 1, Height - 1);
-            using var path = RoundedRect(r, 12);
+            using var path = RoundedRect(r, 16);
             Region = new Region(path);
             using var pen = new Pen(Color.FromArgb(BORDER_CLR), 1.5f);
             e.Graphics.DrawPath(pen, path);
@@ -125,8 +156,8 @@ public class SettingsForm : Form
         {
             Text      = "⚙  AYARLAR",
             ForeColor = Color.White,
-            Font      = new Font("Segoe UI", 14F, FontStyle.Bold),
-            Location  = new Point(24, 20),
+            Font      = new Font("Segoe UI", 15F, FontStyle.Bold),
+            Location  = new Point(24, 22),
             AutoSize  = true,
             BackColor = Color.Transparent
         };
@@ -137,8 +168,8 @@ public class SettingsForm : Form
         {
             Text      = "✕",
             ForeColor = Color.FromArgb(140, 140, 150),
-            Font      = new Font("Segoe UI", 13F, FontStyle.Bold),
-            Location  = new Point(Width - 44, 18),
+            Font      = new Font("Segoe UI", 14F, FontStyle.Bold),
+            Location  = new Point(Width - 48, 20),
             AutoSize  = true,
             BackColor = Color.Transparent,
             Cursor    = Cursors.Hand
@@ -151,87 +182,92 @@ public class SettingsForm : Form
         // Başlık ayırıcı
         Controls.Add(new Panel
         {
-            Location  = new Point(0, 55),
+            Location  = new Point(0, 65),
             Size      = new Size(Width, 1),
             BackColor = Color.FromArgb(BORDER_CLR)
         });
 
-        int cardX = 18, cardW = Width - 36;
+        int cardX = 24, cardW = Width - 48;
 
         // ══════════════════════════════════════════════
         // KART 1 — PERFORMANS + MÜZİK
         // ══════════════════════════════════════════════
-        var card1 = Card(cardX, 68, cardW, 220);
+        var card1 = Card(cardX, 85, cardW, 230);
 
-        SectionHeader(card1, "🎮", "PERFORMANS", 14);
+        SectionHeader(card1, "🎮", "PERFORMANS", 18);
 
         var lblRamLbl = new Label
         {
             Text      = "Maksimum RAM",
-            ForeColor = Color.FromArgb(160, 160, 175),
-            Font      = new Font("Segoe UI", 9F),
-            Location  = new Point(16, 48),
+            ForeColor = Color.FromArgb(TEXT_DIM),
+            Font      = new Font("Segoe UI", 9.5F),
+            Location  = new Point(20, 56),
             AutoSize  = true,
             BackColor = Color.Transparent
         };
         card1.Controls.Add(lblRamLbl);
-
-        trkRam = new TrackBar
-        {
-            Location      = new Point(12, 67),
-            Size          = new Size(card1.Width - 90, 36),
-            Minimum       = 1024,
-            Maximum       = 16384,
-            TickFrequency = 1024,
-            LargeChange   = 1024,
-            SmallChange   = 512,
-            BackColor     = Color.FromArgb(CARD_BG)
-        };
-        trkRam.ValueChanged += (s, e) => lblRamValue.Text = $"{trkRam.Value / 1024.0:0.#} GB";
-        card1.Controls.Add(trkRam);
 
         lblRamValue = new Label
         {
             Text      = "4 GB",
             ForeColor = Color.FromArgb(ACCENT),
             Font      = new Font("Segoe UI", 11F, FontStyle.Bold),
-            Location  = new Point(card1.Width - 70, 72),
+            Location  = new Point(card1.Width - 80, 52),
             AutoSize  = true,
             BackColor = Color.Transparent
         };
         card1.Controls.Add(lblRamValue);
 
+        trkRam = new CustomSlider
+        {
+            Location      = new Point(20, 80),
+            Size          = new Size(card1.Width - 40, 24),
+            Minimum       = 1024,
+            Maximum       = 16384,
+            Value         = 4096
+        };
+        trkRam.ValueChanged += (s, e) => lblRamValue.Text = $"{trkRam.Value / 1024.0:0.#} GB";
+        card1.Controls.Add(trkRam);
+
         // Müzik ayırıcı
         card1.Controls.Add(new Panel
         {
-            Location  = new Point(16, 112),
-            Size      = new Size(card1.Width - 32, 1),
+            Location  = new Point(20, 122),
+            Size      = new Size(card1.Width - 40, 1),
             BackColor = Color.FromArgb(BORDER_CLR)
         });
 
-        SectionHeader(card1, "🎵", "MÜZİK", 120);
+        SectionHeader(card1, "🎵", "MÜZİK", 134);
 
         var lblVolLbl = new Label
         {
             Text      = "Arkaplan Müzik Sesi",
-            ForeColor = Color.FromArgb(160, 160, 175),
-            Font      = new Font("Segoe UI", 9F),
-            Location  = new Point(16, 155),
+            ForeColor = Color.FromArgb(TEXT_DIM),
+            Font      = new Font("Segoe UI", 9.5F),
+            Location  = new Point(20, 172),
             AutoSize  = true,
             BackColor = Color.Transparent
         };
         card1.Controls.Add(lblVolLbl);
 
-        trkVolume = new TrackBar
+        lblVolumeValue = new Label
         {
-            Location      = new Point(12, 174),
-            Size          = new Size(card1.Width - 90, 36),
+            Text      = "25%",
+            ForeColor = Color.FromArgb(ACCENT),
+            Font      = new Font("Segoe UI", 11F, FontStyle.Bold),
+            Location  = new Point(card1.Width - 80, 168),
+            AutoSize  = true,
+            BackColor = Color.Transparent
+        };
+        card1.Controls.Add(lblVolumeValue);
+
+        trkVolume = new CustomSlider
+        {
+            Location      = new Point(20, 196),
+            Size          = new Size(card1.Width - 40, 24),
             Minimum       = 0,
             Maximum       = 100,
-            TickFrequency = 10,
-            LargeChange   = 10,
-            SmallChange   = 5,
-            BackColor     = Color.FromArgb(CARD_BG)
+            Value         = 25
         };
         trkVolume.ValueChanged += (s, e) =>
         {
@@ -240,43 +276,42 @@ public class SettingsForm : Form
         };
         card1.Controls.Add(trkVolume);
 
-        lblVolumeValue = new Label
-        {
-            Text      = "25%",
-            ForeColor = Color.FromArgb(ACCENT),
-            Font      = new Font("Segoe UI", 11F, FontStyle.Bold),
-            Location  = new Point(card1.Width - 70, 179),
-            AutoSize  = true,
-            BackColor = Color.Transparent
-        };
-        card1.Controls.Add(lblVolumeValue);
-
         // ══════════════════════════════════════════════
         // KART 2 — BAŞLATICI
         // ══════════════════════════════════════════════
-        var card2 = Card(cardX, 300, cardW, 110);
+        var card2 = Card(cardX, 330, cardW, 110);
 
-        SectionHeader(card2, "🚀", "BAŞLATICI", 14);
+        SectionHeader(card2, "🚀", "BAŞLATICI", 18);
 
-        chkClose = StyledCheckBox("Oyun açılınca launcher'ı kapat", new Point(16, 48));
+        chkClose = new CustomToggle
+        {
+            Location = new Point(20, 56),
+            Text = "Oyun açılınca launcher'ı kapat",
+            Checked = true
+        };
         card2.Controls.Add(chkClose);
 
-        chkConsole = StyledCheckBox("Konsol penceresini göster (hata ayıklama)", new Point(16, 76));
+        chkConsole = new CustomToggle
+        {
+            Location = new Point(20, 84),
+            Text = "Konsol penceresini göster (hata ayıklama)",
+            Checked = false
+        };
         card2.Controls.Add(chkConsole);
 
         // ══════════════════════════════════════════════
         // KART 3 — JAVA
         // ══════════════════════════════════════════════
-        var card3 = Card(cardX, 424, cardW, 155);
+        var card3 = Card(cardX, 455, cardW, 155);
 
-        SectionHeader(card3, "☕", "JAVA", 14);
+        SectionHeader(card3, "☕", "JAVA", 18);
 
         var lblJavaLbl = new Label
         {
             Text      = "Mevcut Java Yolu",
-            ForeColor = Color.FromArgb(160, 160, 175),
+            ForeColor = Color.FromArgb(TEXT_DIM),
             Font      = new Font("Segoe UI", 9F),
-            Location  = new Point(16, 48),
+            Location  = new Point(20, 54),
             AutoSize  = true,
             BackColor = Color.Transparent
         };
@@ -285,10 +320,10 @@ public class SettingsForm : Form
         lblJavaPath = new Label
         {
             Text         = "Algılanıyor...",
-            ForeColor    = Color.FromArgb(100, 100, 115),
-            Font         = new Font("Segoe UI", 8F),
-            Location     = new Point(16, 66),
-            Size         = new Size(card3.Width - 32, 16),
+            ForeColor    = Color.FromArgb(120, 120, 135),
+            Font         = new Font("Segoe UI", 8.5F),
+            Location     = new Point(20, 72),
+            Size         = new Size(card3.Width - 40, 16),
             AutoEllipsis = true,
             BackColor    = Color.Transparent
         };
@@ -298,33 +333,33 @@ public class SettingsForm : Form
         {
             Text      = "",
             ForeColor = Color.FromArgb(40, 200, 90),
-            Font      = new Font("Segoe UI", 8.5F, FontStyle.Bold),
-            Location  = new Point(16, 84),
+            Font      = new Font("Segoe UI", 9F, FontStyle.Bold),
+            Location  = new Point(20, 92),
             AutoSize  = true,
             BackColor = Color.Transparent
         };
         card3.Controls.Add(lblJavaStatus);
 
-        btnJavaAuto = StyledButton("⬇  Java'yı Otomatik Kur", new Point(16, 108), new Size(210, 34),
-                                   Color.FromArgb(0, 130, 65), Color.White);
+        btnJavaAuto = StyledButton("⬇ Java'yı Otomatik Kur", new Point(20, 115), new Size(220, 32),
+                                   Color.FromArgb(0, 140, 70), Color.White);
         btnJavaAuto.Click += BtnJavaAuto_Click;
         card3.Controls.Add(btnJavaAuto);
 
-        btnJavaManual = StyledButton("📂  Manuel Seç", new Point(236, 108), new Size(130, 34),
-                                     Color.FromArgb(30, 30, 42), Color.White);
+        btnJavaManual = StyledButton("📂 Manuel Seç", new Point(250, 115), new Size(130, 32),
+                                     Color.FromArgb(35, 35, 45), Color.White);
         btnJavaManual.FlatAppearance.BorderColor = Color.FromArgb(BORDER_CLR);
         btnJavaManual.FlatAppearance.BorderSize  = 1;
         btnJavaManual.Click += BtnJavaManual_Click;
         card3.Controls.Add(btnJavaManual);
 
         // ── Alt Kaydet / İptal ──────────────────────────────────────────
-        btnSave = StyledButton("✔  Kaydet", new Point(Width - 230, 592), new Size(110, 36),
+        btnSave = StyledButton("✔  Kaydet", new Point(Width - 240, 625), new Size(120, 38),
                                Color.FromArgb(ACCENT), Color.Black);
         btnSave.Click += BtnSave_Click;
         Controls.Add(btnSave);
 
-        btnCancel = StyledButton("İptal", new Point(Width - 112, 592), new Size(90, 36),
-                                 Color.FromArgb(28, 28, 36), Color.White);
+        btnCancel = StyledButton("İptal", new Point(Width - 110, 625), new Size(86, 38),
+                                 Color.FromArgb(32, 32, 42), Color.White);
         btnCancel.FlatAppearance.BorderColor = Color.FromArgb(BORDER_CLR);
         btnCancel.FlatAppearance.BorderSize  = 1;
         btnCancel.Click += (s, e) => Close();
@@ -342,7 +377,7 @@ public class SettingsForm : Form
             BackColor = bg,
             ForeColor = fg,
             FlatStyle = FlatStyle.Flat,
-            Font      = new Font("Segoe UI", 9F, FontStyle.Bold),
+            Font      = new Font("Segoe UI", 9.5F, FontStyle.Bold),
             Cursor    = Cursors.Hand
         };
         btn.FlatAppearance.BorderSize = 0;
@@ -351,7 +386,7 @@ public class SettingsForm : Form
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             var r = new Rectangle(0, 0, btn.Width - 1, btn.Height - 1);
-            using var path = RoundedRect(r, 7);
+            using var path = RoundedRect(r, 8);
             using var brush = new SolidBrush(bg);
             e.Graphics.FillPath(brush, path);
             using var sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
@@ -359,19 +394,6 @@ public class SettingsForm : Form
             e.Graphics.DrawString(btn.Text, btn.Font, pen, new RectangleF(0, 0, btn.Width, btn.Height), sf);
         };
         return btn;
-    }
-
-    private static CheckBox StyledCheckBox(string text, Point loc)
-    {
-        return new CheckBox
-        {
-            Text      = text,
-            ForeColor = Color.FromArgb(185, 185, 200),
-            Font      = new Font("Segoe UI", 9.5F),
-            Location  = loc,
-            AutoSize  = true,
-            BackColor = Color.Transparent
-        };
     }
 
     // ─── P/Invoke for dragging ───────────────────────────────────────────
@@ -463,7 +485,7 @@ public class SettingsForm : Form
                         lblJavaStatus.Text      = "⚠  Kuruldu ama algılanamadı. Sistemi yeniden başlatın.";
                         lblJavaStatus.ForeColor = Color.FromArgb(255, 180, 0);
                     }
-                    btnJavaAuto.Text    = "⬇  Java'yı Otomatik Kur";
+                    btnJavaAuto.Text    = "⬇ Java'yı Otomatik Kur";
                     btnJavaAuto.Enabled = true;
                 });
             }
@@ -473,7 +495,7 @@ public class SettingsForm : Form
                 {
                     lblJavaStatus.Text      = "✘  Kurulum başarısız: " + ex.Message;
                     lblJavaStatus.ForeColor = Color.FromArgb(220, 60, 60);
-                    btnJavaAuto.Text    = "⬇  Java'yı Otomatik Kur";
+                    btnJavaAuto.Text    = "⬇ Java'yı Otomatik Kur";
                     btnJavaAuto.Enabled = true;
                 });
             }
@@ -496,5 +518,183 @@ public class SettingsForm : Form
             lblJavaStatus.Text      = "✔  Manuel Java seçildi";
             lblJavaStatus.ForeColor = Color.FromArgb(40, 200, 90);
         }
+    }
+}
+
+// ─── Custom Slider Control ─────────────────────────────────────────────────
+public class CustomSlider : Control
+{
+    public int Minimum { get; set; } = 0;
+    public int Maximum { get; set; } = 100;
+
+    private int _value = 50;
+    public int Value
+    {
+        get => _value;
+        set
+        {
+            _value = Math.Clamp(value, Minimum, Maximum);
+            Invalidate();
+            ValueChanged?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    public event EventHandler? ValueChanged;
+
+    private bool _isDragging = false;
+
+    public CustomSlider()
+    {
+        DoubleBuffered = true;
+        SetStyle(ControlStyles.Selectable | ControlStyles.UserPaint, true);
+        Cursor = Cursors.Hand;
+        Size = new Size(200, 24);
+    }
+
+    protected override void OnMouseDown(MouseEventArgs e)
+    {
+        base.OnMouseDown(e);
+        if (e.Button == MouseButtons.Left)
+        {
+            _isDragging = true;
+            UpdateValueFromMouse(e.X);
+        }
+    }
+
+    protected override void OnMouseMove(MouseEventArgs e)
+    {
+        base.OnMouseMove(e);
+        if (_isDragging)
+        {
+            UpdateValueFromMouse(e.X);
+        }
+    }
+
+    protected override void OnMouseUp(MouseEventArgs e)
+    {
+        base.OnMouseUp(e);
+        _isDragging = false;
+    }
+
+    private void UpdateValueFromMouse(int x)
+    {
+        int thumbW = 16;
+        int trackX = thumbW / 2;
+        int trackW = Width - thumbW;
+        
+        float pct = (float)(x - trackX) / trackW;
+        pct = Math.Clamp(pct, 0f, 1f);
+        
+        Value = Minimum + (int)(pct * (Maximum - Minimum));
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+
+        int trackH = 6;
+        int thumbW = 16;
+        int trackY = (Height - trackH) / 2;
+        int trackX = thumbW / 2;
+        int trackW = Width - thumbW;
+
+        // Draw background track
+        var trackRect = new Rectangle(trackX, trackY, trackW, trackH);
+        using var trackPath = SettingsForm.RoundedRect(trackRect, trackH / 2);
+        using var trackBrush = new SolidBrush(Color.FromArgb(40, 40, 50));
+        e.Graphics.FillPath(trackBrush, trackPath);
+
+        // Draw filled track
+        float pct = (float)(Value - Minimum) / (Maximum - Minimum);
+        int fillW = (int)(trackW * pct);
+        if (fillW > 0)
+        {
+            var fillRect = new Rectangle(trackX, trackY, fillW, trackH);
+            using var fillPath = SettingsForm.RoundedRect(fillRect, trackH / 2);
+            using var fillBrush = new SolidBrush(Color.FromArgb(unchecked((int)0xFFFFCC00))); // Accent yellow
+            e.Graphics.FillPath(fillBrush, fillPath);
+        }
+
+        // Draw thumb
+        int thumbX = trackX + fillW - (thumbW / 2);
+        int thumbY = (Height - thumbW) / 2;
+        var thumbRect = new Rectangle(thumbX, thumbY, thumbW, thumbW);
+        using var thumbBrush = new SolidBrush(Color.White);
+        e.Graphics.FillEllipse(thumbBrush, thumbRect);
+    }
+}
+
+// ─── Custom Toggle (Checkbox) Control ──────────────────────────────────────
+public class CustomToggle : Control
+{
+    private bool _checked;
+    public bool Checked
+    {
+        get => _checked;
+        set
+        {
+            if (_checked != value)
+            {
+                _checked = value;
+                Invalidate();
+                CheckedChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+    }
+
+    public event EventHandler? CheckedChanged;
+
+    public CustomToggle()
+    {
+        DoubleBuffered = true;
+        Cursor = Cursors.Hand;
+        Size = new Size(300, 24);
+    }
+
+    protected override void OnClick(EventArgs e)
+    {
+        base.OnClick(e);
+        Checked = !Checked;
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+
+        int toggleW = 40;
+        int toggleH = 20;
+        int toggleY = (Height - toggleH) / 2;
+        
+        var rect = new Rectangle(0, toggleY, toggleW, toggleH);
+        using var path = SettingsForm.RoundedRect(rect, toggleH / 2);
+
+        if (Checked)
+        {
+            using var brush = new SolidBrush(Color.FromArgb(unchecked((int)0xFFFFCC00))); // Accent yellow
+            e.Graphics.FillPath(brush, path);
+
+            // Thumb
+            int tD = toggleH - 4;
+            using var thumbBrush = new SolidBrush(Color.Black);
+            e.Graphics.FillEllipse(thumbBrush, toggleW - tD - 2, toggleY + 2, tD, tD);
+        }
+        else
+        {
+            using var brush = new SolidBrush(Color.FromArgb(40, 40, 50));
+            e.Graphics.FillPath(brush, path);
+
+            // Thumb
+            int tD = toggleH - 4;
+            using var thumbBrush = new SolidBrush(Color.FromArgb(140, 140, 150));
+            e.Graphics.FillEllipse(thumbBrush, 2, toggleY + 2, tD, tD);
+        }
+
+        // Text
+        using var textBrush = new SolidBrush(Color.FromArgb(200, 200, 210));
+        using var font = new Font("Segoe UI", 9.5F);
+        using var sf = new StringFormat { LineAlignment = StringAlignment.Center };
+        var textRect = new Rectangle(toggleW + 10, 0, Width - toggleW - 10, Height);
+        e.Graphics.DrawString(Text, font, textBrush, textRect, sf);
     }
 }
