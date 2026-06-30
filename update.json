@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "3.4",
+  "LatestVersion": "3.5",
   "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe",
-  "Changelog": "- Ana sayfa ve giriş ekranı arka planına animasyonlu parçacık (particle) efekti eklendi.\n- Görsel kalite artırıldı."
+  "Changelog": "- Arayüz ve yazılarda oluşan pikselleşme (aliasing) hatası düzeltildi.\n- Performans için grafikler çift tamponlama (Double Buffering) ile optimize edildi."
 }
