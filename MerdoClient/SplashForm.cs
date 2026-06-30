@@ -262,24 +262,18 @@ public class SplashForm : Form
         return path;
     }
 
+    private static Image? _largeLogo;
     private static void DrawLogo(Graphics g, int x, int y)
     {
-        using (var w = new SolidBrush(Color.White))
-            g.FillEllipse(w, x + 4, y + 4, 24, 24);
-        using (var r = new SolidBrush(Color.FromArgb(230, 40, 40)))
+        if (_largeLogo == null)
         {
-            g.FillEllipse(r, x + 2,  y + 1, 10, 10);
-            g.FillEllipse(r, x + 10, y + 0, 10, 10);
-            g.FillEllipse(r, x + 18, y + 2, 8, 8);
-            g.FillEllipse(r, x + 20, y + 21, 6, 9);
+            try { _largeLogo = Image.FromFile(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "logo_large.jpg")); } catch { }
         }
-        using (var yb = new SolidBrush(Color.FromArgb(255, 204, 0)))
+        if (_largeLogo != null)
         {
-            Point[] beak = { new(x+22,y+14), new(x+31,y+18), new(x+22,y+22) };
-            g.FillPolygon(yb, beak);
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+            g.DrawImage(_largeLogo, x - 20, y - 20, 100, 100);
         }
-        using (var b = new SolidBrush(Color.Black))
-            g.FillEllipse(b, x + 16, y + 11, 4, 4);
     }
 }
 

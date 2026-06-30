@@ -369,79 +369,17 @@ public partial class Form1 : Form
         e.Graphics.FillPath(brush, path);
     }
 
+    private static Image? _largeLogo;
     private void DrawLogoBadge(Graphics g, int x, int y)
     {
-        g.SmoothingMode = SmoothingMode.AntiAlias;
-
-        // Draw chicken vector logo (32x32 size)
-        int logoSize = 32;
-        Rectangle logoRect = new Rectangle(x, y, logoSize, logoSize);
-        
-        // White head base
-        using (var whiteBrush = new SolidBrush(Color.White))
+        if (_largeLogo == null)
         {
-            g.FillEllipse(whiteBrush, logoRect.X + 4, logoRect.Y + 4, 24, 24);
+            try { _largeLogo = Image.FromFile(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "logo_large.jpg")); } catch { }
         }
-        
-        // Red comb at top
-        using (var redBrush = new SolidBrush(Color.FromArgb(230, 40, 40)))
+        if (_largeLogo != null)
         {
-            g.FillEllipse(redBrush, logoRect.X + 2, logoRect.Y + 1, 10, 10);
-            g.FillEllipse(redBrush, logoRect.X + 10, logoRect.Y + 0, 10, 10);
-            g.FillEllipse(redBrush, logoRect.X + 18, logoRect.Y + 2, 8, 8);
-        }
-        
-        // Yellow beak pointing right
-        using (var yellowBrush = new SolidBrush(Color.FromArgb(255, 204, 0)))
-        {
-            Point[] beakPoints = {
-                new Point(logoRect.X + 22, logoRect.Y + 14),
-                new Point(logoRect.X + 31, logoRect.Y + 18),
-                new Point(logoRect.X + 22, logoRect.Y + 22)
-            };
-            g.FillPolygon(yellowBrush, beakPoints);
-        }
-        
-        // Black eye
-        using (var blackBrush = new SolidBrush(Color.Black))
-        {
-            g.FillEllipse(blackBrush, logoRect.X + 16, logoRect.Y + 11, 4, 4);
-        }
-
-        // Red wattle (gidi)
-        using (var redBrush = new SolidBrush(Color.FromArgb(230, 40, 40)))
-        {
-            g.FillEllipse(redBrush, logoRect.X + 20, logoRect.Y + 21, 6, 9);
-        }
-
-        // "MERDO" text
-        using (var font = new Font("Segoe UI", 16F, FontStyle.Bold))
-        using (var brush = new SolidBrush(Color.White))
-        {
-            g.DrawString("MERDO", font, brush, x + 40, y + 2);
-        }
-
-        // "LAUNCHER" badge
-        int badgeX = x + 130;
-        int badgeY = y + 7;
-        int badgeW = 85;
-        int badgeH = 22;
-        Rectangle badgeRect = new Rectangle(badgeX, badgeY, badgeW, badgeH);
-        using (var badgePath = GetRoundedRectanglePath(badgeRect, 5))
-        {
-            using (var yellowBrush = new SolidBrush(Color.FromArgb(255, 204, 0)))
-            {
-                g.FillPath(yellowBrush, badgePath);
-            }
-        }
-
-        using (var font = new Font("Segoe UI", 8.5F, FontStyle.Bold))
-        using (var brush = new SolidBrush(Color.Black))
-        {
-            var size = g.MeasureString("LAUNCHER", font);
-            float tx = badgeX + (badgeW - size.Width) / 2;
-            float ty = badgeY + (badgeH - size.Height) / 2;
-            g.DrawString("LAUNCHER", font, brush, tx, ty);
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+            g.DrawImage(_largeLogo, x - 20, y - 20, 180, 180);
         }
     }
 
