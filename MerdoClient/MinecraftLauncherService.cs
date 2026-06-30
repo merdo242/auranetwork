@@ -34,32 +34,36 @@ public class MinecraftLauncherService
                 onProgress?.Invoke("Oyun dosyaları indiriliyor ve doğrulanıyor...");
             };
 
-            // --- OptiFine'ı otomatik indir ve kur ---
-            string optifineName = "ForgeOptiFine 1.21.8";
-            string optiPath = Path.Combine(path.BasePath, "versions", optifineName);
-            string optiLibs = Path.Combine(path.BasePath, "libraries", "optifine");
+            // --- Orijinal Temiz Kurulum (Fabric + Sodium 1.21.1) ---
+            string versionsDir = Path.Combine(path.BasePath, "versions");
+            string? fabricVerDir = Directory.Exists(versionsDir) 
+                ? Directory.GetDirectories(versionsDir, "fabric-loader-*-1.21.1").FirstOrDefault() 
+                : null;
+                
+            bool needsDownload = string.IsNullOrEmpty(fabricVerDir) || !Directory.Exists(Path.Combine(path.BasePath, "libraries", "net", "fabricmc"));
             
-            if (!Directory.Exists(optiPath) || !Directory.Exists(optiLibs))
+            if (needsDownload)
             {
-                onProgress?.Invoke("OptiFine Full Paketi indiriliyor (Eksik kütüphaneler dahil)... Lütfen bekleyin.");
+                onProgress?.Invoke("Orijinal OptiFine (Fabric+Sodium) Paketi indiriliyor... Lütfen bekleyin.");
                 try 
                 {
                     using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(10) };
-                    var zipBytes = client.GetByteArrayAsync("https://github.com/merdo242/merdoclient/raw/main/installer/ForgeOptiFine_Full.zip").GetAwaiter().GetResult();
-                    var tempZip = Path.Combine(Path.GetTempPath(), "merdo_optifine_full.zip");
+                    var zipBytes = client.GetByteArrayAsync("https://github.com/merdo242/merdoclient/raw/main/installer/Merdo_Fabric_1.21.1.zip").GetAwaiter().GetResult();
+                    var tempZip = Path.Combine(Path.GetTempPath(), "merdo_fabric_1.21.1.zip");
                     System.IO.File.WriteAllBytes(tempZip, zipBytes);
                     System.IO.Compression.ZipFile.ExtractToDirectory(tempZip, path.BasePath, true);
                     System.IO.File.Delete(tempZip);
-                    onProgress?.Invoke("OptiFine ve gerekli kütüphaneler başarıyla kuruldu.");
+                    onProgress?.Invoke("Orijinal sürüm ve modlar başarıyla kuruldu.");
                 } 
                 catch (Exception ex) 
                 {
-                    return new LauncherResult(false, "OptiFine indirilemedi: " + ex.Message + "\nİnternet bağlantınızı kontrol edin.");
+                    return new LauncherResult(false, "Sürüm indirilemedi: " + ex.Message + "\nİnternet bağlantınızı kontrol edin.");
                 }
             }
 
-            // --- OptiFine sürümünü otomatik bul (yoksa 1.21.8 vanilla) ---
-            string launchVersion = FindOptifineVersion(path.BasePath) ?? FixedVersion;
+            // --- Kurulan Fabric sürümünü bul ---
+            fabricVerDir = Directory.GetDirectories(versionsDir, "fabric-loader-*-1.21.1").FirstOrDefault();
+            string launchVersion = string.IsNullOrEmpty(fabricVerDir) ? FixedVersion : Path.GetFileName(fabricVerDir);
 
             // --- Java yolunu bul ---
             onProgress?.Invoke("Java kontrol ediliyor...");
@@ -74,29 +78,55 @@ public class MinecraftLauncherService
                     "Tipik konum:\n" +
                     @"%AppData%\.minecraft\runtime\java-runtime-delta\windows\java-runtime-delta\bin\javaw.exe");
 
+            // --- Eksik dosyaları zorla indir ---
+            onProgress?.Invoke("Eksik oyun dosyaları doğrulanıp indiriliyor... (Bu işlem ilk açılışta sürebilir)");
+            launcher.InstallAsync(launchVersion).GetAwaiter().GetResult();
+
             // --- Session ve başlatma seçenekleri ---
             var session = new MSession(username, "offline_token", Guid.NewGuid().ToString("N"));
             var launchOptions = new MLaunchOption
             {
+                // MaximumRamMb = settings.MaxRamMb, // RAM Sınırını kaldırıyoruz
                 Session      = session,
-                MaximumRamMb = settings.MaxRamMb,
                 JavaPath     = javaPath
             };
 
             // Process'i oluştur (Task.Run içinde çalıştığından deadlock yok)
             onProgress?.Invoke("Minecraft dosyaları hazırlanıyor...");
-            var process = launcher.BuildProcessAsync(launchVersion, launchOptions, default)
-                                  .AsTask()
-                                  .ConfigureAwait(false)
-                                  .GetAwaiter()
-                                  .GetResult();
+            var process = launcher.CreateProcessAsync(launchVersion, launchOptions).GetAwaiter().GetResult();
+            
+            // javaw.exe yerine java.exe kullanalım ki hata çıktılarını okuyabilelim
+            string exePath = javaPath;
+            if (exePath.EndsWith("javaw.exe", StringComparison.OrdinalIgnoreCase))
+            {
+                string javaExePath = exePath.Substring(0, exePath.Length - 5) + ".exe";
+                if (System.IO.File.Exists(javaExePath))
+                {
+                    exePath = javaExePath;
+                }
+            }
+            process.StartInfo.FileName = exePath;
 
             process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow  = !settings.ShowConsole;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.RedirectStandardError = true;
 
-            bool started = process.Start();
-            if (!started)
-                return new LauncherResult(false, "Minecraft prosesi başlatılamadı.");
+            process.Start();
+
+            // Wait a short amount of time to see if it crashes immediately (e.g. Java version mismatch)
+            if (process.WaitForExit(2000))
+            {
+                string errorOutput = process.StandardError.ReadToEnd();
+                return new LauncherResult(false, 
+                    $"Minecraft aniden kapandı. Oyun desteklenmeyen bir Java sürümüyle açılmaya çalışılmış olabilir.\n" +
+                    $"Hata detayı: {errorOutput}\n\n" +
+                    "Lütfen ayarlar menüsünden Java 21 yolunu seçtiğinizden emin olun.");
+            }
+
+            if (settings.CloseOnLaunch)
+            {
+                System.Windows.Forms.Application.Exit();
+            }
 
             return new LauncherResult(true, $"Minecraft {launchVersion} başarıyla başlatıldı!");
         }
