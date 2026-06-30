@@ -786,7 +786,6 @@ public partial class Form1 : Form
         }
         catch { }
     }
-    }
 
     private void TransitionTimer_Tick(object? sender, EventArgs e)
     {
