@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "3.2",
+  "LatestVersion": "3.3",
   "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe",
-  "Changelog": "- Form başlığındaki (title bar) ikon yeni M logosu ile değiştirildi.\n- Splash ekranı başlık tasarımı ana sayfayla aynı olacak şekilde güncellendi.\n- Oyuncu yetkilerine (Kurucu, Admin, Mod, VIP vs.) göre dinamik renkli rozet sistemi eklendi."
+  "Changelog": "- Oyuncu yetki kontrolü altyapısı güncellendi (8080 portu).\n- Merdo Network API üzerinden dinamik rol atama iyileştirildi."
 }
