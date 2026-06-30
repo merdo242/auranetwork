@@ -40,6 +40,19 @@ public partial class Form1 : Form
         }
     }
 
+    // Parçacık sistemi için
+    private struct Particle
+    {
+        public float X, Y;
+        public float SpeedX, SpeedY;
+        public float Size;
+        public float Alpha;
+        public Color Color;
+    }
+    private readonly List<Particle> _particles = new();
+    private readonly Random _rng = new();
+    private readonly System.Windows.Forms.Timer _particleTimer = new();
+
     private readonly NewsSlide[] _newsSlides = new[]
     {
         new NewsSlide("TURNUVALAR", "KAZANMAYA HAZIR OL", "Haftalık turnuvalara katıl, rakiplerinle yarış ve büyük ödüllerin sahibi ol!"),
@@ -150,6 +163,18 @@ public partial class Form1 : Form
         _onlineCheckTimer.Tick += (s, e) => UpdateOnlinePlayerCount();
         _onlineCheckTimer.Start();
         UpdateOnlinePlayerCount();
+
+        // Particle init
+        for (int i = 0; i < 60; i++) SpawnParticle();
+        _particleTimer.Interval = 16;
+        _particleTimer.Tick += (s, e) =>
+        {
+            UpdateParticles();
+            // Sadece aktif olan paneli yenile
+            if (pnlLogin.Visible) pnlLogin.Invalidate();
+            if (pnlHome.Visible) pnlHome.Invalidate();
+        };
+        _particleTimer.Start();
     }
 
     protected override void OnLoad(EventArgs e)
@@ -179,6 +204,40 @@ public partial class Form1 : Form
         MakeControlRounded(btnWebsite, 6);
         MakeControlRounded(btnDiscordLink, 6);
         MakeControlRounded(btnExit, 6);
+    }
+
+    private void SpawnParticle()
+    {
+        _particles.Add(new Particle
+        {
+            X      = _rng.Next(0, Width),
+            Y      = _rng.Next(0, Height),
+            SpeedX = (float)(_rng.NextDouble() - 0.5) * 0.6f,
+            SpeedY = (float)(-_rng.NextDouble()) * 0.8f - 0.2f,
+            Size   = (float)(_rng.NextDouble() * 3 + 1),
+            Alpha  = (float)(_rng.NextDouble() * 0.6 + 0.1),
+            Color  = _rng.Next(2) == 0
+                        ? Color.FromArgb(255, 204, 0)   // Altın
+                        : Color.FromArgb(80, 140, 255)  // Mavi
+        });
+    }
+
+    private void UpdateParticles()
+    {
+        for (int i = _particles.Count - 1; i >= 0; i--)
+        {
+            var p = _particles[i];
+            p.X     += p.SpeedX;
+            p.Y     += p.SpeedY;
+            p.Alpha -= 0.003f;
+            _particles[i] = p;
+
+            if (p.Alpha <= 0 || p.Y < -10)
+            {
+                _particles.RemoveAt(i);
+                SpawnParticle();
+            }
+        }
     }
 
     private void StartBackgroundMusic()
@@ -234,6 +293,25 @@ public partial class Form1 : Form
 
     private void Panel_Paint(object? sender, PaintEventArgs e)
     {
+        var panel = (Panel)sender!;
+        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+
+        // Background Gradient
+        using var bg = new LinearGradientBrush(
+            panel.ClientRectangle,
+            Color.FromArgb(10, 10, 14),
+            Color.FromArgb(18, 18, 24),
+            LinearGradientMode.Vertical);
+        e.Graphics.FillRectangle(bg, panel.ClientRectangle);
+
+        // Draw particles
+        foreach (var p in _particles)
+        {
+            int a = Math.Clamp((int)(p.Alpha * 255), 0, 255);
+            using var brush = new SolidBrush(Color.FromArgb(a, p.Color));
+            e.Graphics.FillEllipse(brush, p.X - p.Size / 2, p.Y - p.Size / 2, p.Size, p.Size);
+        }
+
         DrawLogoBadge(e.Graphics, 0, 0);
     }
 
