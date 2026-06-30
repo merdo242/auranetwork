@@ -462,7 +462,7 @@ partial class Form1
         this.btnWebsiteLink.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this.btnWebsiteLink.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.btnWebsiteLink.ForeColor = System.Drawing.Color.Black;
-        this.btnWebsiteLink.Location = new System.Drawing.Point(800, 605);
+        this.btnWebsiteLink.Location = new System.Drawing.Point(1060, 648);
         this.btnWebsiteLink.Name = "btnWebsiteLink";
         this.btnWebsiteLink.Size = new System.Drawing.Size(120, 34);
         this.btnWebsiteLink.Text = "chickennw.com";
