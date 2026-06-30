@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "2.4",
+  "LatestVersion": "2.5",
   "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe",
-  "Changelog": "- Sürüm seçimi ayarlardan kaldırıldı, Minecraft doğrudan 1.21.8 sürümünde açılacak şekilde sabitlendi.\n- Ayarlara müzik ses seviyesi kontrolü (0-100%) eklendi."
+  "Changelog": "- 1.21.8 OptiFine (ForgeOptiFine 1.21.8) otomatik tanıma desteği eklendi.\n- Java 21 (java-runtime-delta) tespiti ve önceliklendirmesi yapıldı, çökmeler giderildi."
 }

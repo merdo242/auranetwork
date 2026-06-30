@@ -28,8 +28,8 @@ public class MinecraftLauncherService
             var launcher = new MinecraftLauncher(path);
             var settings = _settingsService.Settings;
 
-            // --- Sabit sürüm 1.21.8 ---
-            string launchVersion = FixedVersion;
+            // --- OptiFine sürümünü otomatik bul (yoksa 1.21.8 vanilla) ---
+            string launchVersion = FindOptifineVersion(path.BasePath) ?? FixedVersion;
 
             // --- Java yolunu bul ---
             string javaPath = !string.IsNullOrEmpty(settings.JavaPath) && File.Exists(settings.JavaPath)
@@ -80,7 +80,33 @@ public class MinecraftLauncherService
     /// <summary>Sistemde kurulu javaw.exe'yi arar.</summary>
     public static string FindSystemJavaPath()
     {
-        // 1) JAVA_HOME
+        // 1) Minecraft'ın kendi runtime dizini — ÖNCE ARANIR (Java 21/17 Öncelikli)
+        string appData   = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        string mcRuntime = Path.Combine(appData, ".minecraft", "runtime");
+        if (Directory.Exists(mcRuntime))
+        {
+            try
+            {
+                // Önce java-runtime-delta (Java 21 - MC 1.20.5+ için) veya gamma (Java 17) ara
+                string[] preferredRuntimes = { "java-runtime-delta", "java-runtime-gamma", "java-runtime-beta" };
+                foreach (var pref in preferredRuntimes)
+                {
+                    var prefDirs = Directory.GetDirectories(mcRuntime, pref, SearchOption.AllDirectories);
+                    foreach (var pDir in prefDirs)
+                    {
+                        var jPath = Path.Combine(pDir, "bin", "javaw.exe");
+                        if (File.Exists(jPath)) return jPath;
+                    }
+                }
+
+                // Bulunamazsa herhangi bir javaw.exe (legacy vb.)
+                foreach (var found in Directory.EnumerateFiles(mcRuntime, "javaw.exe", SearchOption.AllDirectories))
+                    return found;
+            }
+            catch { }
+        }
+
+        // 2) JAVA_HOME
         string? javaHome = Environment.GetEnvironmentVariable("JAVA_HOME");
         if (!string.IsNullOrEmpty(javaHome))
         {
@@ -88,7 +114,7 @@ public class MinecraftLauncherService
             if (File.Exists(c)) return c;
         }
 
-        // 2) PATH
+        // 3) PATH
         string? pathEnv = Environment.GetEnvironmentVariable("PATH");
         if (!string.IsNullOrEmpty(pathEnv))
         {
@@ -97,20 +123,6 @@ public class MinecraftLauncherService
                 string c = Path.Combine(dir.Trim(), "javaw.exe");
                 if (File.Exists(c)) return c;
             }
-        }
-
-        // 3) Minecraft'ın kendi runtime dizini — ÖNCE ARANIR
-        //    (Türkçe 'ı' içeren 'wındows' klasörü dahil EnumerateFiles ile bulunur)
-        string appData   = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        string mcRuntime = Path.Combine(appData, ".minecraft", "runtime");
-        if (Directory.Exists(mcRuntime))
-        {
-            try
-            {
-                foreach (var found in Directory.EnumerateFiles(mcRuntime, "javaw.exe", SearchOption.AllDirectories))
-                    return found;
-            }
-            catch { }
         }
 
         // 4) Bilinen Java kurulum dizinleri
@@ -138,6 +150,30 @@ public class MinecraftLauncherService
         }
 
         return string.Empty;
+    }
+
+    /// <summary>.minecraft/versions klasöründeki 1.21.8 Optifine sürümlerini arar</summary>
+    private static string? FindOptifineVersion(string basePath)
+    {
+        string versionsDir = Path.Combine(basePath, "versions");
+        if (!Directory.Exists(versionsDir)) return null;
+
+        try
+        {
+            var dirs = Directory.GetDirectories(versionsDir);
+            // ForgeOptiFine 1.21.8 veya OptiFine 1.21.8 gibi klasörleri bul
+            foreach (var d in dirs)
+            {
+                string name = Path.GetFileName(d);
+                if (name.Contains("1.21.8") && name.IndexOf("OptiFine", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return name;
+                }
+            }
+        }
+        catch { }
+
+        return null;
     }
 }
 
