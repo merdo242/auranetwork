@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "2.7",
+  "LatestVersion": "2.8",
   "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe",
   "Changelog": "- 1.21.8 OptiFine dosyası bulunamazsa otomatik ve arka planda indirilme eklendi.\n- Başlatıcıyı güncellemek zorunlu hale getirildi, güncellemeyi reddedenler başlatıcıya giremez.\n- Oyun indirilirken / doğrulanırken ekranda ilerleme durumunu gösteren bilgi mesajları eklendi."
 }
