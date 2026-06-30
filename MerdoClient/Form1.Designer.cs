@@ -259,7 +259,7 @@ partial class Form1
         this.pnlRightLoginCard.Controls.Add(this.pnlSavedAccounts);
         this.pnlRightLoginCard.Controls.Add(this.lblForgotPassword);
         this.pnlRightLoginCard.Controls.Add(this.lblRegister);
-        this.pnlRightLoginCard.Location = new System.Drawing.Point(600, 100);
+        this.pnlRightLoginCard.Location = new System.Drawing.Point(680, 100);
         this.pnlRightLoginCard.Name = "pnlRightLoginCard";
         this.pnlRightLoginCard.Size = new System.Drawing.Size(380, 480);
 

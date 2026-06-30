@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "4.4",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe?v=4.4",
-  "Changelog": "- Giriş yapma arayüzü (tasarımı) baştan aşağıya istenilen tasarıma birebir uyacak şekilde (genişlik, çerçeve, renkler) yenilendi."
+  "LatestVersion": "4.5",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe?v=4.5",
+  "Changelog": "- Giriş paneli arayüz hizalaması (tasarıma sıfıra sıfır oturması için) kusursuzlaştırıldı."
 }
