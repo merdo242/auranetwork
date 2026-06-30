@@ -494,40 +494,116 @@ public partial class Form1 : Form
         {
             pnlSavedAccounts.Controls.Add(lblSavedAccountsPlaceholder);
             lblSavedAccountsPlaceholder.Visible = true;
+            pnlSavedAccounts.Height = 44;
+            lblForgotPassword.Top = 335;
+            lblRegister.Top = 358;
         }
         else
         {
             lblSavedAccountsPlaceholder.Visible = false;
             
-            int xOffset = 10;
-            int btnWidth = 115;
-            int btnHeight = 28;
-            int count = Math.Min(saved.Count, 2);
+            int yOffset = 0;
+            int itemHeight = 36;
             
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < saved.Count; i++)
             {
                 var acc = saved[i];
-                var btnAcc = new Button
+                var pnlAcc = new Panel
+                {
+                    Size = new Size(pnlSavedAccounts.Width, itemHeight),
+                    Location = new Point(0, yOffset),
+                    BackColor = Color.FromArgb(28, 28, 32),
+                    Cursor = Cursors.Hand
+                };
+
+                pnlAcc.Paint += (s, ev) =>
+                {
+                    ev.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                    var rect = new Rectangle(0, 0, pnlAcc.Width - 1, pnlAcc.Height - 1);
+                    using var path = GetRoundedRectanglePath(rect, 6);
+                    using var pen = new Pen(Color.FromArgb(255, 204, 0), 1.5f);
+                    ev.Graphics.DrawPath(pen, path);
+                };
+                
+                MakeControlRounded(pnlAcc, 6);
+
+                var lblIcon = new Label
+                {
+                    Text = "👤",
+                    Font = new Font("Segoe UI", 11F),
+                    ForeColor = Color.White,
+                    AutoSize = true,
+                    Location = new Point(10, 7),
+                    BackColor = Color.Transparent,
+                    Cursor = Cursors.Hand
+                };
+
+                var lblUser = new Label
                 {
                     Text = acc.Username,
-                    Size = new Size(btnWidth, btnHeight),
-                    Location = new Point(xOffset, 8),
-                    BackColor = Color.FromArgb(28, 28, 32),
+                    Font = new Font("Segoe UI", 9.5F, FontStyle.Bold),
                     ForeColor = Color.White,
-                    FlatStyle = FlatStyle.Flat,
-                    Font = new Font("Segoe UI", 8.5F, FontStyle.Bold)
+                    AutoSize = true,
+                    Location = new Point(35, 9),
+                    BackColor = Color.Transparent,
+                    Cursor = Cursors.Hand
                 };
-                btnAcc.FlatAppearance.BorderSize = 0;
+
+                var lblArrow = new Label
+                {
+                    Text = "→",
+                    Font = new Font("Segoe UI", 10F),
+                    ForeColor = Color.FromArgb(255, 204, 0),
+                    AutoSize = true,
+                    Location = new Point(lblUser.Right + 2, 8),
+                    BackColor = Color.Transparent,
+                    Cursor = Cursors.Hand
+                };
+
+                var lblDelete = new Label
+                {
+                    Text = "✖",
+                    Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                    ForeColor = Color.Red,
+                    AutoSize = true,
+                    BackColor = Color.Transparent,
+                    Cursor = Cursors.Hand
+                };
+                lblDelete.Location = new Point(pnlAcc.Width - 25, 10);
                 
-                // Click handler — kayıtlı hesapla doğrudan giriş (UI alanları atlanır)
-                btnAcc.Click += (s, ev) => LoginDirect(acc.Username, acc.Password);
+                pnlAcc.Layout += (s, ev) => 
+                {
+                    lblArrow.Left = lblUser.Right + 2;
+                };
+
+                lblDelete.Click += (s, ev) => 
+                {
+                    _accountService.RemoveSavedAccount(acc.Username);
+                    UpdateSavedAccountsUI();
+                };
+
+                EventHandler loginHandler = (s, ev) => LoginDirect(acc.Username, acc.Password);
+                pnlAcc.Click += loginHandler;
+                lblIcon.Click += loginHandler;
+                lblUser.Click += loginHandler;
+                lblArrow.Click += loginHandler;
+
+                pnlAcc.Controls.Add(lblIcon);
+                pnlAcc.Controls.Add(lblUser);
+                pnlAcc.Controls.Add(lblArrow);
+                pnlAcc.Controls.Add(lblDelete);
+
+                pnlSavedAccounts.Controls.Add(pnlAcc);
                 
-                pnlSavedAccounts.Controls.Add(btnAcc);
-                MakeControlRounded(btnAcc, 6);
-                ApplyHoverEffect(btnAcc, Color.FromArgb(45, 45, 50), Color.FromArgb(255, 204, 0));
-                
-                xOffset += 125;
+                yOffset += itemHeight + 6;
             }
+            
+            int totalHeight = Math.Max(44, yOffset);
+            pnlSavedAccounts.Height = totalHeight;
+            
+            int shift = Math.Max(0, totalHeight - 44);
+            lblForgotPassword.Top = 335 + shift;
+            lblRegister.Top = 358 + shift;
         }
     }
 

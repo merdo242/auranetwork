@@ -82,7 +82,16 @@ public class MerdoServerPlugin extends JavaPlugin implements Listener {
                                 if (uuid != null) {
                                     User user = api.getUserManager().loadUser(uuid).join();
                                     if (user != null) {
-                                        role = user.getPrimaryGroup();
+                                        String prefix = user.getCachedData().getMetaData().getPrefix();
+                                        if (prefix != null && !prefix.trim().isEmpty()) {
+                                            role = prefix.replaceAll("(?i)[&§][0-9a-fk-or]", "")
+                                                         .replaceAll("(?i)[&§]#[0-9a-f]{6}", "")
+                                                         .replaceAll("(?i)<#[0-9a-f]{6}>", "")
+                                                         .replaceAll("[\\[\\]]", "")
+                                                         .trim();
+                                        } else {
+                                            role = user.getPrimaryGroup();
+                                        }
                                         if (role.equalsIgnoreCase("default")) role = "OYUNCU";
                                     }
                                 }
