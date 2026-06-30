@@ -374,7 +374,7 @@ public partial class Form1 : Form
     {
         if (_largeLogo == null)
         {
-            try { _largeLogo = Image.FromFile(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "logo_large.jpg")); } catch { }
+            try { _largeLogo = Image.FromFile(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "logo_large.png")); } catch { }
         }
         if (_largeLogo != null)
         {

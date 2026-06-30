@@ -21,7 +21,7 @@
     <Content Include="Resources\logo_small.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\logo_large.jpg">
+    <Content Include="Resources\logo_large.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
