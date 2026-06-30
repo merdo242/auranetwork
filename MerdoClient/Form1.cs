@@ -233,7 +233,7 @@ public partial class Form1 : Form
 
     private void Panel_Paint(object? sender, PaintEventArgs e)
     {
-        DrawLogoBadge(e.Graphics, 5, 5);
+        DrawLogoBadge(e.Graphics, 5, -10);
     }
 
     private void CardPanel_Paint(object? sender, PaintEventArgs e)

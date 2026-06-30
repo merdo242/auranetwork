@@ -25,10 +25,11 @@ Name: "startmenu"; Description: "Başlat menüsüne kısayol ekle"; GroupDescrip
 
 [Files]
 Source: "..\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\MerdoClient\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\Merdo Launcher"; Filename: "{app}\MerdoLauncher.exe"
-Name: "{autodesktop}\Merdo Launcher"; Filename: "{app}\MerdoLauncher.exe"; Tasks: desktopicon
+Name: "{group}\Merdo Launcher"; Filename: "{app}\MerdoLauncher.exe"; IconFilename: "{app}\icon.ico"
+Name: "{autodesktop}\Merdo Launcher"; Filename: "{app}\MerdoLauncher.exe"; IconFilename: "{app}\icon.ico"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\MerdoLauncher.exe"; Description: "Merdo Launcher'ı başlat"; Flags: nowait postinstall skipifsilent

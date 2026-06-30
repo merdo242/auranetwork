@@ -153,7 +153,7 @@ public class SplashForm : Form
         }
 
         // --- Logo çizimi ---
-        DrawLogo(g, 40, 52);
+        DrawLogo(g, 10, 52);
 
         // --- Başlık ---
         using (var titleFont = new Font("Segoe UI", 22F, FontStyle.Bold))
