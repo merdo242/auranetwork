@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "3.5",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe",
-  "Changelog": "- Arayüz ve yazılarda oluşan pikselleşme (aliasing) hatası düzeltildi.\n- Performans için grafikler çift tamponlama (Double Buffering) ile optimize edildi."
+  "LatestVersion": "3.6",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe?v=3.6",
+  "Changelog": "- Performans ve uyumluluk sorunlarına yol açan arka plan parçacıkları kaldırıldı.\n- Giriş ekranı ve ana sayfa eski akıcı ve yüksek kaliteli haline getirildi."
 }
