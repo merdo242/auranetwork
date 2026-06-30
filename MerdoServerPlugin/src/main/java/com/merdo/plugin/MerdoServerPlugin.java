@@ -83,6 +83,18 @@ public class MerdoServerPlugin extends JavaPlugin implements Listener {
                                     User user = api.getUserManager().loadUser(uuid).join();
                                     if (user != null) {
                                         String prefix = user.getCachedData().getMetaData().getPrefix();
+                                        
+                                        // If prefix is null (e.g. offline user or inherited), try from their primary group
+                                        if (prefix == null || prefix.trim().isEmpty()) {
+                                            net.luckperms.api.model.group.Group group = api.getGroupManager().getGroup(user.getPrimaryGroup());
+                                            if (group != null) {
+                                                prefix = group.getCachedData().getMetaData().getPrefix();
+                                                if (prefix == null || prefix.trim().isEmpty()) {
+                                                    prefix = group.getDisplayName(); // fallback to display name if prefix doesn't exist
+                                                }
+                                            }
+                                        }
+
                                         if (prefix != null && !prefix.trim().isEmpty()) {
                                             role = prefix.replaceAll("(?i)[&§][0-9a-fk-or]", "")
                                                          .replaceAll("(?i)[&§]#[0-9a-f]{6}", "")
