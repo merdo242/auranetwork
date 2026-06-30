@@ -46,10 +46,7 @@ public class UpdateCheckerService
                   $"📋 Değişiklikler:\n{data.Changelog}\n\n" +
                   $"Devam etmek için güncellemeyi yüklemelisiniz. Şimdi yüklensin mi?";
 
-        var result = MessageBox.Show(parentForm, msg,
-            "🔄 Zorunlu Güncelleme Mevcut",
-            MessageBoxButtons.YesNo,
-            MessageBoxIcon.Warning);
+        var result = MerdoDialog.ShowYesNo(parentForm, msg);
 
         if (result != DialogResult.Yes)
         {
@@ -66,9 +63,7 @@ public class UpdateCheckerService
     {
         if (string.IsNullOrEmpty(data.DownloadUrl))
         {
-            MessageBox.Show(parentForm,
-                "İndirme bağlantısı bulunamadı. Lütfen web sitesini ziyaret edin.",
-                "Merdo Launcher", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MerdoDialog.ShowWarning(parentForm, "İndirme bağlantısı bulunamadı. Lütfen web sitesini ziyaret edin.");
             return;
         }
 
@@ -181,11 +176,8 @@ public class UpdateCheckerService
                 dlgForm.Invoke(() =>
                 {
                     dlgForm.Close();
-                    MessageBox.Show(parentForm,
-                        $"İndirme sırasında hata oluştu:\n{ex.Message}\n\nEl ile güncellemek için:\n{data.DownloadUrl}",
-                        "İndirme Hatası",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
+                    MerdoDialog.ShowError(parentForm,
+                        $"İndirme sırasında hata oluştu:\n{ex.Message}\n\nEl ile güncellemek için:\n{data.DownloadUrl}");
                 });
             }
         });

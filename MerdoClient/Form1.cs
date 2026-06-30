@@ -786,6 +786,11 @@ public partial class Form1 : Form
 
     private void ShowMessage(string message, MessageBoxIcon icon)
     {
-        MessageBox.Show(message, "Merdo Launcher", MessageBoxButtons.OK, icon);
+        if (icon == MessageBoxIcon.Error)
+            MerdoDialog.ShowError(this, message);
+        else if (icon == MessageBoxIcon.Warning)
+            MerdoDialog.ShowWarning(this, message);
+        else
+            MerdoDialog.ShowInfo(this, message);
     }
 }
