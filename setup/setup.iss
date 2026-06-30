@@ -24,8 +24,7 @@ Name: "desktopicon"; Description: "Masaüstüne kısayol oluştur"; GroupDescrip
 Name: "startmenu"; Description: "Başlat menüsüne kısayol ekle"; GroupDescription: "Ek görevler:"
 
 [Files]
-Source: "..\publish\MerdoLauncher.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\publish\Resources\bg_music.mp3"; DestDir: "{app}\Resources"; Flags: ignoreversion
+Source: "..\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\Merdo Launcher"; Filename: "{app}\MerdoLauncher.exe"
