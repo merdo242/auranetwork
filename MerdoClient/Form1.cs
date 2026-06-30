@@ -727,50 +727,33 @@ public partial class Form1 : Form
             client.Timeout = System.TimeSpan.FromSeconds(5);
             client.DefaultRequestHeaders.UserAgent.ParseAdd("MerdoLauncher/2.0");
 
-            // 1. Fetch Rank
-            try
+            // 1. Instant override for known staff to avoid API delays
+            string? instantRole = null;
+            var lowerUser = username.ToLower();
+            if (lowerUser == "merdo" || lowerUser == "merdo242")
+                instantRole = "KURUCU";
+
+            if (instantRole != null)
             {
-                var response = await client.GetStringAsync($"http://91.132.49.16:24454/check?username={System.Uri.EscapeDataString(username)}");
-                using var doc = System.Text.Json.JsonDocument.Parse(response);
-                if (doc.RootElement.TryGetProperty("role", out var roleProp))
+                UpdateRoleBadge(instantRole);
+            }
+            else
+            {
+                try
                 {
-                    var roleStr = roleProp.GetString();
-                    if (!string.IsNullOrEmpty(roleStr))
+                    var response = await client.GetStringAsync($"http://91.132.49.16:24454/check?username={System.Uri.EscapeDataString(username)}");
+                    using var doc = System.Text.Json.JsonDocument.Parse(response);
+                    if (doc.RootElement.TryGetProperty("role", out var roleProp))
                     {
-                        Invoke(() =>
+                        var roleStr = roleProp.GetString();
+                        if (!string.IsNullOrEmpty(roleStr))
                         {
-                            lblRole.Text = roleStr.ToUpper();
-                            // Set badge color based on role
-                            var roleLower = roleStr.ToLower();
-                            Color badgeColor;
-                            if (roleLower.Contains("kurucu") || roleLower.Contains("founder"))
-                                badgeColor = Color.FromArgb(255, 165, 0); // Orange/Gold
-                            else if (roleLower.Contains("admin") || roleLower.Contains("owner"))
-                                badgeColor = Color.FromArgb(220, 50, 50);  // Red
-                            else if (roleLower.Contains("mod"))
-                                badgeColor = Color.FromArgb(130, 80, 220); // Purple
-                            else if (roleLower.Contains("vip"))
-                                badgeColor = Color.FromArgb(0, 180, 220);  // Blue
-                            else
-                                badgeColor = Color.FromArgb(255, 204, 0);  // Yellow (default Oyuncu)
-
-                            // Resize badge panel to fit text
-                            using var g = pnlRoleBadge.CreateGraphics();
-                            var sz = g.MeasureString(lblRole.Text, lblRole.Font);
-                            int newW = (int)sz.Width + 20;
-                            pnlRoleBadge.Width  = newW;
-                            lblRole.Width       = newW;
-                            // Re-center badge horizontally
-                            pnlRoleBadge.Left = (pnlHomeRightCard.Width - newW) / 2;
-
-                            // Store color for paint
-                            pnlRoleBadge.Tag = badgeColor;
-                            pnlRoleBadge.Invalidate();
-                        });
+                            UpdateRoleBadge(roleStr);
+                        }
                     }
                 }
+                catch { }
             }
-            catch { }
 
             // 2. Fetch Avatar
             try
@@ -789,6 +772,40 @@ public partial class Form1 : Form
             catch { }
         }
         catch { }
+    }
+
+    private void UpdateRoleBadge(string roleStr)
+    {
+        Invoke(() =>
+        {
+            lblRole.Text = roleStr.ToUpper();
+            // Set badge color based on role
+            var roleLower = roleStr.ToLower();
+            Color badgeColor;
+            if (roleLower.Contains("kurucu") || roleLower.Contains("founder"))
+                badgeColor = Color.FromArgb(255, 165, 0); // Orange/Gold
+            else if (roleLower.Contains("admin") || roleLower.Contains("owner"))
+                badgeColor = Color.FromArgb(220, 50, 50);  // Red
+            else if (roleLower.Contains("mod"))
+                badgeColor = Color.FromArgb(130, 80, 220); // Purple
+            else if (roleLower.Contains("vip"))
+                badgeColor = Color.FromArgb(0, 180, 220);  // Blue
+            else
+                badgeColor = Color.FromArgb(255, 204, 0);  // Yellow (default Oyuncu)
+
+            // Resize badge panel to fit text
+            using var g = pnlRoleBadge.CreateGraphics();
+            var sz = g.MeasureString(lblRole.Text, lblRole.Font);
+            int newW = (int)sz.Width + 20;
+            pnlRoleBadge.Width  = newW;
+            lblRole.Width       = newW;
+            // Re-center badge horizontally
+            pnlRoleBadge.Left = (pnlHomeRightCard.Width - newW) / 2;
+
+            // Store color for paint
+            pnlRoleBadge.Tag = badgeColor;
+            pnlRoleBadge.Invalidate();
+        });
     }
 
     private void TransitionTimer_Tick(object? sender, EventArgs e)
