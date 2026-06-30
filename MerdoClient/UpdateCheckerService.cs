@@ -121,7 +121,12 @@ public class UpdateCheckerService
                 using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(10) };
                 client.DefaultRequestHeaders.UserAgent.ParseAdd("MerdoLauncher/2.0");
 
-                using var response = await client.GetAsync(data.DownloadUrl, HttpCompletionOption.ResponseHeadersRead);
+                string downloadUrl = data.DownloadUrl;
+                if (!string.IsNullOrEmpty(downloadUrl)) {
+                    downloadUrl += (downloadUrl.Contains("?") ? "&" : "?") + "t=" + DateTime.UtcNow.Ticks;
+                }
+
+                using var response = await client.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
                 response.EnsureSuccessStatusCode();
 
                 long totalBytes  = response.Content.Headers.ContentLength ?? -1;
