@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "4.3",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe?v=4.3",
-  "Changelog": "- Launcher simge durumuna küçültüldüğünde (alta alındığında) ortaya çıkan çökme (hata) sorunu giderildi."
+  "LatestVersion": "4.4",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe?v=4.4",
+  "Changelog": "- Giriş yapma arayüzü (tasarımı) baştan aşağıya istenilen tasarıma birebir uyacak şekilde (genişlik, çerçeve, renkler) yenilendi."
 }

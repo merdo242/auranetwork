@@ -276,6 +276,8 @@ public partial class Form1 : Form
         using var brush = new SolidBrush(Color.FromArgb(21, 21, 24)); // Card BG
         using var path = GetRoundedRectanglePath(new Rectangle(0, 0, panel.Width - 1, panel.Height - 1), 12);
         e.Graphics.FillPath(brush, path);
+        using var pen = new Pen(Color.FromArgb(35, 35, 40), 1);
+        e.Graphics.DrawPath(pen, path);
     }
 
     private void InputPanel_Paint(object? sender, PaintEventArgs e)
@@ -286,6 +288,8 @@ public partial class Form1 : Form
         using var brush = new SolidBrush(Color.FromArgb(13, 13, 15)); // Input BG
         using var path = GetRoundedRectanglePath(new Rectangle(0, 0, panel.Width - 1, panel.Height - 1), 8);
         e.Graphics.FillPath(brush, path);
+        using var pen = new Pen(Color.FromArgb(40, 40, 45), 1);
+        e.Graphics.DrawPath(pen, path);
     }
 
     private void OnlinePlayers_Paint(object? sender, PaintEventArgs e)
@@ -500,9 +504,9 @@ public partial class Form1 : Form
         {
             pnlSavedAccounts.Controls.Add(lblSavedAccountsPlaceholder);
             lblSavedAccountsPlaceholder.Visible = true;
-            pnlSavedAccounts.Height = 44;
-            lblForgotPassword.Top = 335;
-            lblRegister.Top = 358;
+            pnlSavedAccounts.Height = 50;
+            lblForgotPassword.Top = 420;
+            lblRegister.Top = 445;
         }
         else
         {
@@ -604,12 +608,12 @@ public partial class Form1 : Form
                 yOffset += itemHeight + 6;
             }
             
-            int totalHeight = Math.Max(44, yOffset);
+            int totalHeight = Math.Max(50, yOffset);
             pnlSavedAccounts.Height = totalHeight;
             
-            int shift = Math.Max(0, totalHeight - 44);
-            lblForgotPassword.Top = 335 + shift;
-            lblRegister.Top = 358 + shift;
+            int shift = Math.Max(0, totalHeight - 50);
+            lblForgotPassword.Top = 420 + shift;
+            lblRegister.Top = 445 + shift;
         }
     }
 
