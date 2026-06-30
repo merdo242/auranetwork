@@ -61,6 +61,34 @@ public class MinecraftLauncherService
                 }
             }
 
+            // --- Sesli Sohbet (Simple Voice Chat) modunu otomatik kur ---
+            string modsDir = Path.Combine(path.BasePath, "mods");
+            if (!Directory.Exists(modsDir)) Directory.CreateDirectory(modsDir);
+
+            string voiceChatName = "voicechat-fabric-1.21.1-2.5.20.jar";
+            string voiceChatPath = Path.Combine(modsDir, voiceChatName);
+            if (!File.Exists(voiceChatPath))
+            {
+                // Silinmesi gereken eski sürümler varsa (örneğin kullanıcının attığı yanlış sürüm)
+                var oldVersions = Directory.GetFiles(modsDir, "voicechat-fabric-*.jar");
+                foreach (var old in oldVersions)
+                {
+                    try { File.Delete(old); } catch { }
+                }
+
+                onProgress?.Invoke("Sesli sohbet modu (Simple Voice Chat) indiriliyor...");
+                try
+                {
+                    using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(2) };
+                    var voiceBytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/9eGKb6K1/versions/bvaEHE2T/voicechat-fabric-2.6.20%2B26.2.jar").GetAwaiter().GetResult();
+                    File.WriteAllBytes(voiceChatPath, voiceBytes);
+                }
+                catch
+                {
+                    // Hata olursa en azından oyuna devam etsin, sessiz kalalım
+                }
+            }
+
             // --- Kurulan Fabric sürümünü bul ---
             fabricVerDir = Directory.GetDirectories(versionsDir, "fabric-loader-*-1.21.1").FirstOrDefault();
             string launchVersion = string.IsNullOrEmpty(fabricVerDir) ? FixedVersion : Path.GetFileName(fabricVerDir);
