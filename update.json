@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "6.6",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v66.exe",
-  "Changelog": "- Arka plan resmi tam ekrana yayıldı.\n- Bakiye Yükleniyor sorunu çözüldü.\n- Oyun içi ayarlara erişim sorunu (mod indirmesi) düzeltildi."
+  "LatestVersion": "6.7",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v67.exe",
+  "Changelog": "- Eski ayar menüsünün (mod) silinip, güncel halinin başarıyla indirilmesi sağlandı."
 }

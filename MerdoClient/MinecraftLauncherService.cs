@@ -88,16 +88,20 @@ public class MinecraftLauncherService
                     // Hata olursa en azından oyuna devam etsin, sessiz kalalım
                 }
             }
-            
             // --- MerdoBridge Modunu kur ---
-            string bridgeName = "merdobridge-1.0.0.jar";
+            var oldBridgeVersions = Directory.GetFiles(modsDir, "merdobridge-*.jar");
+            foreach (var old in oldBridgeVersions)
+            {
+                try { File.Delete(old); } catch { }
+            }
+            string bridgeName = "merdobridge-1.0.1.jar";
             string bridgePath = Path.Combine(modsDir, bridgeName);
             if (!File.Exists(bridgePath))
             {
                 try
                 {
                     using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(2) };
-                    var bridgeBytes = client.GetByteArrayAsync("https://github.com/merdo242/merdoclient/raw/main/installer/merdobridge-1.0.0.jar").GetAwaiter().GetResult();
+                    var bridgeBytes = client.GetByteArrayAsync("https://github.com/merdo242/merdoclient/raw/main/installer/merdobridge-1.0.1.jar").GetAwaiter().GetResult();
                     File.WriteAllBytes(bridgePath, bridgeBytes);
                 }
                 catch { }
