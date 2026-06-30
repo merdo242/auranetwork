@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "6.7",
+  "LatestVersion": "6.8",
   "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe",
-  "Changelog": "- Eski ayar menüsünün (mod) silinip, güncel halinin başarıyla indirilmesi sağlandı."
+  "Changelog": "- Yepyeni özel Ana Menü (Title Screen) eklendi.\n- 3D Karakter arayüzü eklendi."
 }

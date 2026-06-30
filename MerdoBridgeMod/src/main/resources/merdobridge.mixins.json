@@ -7,7 +7,7 @@
   ],
   "client": [
     "GameMenuScreenMixin",
-    "TitleScreenMixin",
+    "MinecraftClientMixin",
     "SimpleOptionMixin",
     "InGameOverlayRendererMixin",
     "MultiplayerScreenMixin",
