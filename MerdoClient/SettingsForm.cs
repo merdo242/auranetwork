@@ -299,6 +299,18 @@ public class SettingsForm : Form
         };
         card2.Controls.Add(chkConsole);
 
+        var btnOpenMods = StyledButton("📂 Mod Klasörü", new Point(card2.Width - 140, 56), new Size(120, 32),
+                                     Color.FromArgb(35, 35, 45), Color.White);
+        btnOpenMods.FlatAppearance.BorderColor = Color.FromArgb(BORDER_CLR);
+        btnOpenMods.FlatAppearance.BorderSize  = 1;
+        btnOpenMods.Click += (s, e) => 
+        {
+            string modsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ".minecraft", "mods");
+            if (!System.IO.Directory.Exists(modsPath)) System.IO.Directory.CreateDirectory(modsPath);
+            System.Diagnostics.Process.Start("explorer.exe", modsPath);
+        };
+        card2.Controls.Add(btnOpenMods);
+
         // ══════════════════════════════════════════════
         // KART 3 — JAVA
         // ══════════════════════════════════════════════

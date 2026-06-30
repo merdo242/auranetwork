@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "5.5",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v55.exe",
-  "Changelog": "- Turnuvalar (Haberler) kısmı tamamen yenilendi: Artık daha pürüzsüz donanım hızlandırmalı geçiş (yakınlaşarak belirme) efektine sahip ve otomatik süre 5 saniyeye düşürüldü."
+  "LatestVersion": "5.6",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v56.exe",
+  "Changelog": "- Ayarlar menüsüne \"Mod Klasörü\" butonu eklendi. Artık oyuncular launcher üzerinden kolayca mod klasörüne ulaşarak Fabric (Sodium/Iris uyumlu) modları yükleyebilirler."
 }
