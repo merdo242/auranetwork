@@ -1,5 +1,5 @@
 {
   "LatestVersion": "5.6",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v56.exe",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v56_fix.exe",
   "Changelog": "- Ayarlar menüsüne \"Mod Klasörü\" butonu eklendi. Artık oyuncular launcher üzerinden kolayca mod klasörüne ulaşarak Fabric (Sodium/Iris uyumlu) modları yükleyebilirler."
 }
