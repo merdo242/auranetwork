@@ -388,17 +388,8 @@ public partial class Form1 : Form
 
         if (_largeLogo != null)
         {
-            // Clip to circle
-            var clipPath = new System.Drawing.Drawing2D.GraphicsPath();
-            clipPath.AddEllipse(iconX, iconY, iconSize, iconSize);
-            var oldClip = g.Clip;
-            g.SetClip(clipPath, System.Drawing.Drawing2D.CombineMode.Replace);
+            // Draw centered within the icon area – no clip needed (PNG is transparent)
             g.DrawImage(_largeLogo, iconX, iconY, iconSize, iconSize);
-            g.Clip = oldClip;
-
-            // Circle border
-            using var borderPen = new Pen(Color.FromArgb(60, 60, 70), 1.5f);
-            g.DrawEllipse(borderPen, iconX, iconY, iconSize, iconSize);
         }
 
         // --- "MERDO" bold text ---
