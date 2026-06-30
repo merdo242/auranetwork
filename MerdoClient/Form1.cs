@@ -346,19 +346,35 @@ public partial class Form1 : Form
         return path;
     }
 
+    private static Image? _mainBgImage;
     private void Panel_Paint(object? sender, PaintEventArgs e)
     {
         var panel = (Panel)sender!;
         if (panel.Width <= 0 || panel.Height <= 0) return;
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
-        // Background Gradient
-        using var bg = new LinearGradientBrush(
-            panel.ClientRectangle,
-            Color.FromArgb(10, 10, 14),
-            Color.FromArgb(18, 18, 24),
-            LinearGradientMode.Vertical);
-        e.Graphics.FillRectangle(bg, panel.ClientRectangle);
+        // Draw background image if available, else Gradient
+        if (_mainBgImage == null)
+        {
+            try { _mainBgImage = Image.FromFile(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "news_bg.jpg")); } catch { }
+        }
+        
+        if (_mainBgImage != null && panel == pnlHome)
+        {
+            e.Graphics.DrawImage(_mainBgImage, new Rectangle(0, 0, panel.Width, panel.Height));
+            // Dark overlay for readability
+            using var overlayBrush = new SolidBrush(Color.FromArgb(190, 10, 10, 14));
+            e.Graphics.FillRectangle(overlayBrush, panel.ClientRectangle);
+        }
+        else
+        {
+            using var bg = new LinearGradientBrush(
+                panel.ClientRectangle,
+                Color.FromArgb(10, 10, 14),
+                Color.FromArgb(18, 18, 24),
+                LinearGradientMode.Vertical);
+            e.Graphics.FillRectangle(bg, panel.ClientRectangle);
+        }
 
         // Draw logo
         DrawLogoBadge(e.Graphics, 0, 0);
@@ -604,7 +620,6 @@ public partial class Form1 : Form
         pnlLeftNewsCard.Invalidate();
     }
     
-    private static Image? _newsBgImage;
     private void PnlLeftNewsCard_Paint(object? sender, PaintEventArgs e)
     {
         var slide = _newsSlides[_currentSlideIndex];
@@ -612,23 +627,6 @@ public partial class Form1 : Form
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
         e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
         
-        // Draw background image if available
-        if (_newsBgImage == null)
-        {
-            try { _newsBgImage = Image.FromFile(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "news_bg.jpg")); } catch { }
-        }
-        if (_newsBgImage != null)
-        {
-            var panel = (Panel)sender!;
-            using var clipPath = GetRoundedRectanglePath(new Rectangle(0, 0, panel.Width - 1, panel.Height - 1), 12);
-            e.Graphics.SetClip(clipPath);
-            e.Graphics.DrawImage(_newsBgImage, new Rectangle(0, 0, panel.Width, panel.Height));
-            // Add a dark overlay over the image for text readability
-            using var overlayBrush = new SolidBrush(Color.FromArgb(160, 0, 0, 0));
-            e.Graphics.FillRectangle(overlayBrush, new Rectangle(0, 0, panel.Width, panel.Height));
-            e.Graphics.ResetClip();
-        }
-
         double ease = Math.Sin(_newsAnimProgress * Math.PI / 2); // 0 to 1
         int alpha = (int)(255 * ease);
         if (alpha < 0) alpha = 0;
@@ -1019,7 +1017,11 @@ public partial class Form1 : Form
     {
         try
         {
-            lblRole.Text = "OYUNCU"; // Default
+            Invoke(() => 
+            {
+                lblRole.Text = "OYUNCU"; // Default
+                lblBalance.Text = "💲 Güncel Bakiye : 0"; // Default
+            });
 
             using var client = new System.Net.Http.HttpClient();
             client.Timeout = System.TimeSpan.FromSeconds(5);
