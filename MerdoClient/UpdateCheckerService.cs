@@ -8,7 +8,7 @@ namespace MerdoClient;
 public class UpdateCheckerService
 {
     // Mevcut launcher sürümü
-    public const string CurrentVersion = "4.2"; 
+    public const string CurrentVersion = "3.9";
 
     // Güncelleme kontrolü için doğrudan bu GitHub deposundaki update.json dosyasını kullanıyoruz (100% ücretsiz & hızlı)
     private const string UpdateUrl = "https://raw.githubusercontent.com/merdo242/merdoclient/main/update.json";
@@ -22,9 +22,7 @@ public class UpdateCheckerService
                 using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(8) };
                 client.DefaultRequestHeaders.UserAgent.ParseAdd("MerdoLauncher/2.0");
 
-                // Cache buster ekleyerek GitHub CDN önbelleğini bypass ediyoruz
-                string requestUrl = UpdateUrl + "?t=" + DateTime.UtcNow.Ticks;
-                var response = await client.GetStringAsync(requestUrl);
+                var response = await client.GetStringAsync(UpdateUrl);
                 var data = JsonSerializer.Deserialize<UpdateResponse>(response,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 

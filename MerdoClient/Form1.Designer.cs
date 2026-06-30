@@ -21,7 +21,7 @@ partial class Form1
     private System.Windows.Forms.Panel pnlPassContainer;
     private System.Windows.Forms.TextBox txtPassword;
     private System.Windows.Forms.Button btnLogin;
-    private CustomCheckBox chkRemember;
+    private System.Windows.Forms.CheckBox chkRemember;
     private System.Windows.Forms.Label lblSavedAccountsTitle;
     private System.Windows.Forms.Panel pnlSavedAccounts;
     private System.Windows.Forms.Label lblSavedAccountsPlaceholder;
@@ -86,7 +86,7 @@ partial class Form1
         this.pnlPassContainer = new System.Windows.Forms.Panel();
         this.txtPassword = new System.Windows.Forms.TextBox();
         this.btnLogin = new System.Windows.Forms.Button();
-        this.chkRemember = new CustomCheckBox();
+        this.chkRemember = new System.Windows.Forms.CheckBox();
         this.lblSavedAccountsTitle = new System.Windows.Forms.Label();
         this.pnlSavedAccounts = new System.Windows.Forms.Panel();
         this.lblSavedAccountsPlaceholder = new System.Windows.Forms.Label();
@@ -333,13 +333,13 @@ partial class Form1
         // 
         // chkRemember
         // 
-        this.chkRemember.AutoSize = false;
+        this.chkRemember.AutoSize = true;
         this.chkRemember.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.chkRemember.ForeColor = System.Drawing.Color.FromArgb(170, 170, 180);
         this.chkRemember.Location = new System.Drawing.Point(30, 226);
         this.chkRemember.Name = "chkRemember";
-        this.chkRemember.Size = new System.Drawing.Size(160, 22);
-        this.chkRemember.Text = "Hesabı kaydet";
+        this.chkRemember.Size = new System.Drawing.Size(121, 19);
+        this.chkRemember.Text = "🔒 Hesabı kaydet";
         this.chkRemember.UseVisualStyleBackColor = true;
 
         // 
@@ -465,7 +465,7 @@ partial class Form1
         this.btnWebsiteLink.Location = new System.Drawing.Point(830, 545);
         this.btnWebsiteLink.Name = "btnWebsiteLink";
         this.btnWebsiteLink.Size = new System.Drawing.Size(120, 34);
-        this.btnWebsiteLink.Text = "Ücretsiz Deneyim Keyfi!";
+        this.btnWebsiteLink.Text = "chickennw.com";
         this.btnWebsiteLink.UseVisualStyleBackColor = false;
 
         // 
@@ -511,7 +511,7 @@ partial class Form1
         this.lblHomeLeftTitle.Location = new System.Drawing.Point(30, 85);
         this.lblHomeLeftTitle.Name = "lblHomeLeftTitle";
         this.lblHomeLeftTitle.Size = new System.Drawing.Size(325, 45);
-        this.lblHomeLeftTitle.Text = "MERDO NETWORK";
+        this.lblHomeLeftTitle.Text = "CHICKEN NETWORK";
 
         // 
         // pnlHomeLeftLine
@@ -529,7 +529,7 @@ partial class Form1
         this.lblHomeLeftText.Location = new System.Drawing.Point(30, 155);
         this.lblHomeLeftText.Name = "lblHomeLeftText";
         this.lblHomeLeftText.Size = new System.Drawing.Size(490, 220);
-        this.lblHomeLeftText.Text = "Merdo Network sunucusunda Skyblock, Survival, OP Skyblock dahil bir sürü eğlenceli oyun modunda oynayabilir ve eğlenebilirsin. Arkadaşlarınla klan/ada kurabilir ve diğer oyuncularla savaşarak ganimet elde edebilirsin.\r\n\r\nYaşadığın tüm sorunlar için site desteğinden bizimle iletişime geçmekten lütfen çekinme. Ayrıca sunucu oylama ve çekilişlerine katılmak için Discord sunucumuza katılabilirsin. Discord sunucusuna katılan oyuncular 1 haftalık VIP üyelik kazanır.";
+        this.lblHomeLeftText.Text = "Chicken Network sunucusunda Skyblock, Survival, OP Skyblock dahil bir sürü eğlenceli oyun modunda oynayabilir ve eğlenebilirsin. Arkadaşlarınla klan/ada kurabilir ve diğer oyuncularla savaşarak ganimet elde edebilirsin.\r\n\r\nYaşadığın tüm sorunlar için site desteğinden bizimle iletişime geçmekten lütfen çekinme. Ayrıca sunucu oylama ve çekilişlerine katılmak için Discord sunucumuza katılabilirsin. Discord sunucusuna katılan oyuncular 1 haftalık VIP üyelik kazanır.";
 
         // 
         // pnlHomeRightCard
