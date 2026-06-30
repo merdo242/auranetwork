@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "5.7",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v57.exe",
-  "Changelog": "- Simple Voice Chat (Sesli Sohbet) modu launcher içine otomatik olarak entegre edildi."
+  "LatestVersion": "5.8",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v58.exe",
+  "Changelog": "- Otomatik olarak indirilen Simple Voice Chat sürümü (1.21.1) düzeltildi."
 }
