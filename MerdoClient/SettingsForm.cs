@@ -92,6 +92,7 @@ public class SettingsForm : Form
         pnl.Paint += (s, e) =>
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            e.Graphics.Clear(Color.FromArgb(BG)); // Clear with parent BG to fix white corners
             var r = new Rectangle(0, 0, pnl.Width - 1, pnl.Height - 1);
             // Linear gradient for a more premium look
             using var bg = new LinearGradientBrush(r, Color.FromArgb(CARD_BG), Color.FromArgb(26, 26, 30), LinearGradientMode.Vertical);
@@ -300,8 +301,8 @@ public class SettingsForm : Form
         };
         card2.Controls.Add(chkConsole);
 
-        var btnOpenMods = StyledButton("📂 Mod Klasörü", new Point(card2.Width - 140, 56), new Size(120, 32),
-                                     Color.FromArgb(35, 35, 45), Color.White);
+        var btnOpenMods = StyledButton("Mod Klasörü", new Point(card2.Width - 140, 56), new Size(120, 32),
+                                     Color.FromArgb(35, 35, 45), Color.White, Color.FromArgb(26, 26, 30));
         btnOpenMods.FlatAppearance.BorderColor = Color.FromArgb(BORDER_CLR);
         btnOpenMods.FlatAppearance.BorderSize  = 1;
         btnOpenMods.Click += (s, e) => 
@@ -353,26 +354,26 @@ public class SettingsForm : Form
         };
         card3.Controls.Add(lblJavaStatus);
 
-        btnJavaAuto = StyledButton("⬇ Java'yı Otomatik Kur", new Point(20, 115), new Size(220, 32),
-                                   Color.FromArgb(0, 140, 70), Color.White);
+        btnJavaAuto = StyledButton("Otomatik Kur", new Point(20, 115), new Size(220, 32),
+                                   Color.FromArgb(0, 140, 70), Color.White, Color.FromArgb(26, 26, 30));
         btnJavaAuto.Click += BtnJavaAuto_Click;
         card3.Controls.Add(btnJavaAuto);
 
-        btnJavaManual = StyledButton("📂 Manuel Seç", new Point(250, 115), new Size(130, 32),
-                                     Color.FromArgb(35, 35, 45), Color.White);
+        btnJavaManual = StyledButton("Manuel Seç", new Point(250, 115), new Size(130, 32),
+                                     Color.FromArgb(35, 35, 45), Color.White, Color.FromArgb(26, 26, 30));
         btnJavaManual.FlatAppearance.BorderColor = Color.FromArgb(BORDER_CLR);
         btnJavaManual.FlatAppearance.BorderSize  = 1;
         btnJavaManual.Click += BtnJavaManual_Click;
         card3.Controls.Add(btnJavaManual);
 
         // ── Alt Kaydet / İptal ──────────────────────────────────────────
-        btnSave = StyledButton("✔  Kaydet", new Point(Width - 240, 625), new Size(120, 38),
-                               Color.FromArgb(ACCENT), Color.Black);
+        btnSave = StyledButton("Kaydet", new Point(Width - 240, 625), new Size(120, 38),
+                               Color.FromArgb(ACCENT), Color.Black, Color.FromArgb(BG));
         btnSave.Click += BtnSave_Click;
         Controls.Add(btnSave);
 
         btnCancel = StyledButton("İptal", new Point(Width - 110, 625), new Size(86, 38),
-                                 Color.FromArgb(32, 32, 42), Color.White);
+                                 Color.FromArgb(32, 32, 42), Color.White, Color.FromArgb(BG));
         btnCancel.FlatAppearance.BorderColor = Color.FromArgb(BORDER_CLR);
         btnCancel.FlatAppearance.BorderSize  = 1;
         btnCancel.Click += (s, e) => Close();
@@ -380,7 +381,7 @@ public class SettingsForm : Form
     }
 
     // ─── Helpers ────────────────────────────────────────────────────────
-    private static Button StyledButton(string text, Point loc, Size sz, Color bg, Color fg)
+    private static Button StyledButton(string text, Point loc, Size sz, Color bg, Color fg, Color parentBg)
     {
         var btn = new Button
         {
@@ -408,7 +409,8 @@ public class SettingsForm : Form
         btn.Paint += (s, e) =>
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            e.Graphics.Clear(btn.Parent?.BackColor ?? Color.Transparent);
+            e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+            e.Graphics.Clear(parentBg);
             
             var r = new Rectangle(0, 0, btn.Width - 1, btn.Height - 1);
             using var path = RoundedRect(r, 8);
@@ -529,7 +531,7 @@ public class SettingsForm : Form
                         lblJavaStatus.Text      = "⚠  Kuruldu ama algılanamadı. Sistemi yeniden başlatın.";
                         lblJavaStatus.ForeColor = Color.FromArgb(255, 180, 0);
                     }
-                    btnJavaAuto.Text    = "⬇ Java'yı Otomatik Kur";
+                    btnJavaAuto.Text    = "Otomatik Kur";
                     btnJavaAuto.Enabled = true;
                 });
             }
@@ -539,7 +541,7 @@ public class SettingsForm : Form
                 {
                     lblJavaStatus.Text      = "✘  Kurulum başarısız: " + ex.Message;
                     lblJavaStatus.ForeColor = Color.FromArgb(220, 60, 60);
-                    btnJavaAuto.Text    = "⬇ Java'yı Otomatik Kur";
+                    btnJavaAuto.Text    = "Otomatik Kur";
                     btnJavaAuto.Enabled = true;
                 });
             }

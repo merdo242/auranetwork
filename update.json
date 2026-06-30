@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "6.1",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v61.exe",
-  "Changelog": "- Ayarlar menüsüne çok daha premium bir hissiyat katıldı (hover, renk geçişleri, animasyonlar)."
+  "LatestVersion": "6.2",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v62.exe",
+  "Changelog": "- Ayarlar menüsündeki font bulanıklığı giderildi, buton metinleri düzeltildi ve kart köşelerindeki beyaz hatalar silindi."
 }
