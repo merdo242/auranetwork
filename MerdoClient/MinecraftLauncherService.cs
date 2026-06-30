@@ -29,26 +29,28 @@ public class MinecraftLauncherService
             var settings = _settingsService.Settings;
 
             // --- İndirme durumunu bildiren olaylar ---
-            launcher.FileChanged += (e) =>
+            launcher.FileProgressChanged += (sender, e) =>
             {
-                onProgress?.Invoke($"İndiriliyor: {e.FileName} ({e.ProgressedFileCount}/{e.TotalFileCount})");
+                onProgress?.Invoke("Oyun dosyaları indiriliyor ve doğrulanıyor...");
             };
 
             // --- OptiFine'ı otomatik indir ve kur ---
             string optifineName = "ForgeOptiFine 1.21.8";
             string optiPath = Path.Combine(path.BasePath, "versions", optifineName);
-            if (!Directory.Exists(optiPath))
+            string optiLibs = Path.Combine(path.BasePath, "libraries", "optifine");
+            
+            if (!Directory.Exists(optiPath) || !Directory.Exists(optiLibs))
             {
-                onProgress?.Invoke("OptiFine 1.21.8 paketi indiriliyor (25 MB)... Lütfen bekleyin.");
+                onProgress?.Invoke("OptiFine Full Paketi indiriliyor (Eksik kütüphaneler dahil)... Lütfen bekleyin.");
                 try 
                 {
                     using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(10) };
-                    var zipBytes = client.GetByteArrayAsync("https://github.com/merdo242/merdoclient/raw/main/installer/ForgeOptiFine_1.21.8.zip").GetAwaiter().GetResult();
-                    var tempZip = Path.Combine(Path.GetTempPath(), "merdo_optifine.zip");
+                    var zipBytes = client.GetByteArrayAsync("https://github.com/merdo242/merdoclient/raw/main/installer/ForgeOptiFine_Full.zip").GetAwaiter().GetResult();
+                    var tempZip = Path.Combine(Path.GetTempPath(), "merdo_optifine_full.zip");
                     System.IO.File.WriteAllBytes(tempZip, zipBytes);
-                    System.IO.Compression.ZipFile.ExtractToDirectory(tempZip, optiPath, true);
+                    System.IO.Compression.ZipFile.ExtractToDirectory(tempZip, path.BasePath, true);
                     System.IO.File.Delete(tempZip);
-                    onProgress?.Invoke("OptiFine başarıyla indirildi.");
+                    onProgress?.Invoke("OptiFine ve gerekli kütüphaneler başarıyla kuruldu.");
                 } 
                 catch (Exception ex) 
                 {
