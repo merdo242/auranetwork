@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.merdo.bridge.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+  ],
+  "client": [
+    "GameMenuScreenMixin",
+    "TitleScreenMixin",
+    "SimpleOptionMixin",
+    "InGameOverlayRendererMixin",
+    "MultiplayerScreenMixin",
+    "CreativeInventoryScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
