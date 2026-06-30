@@ -545,8 +545,9 @@ public class CustomSlider : Control
 
     public CustomSlider()
     {
+        SetStyle(ControlStyles.SupportsTransparentBackColor | ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint, true);
+        BackColor = Color.Transparent;
         DoubleBuffered = true;
-        SetStyle(ControlStyles.Selectable | ControlStyles.UserPaint, true);
         Cursor = Cursors.Hand;
         Size = new Size(200, 24);
     }
@@ -646,6 +647,8 @@ public class CustomToggle : Control
 
     public CustomToggle()
     {
+        SetStyle(ControlStyles.SupportsTransparentBackColor | ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint, true);
+        BackColor = Color.Transparent;
         DoubleBuffered = true;
         Cursor = Cursors.Hand;
         Size = new Size(300, 24);
@@ -660,7 +663,7 @@ public class CustomToggle : Control
     protected override void OnPaint(PaintEventArgs e)
     {
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-        e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+        e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
 
         int toggleW = 40;
         int toggleH = 20;

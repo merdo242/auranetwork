@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "5.3",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v53.exe",
-  "Changelog": "- Giriş yaptıktan sonra oyun ekranı daha derli toplu ve şık görünmesi için otomatik olarak küçültülüyor."
+  "LatestVersion": "5.4",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup_v54.exe",
+  "Changelog": "- Ayarlar menüsündeki arka plan transparanlık hatası düzeltildi, kaydırma çubukları çok daha şık hale getirildi.\n- Turnuvalar (Haberler) kısmı artık 10 saniyede bir otomatik geçiş yapıyor ve arkadan geliyormuş gibi bir animasyona sahip."
 }

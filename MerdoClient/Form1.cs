@@ -13,6 +13,9 @@ public partial class Form1 : Form
     private readonly System.Windows.Forms.Timer _transitionTimer = new();
     private readonly System.Windows.Forms.Timer _launchTimer = new();
     private readonly System.Windows.Forms.Timer _onlineCheckTimer = new();
+    private readonly System.Windows.Forms.Timer _newsAutoTimer = new();
+    private readonly System.Windows.Forms.Timer _newsAnimTimer = new();
+    private double _newsAnimProgress = 1.0;
 
     private dynamic? _musicPlayer; // Windows Media Player COM
     
@@ -121,6 +124,16 @@ public partial class Form1 : Form
         // Launch Timer
         _launchTimer.Interval = 16;
         _launchTimer.Tick += LaunchTimer_Tick;
+
+        // News Timers
+        _newsAutoTimer.Interval = 10000;
+        _newsAutoTimer.Tick += (s, e) => 
+        {
+            _currentSlideIndex = (_currentSlideIndex + 1) % _newsSlides.Length;
+            UpdateNewsSlide();
+        };
+        _newsAnimTimer.Interval = 16;
+        _newsAnimTimer.Tick += NewsAnimTimer_Tick;
 
         // Setup Placeholders
         SetupPlaceholder(txtUsername, "Kullanıcı Adı");
@@ -551,6 +564,44 @@ public partial class Form1 : Form
         lblNewsTitle.Text = slide.Title;
         lblNewsSubtitle.Text = slide.Subtitle;
         lblNewsText.Text = slide.Text;
+        
+        _newsAutoTimer.Stop();
+        if (pnlHome.Visible) _newsAutoTimer.Start();
+        
+        _newsAnimProgress = 0;
+        _newsAnimTimer.Start();
+    }
+
+    private void NewsAnimTimer_Tick(object? sender, EventArgs e)
+    {
+        _newsAnimProgress += 0.08;
+        if (_newsAnimProgress >= 1)
+        {
+            _newsAnimProgress = 1;
+            _newsAnimTimer.Stop();
+        }
+
+        double ease = Math.Sin(_newsAnimProgress * Math.PI / 2); // 0 to 1
+        
+        int offsetY = (int)(20 * (1 - ease));
+        
+        lblNewsTitle.Location = new Point(30, 30 + offsetY);
+        lblNewsSubtitle.Location = new Point(30, 85 + offsetY);
+        lblNewsText.Location = new Point(30, 120 + offsetY);
+
+        int rBg = 25, gBg = 25, bBg = 30; // panel bg color approx
+        
+        lblNewsTitle.ForeColor = InterpolateColor(Color.FromArgb(rBg, gBg, bBg), Color.FromArgb(255, 204, 0), ease);
+        lblNewsSubtitle.ForeColor = InterpolateColor(Color.FromArgb(rBg, gBg, bBg), Color.White, ease);
+        lblNewsText.ForeColor = InterpolateColor(Color.FromArgb(rBg, gBg, bBg), Color.FromArgb(170, 170, 180), ease);
+    }
+    
+    private Color InterpolateColor(Color c1, Color c2, double ratio)
+    {
+        int r = c1.R + (int)((c2.R - c1.R) * ratio);
+        int g = c1.G + (int)((c2.G - c1.G) * ratio);
+        int b = c1.B + (int)((c2.B - c1.B) * ratio);
+        return Color.FromArgb(r, g, b);
     }
 
     private void UpdateSavedAccountsUI()
@@ -858,6 +909,7 @@ public partial class Form1 : Form
         Text = "Merdo Launcher - Giriş Yap";
         pnlHome.Visible = false;
         pnlLogin.Visible = true;
+        _newsAutoTimer.Stop();
         
         UpdateSavedAccountsUI();
     }
@@ -906,6 +958,8 @@ public partial class Form1 : Form
         Text = "Merdo Launcher - Oyun Ekranı";
         _transitionProgress = 0;
         _transitionTimer.Start();
+        
+        _newsAutoTimer.Start();
         
         // Fetch avatar and role dynamically when entering home
         _ = FetchPlayerAvatarAndRole(_currentUser);
