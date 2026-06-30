@@ -1,0 +1,23 @@
+package com.merdo.bridge;
+
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+
+public class MerdoBridgeMod implements ClientModInitializer {
+    @Override
+    public void onInitializeClient() {
+        System.out.println("[MerdoBridgeMod] Merdo Bridge Mod yuklendi!");
+
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            String token = System.getenv("MERDO_TOKEN");
+            if (token != null && !token.trim().isEmpty()) {
+                System.out.println("[MerdoBridgeMod] Token bulundu, sunucuya aktariliyor...");
+                if (client.getNetworkHandler() != null) {
+                    client.getNetworkHandler().sendChatCommand("merdoauth " + token.trim());
+                }
+            } else {
+                System.out.println("[MerdoBridgeMod] Token bulunamadi, normal giris yapiliyor.");
+            }
+        });
+    }
+}

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "merdobridge",
+  "version": "${version}",
+  "name": "Merdo Bridge Mod",
+  "description": "Sends authentication tokens from Merdo Launcher to the server.",
+  "authors": [
+    "MerdoClient"
+  ],
+  "contact": {
+    "homepage": "https://github.com/merdo242/merdoclient"
+  },
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.merdo.bridge.MerdoBridgeMod"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": "1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}

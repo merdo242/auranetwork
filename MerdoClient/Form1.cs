@@ -17,6 +17,7 @@ public partial class Form1 : Form
     private dynamic? _musicPlayer; // Windows Media Player COM
     
     private string _currentUser = string.Empty;
+    private string _currentPassword = string.Empty;
     private double _transitionProgress;
     private int _launchProgress;
     private bool _isRegisterMode = false;
@@ -573,6 +574,7 @@ public partial class Form1 : Form
             if (_accountService.Register(username, password))
             {
                 _currentUser = username;
+              _currentPassword = password;
                 lblWelcome.Text = username.ToUpper();
                 lblStatus.Text = "Hesap oluşturuldu. Oynamaya hazırsın.";
                 
@@ -595,6 +597,7 @@ public partial class Form1 : Form
             if (_accountService.Login(username, password))
             {
                 _currentUser = username;
+              _currentPassword = password;
                 lblWelcome.Text = username.ToUpper();
                 lblStatus.Text = "Hazır. Oynamaya başlamak için Oyna butonuna basın.";
                 
@@ -625,6 +628,7 @@ public partial class Form1 : Form
         if (_accountService.Login(username, password))
         {
             _currentUser = username;
+            _currentPassword = password;
             lblWelcome.Text = username.ToUpper();
             lblStatus.Text = "Hazır. Oynamaya başlamak için Oyna butonuna basın.";
 
@@ -697,7 +701,7 @@ public partial class Form1 : Form
 
         // Minecraft'ı arka planda başlat — UI donmasın
         var result = await System.Threading.Tasks.Task.Run(
-            () => _minecraftLauncherService.StartMinecraft(_currentUser, msg => Invoke(() => lblStatus.Text = msg)));
+            () => _minecraftLauncherService.StartMinecraft(_currentUser, _currentPassword, msg => Invoke(() => lblStatus.Text = msg)));
 
         _launchTimer.Stop();
         btnPlay.Enabled = true;

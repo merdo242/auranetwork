@@ -1,0 +1,6 @@
+name: MerdoServerPlugin
+version: 1.0
+main: com.merdo.plugin.MerdoServerPlugin
+api-version: 1.13
+depend: [AuthMe, LuckPerms]
+description: Merdo Launcher Auth and VIP Integration

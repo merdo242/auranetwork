@@ -17,7 +17,7 @@ public class MinecraftLauncherService
     }
 
     /// <summary>Minecraft'ı başlatır. Arka planda (Task.Run içinde) çağrılmalıdır.</summary>
-    public LauncherResult StartMinecraft(string username, Action<string>? onProgress = null)
+    public LauncherResult StartMinecraft(string username, string password, Action<string>? onProgress = null)
     {
         if (string.IsNullOrWhiteSpace(username))
             return new LauncherResult(false, "Minecraft'ı başlatmak için kullanıcı adı gereklidir.");
@@ -110,6 +110,7 @@ public class MinecraftLauncherService
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.EnvironmentVariables["MERDO_TOKEN"] = password;
 
             process.Start();
 

@@ -12,3 +12,7 @@ publish/
 # System files
 .DS_Store
 Thumbs.db
+
+.gradle/
+build/
+target/
