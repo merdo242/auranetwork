@@ -552,7 +552,29 @@ public partial class Form1 : Form
         }
     }
 
-    private void btnLogin_Click(object sender, EventArgs e)
+    private async System.Threading.Tasks.Task<bool> IsUsernameTakenOnServer(string username)
+    {
+        try
+        {
+            using var client = new System.Net.Http.HttpClient();
+            client.Timeout = System.TimeSpan.FromSeconds(5);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("MerdoLauncher/2.0");
+
+            var response = await client.GetStringAsync($"http://91.132.49.16:8880/check?username={System.Uri.EscapeDataString(username)}");
+            using var doc = System.Text.Json.JsonDocument.Parse(response);
+            if (doc.RootElement.TryGetProperty("registered", out var registeredProp))
+            {
+                return registeredProp.GetBoolean();
+            }
+        }
+        catch (System.Exception)
+        {
+            // Eğer sunucu kapalıysa veya hata alınırsa kayıt işlemine engel olmamak için false dönüyoruz
+        }
+        return false;
+    }
+
+    private async void btnLogin_Click(object sender, EventArgs e)
     {
         string username = txtUsername.Text == "Kullanıcı Adı" ? "" : txtUsername.Text.Trim();
         string password = txtPassword.Text == "Şifre" ? "" : txtPassword.Text;
@@ -565,9 +587,21 @@ public partial class Form1 : Form
 
         if (_isRegisterMode)
         {
-            if (_accountService.HasAccountRegistered())
+            if (_accountService.HasReachedRegisterLimit())
             {
-                ShowMessage("Bu cihazda zaten bir hesap oluşturulmuş. Yalnızca bir hesap oluşturabilirsiniz.", MessageBoxIcon.Warning);
+                ShowMessage("Bu cihazda en fazla 3 hesap oluşturulabilir.", MessageBoxIcon.Warning);
+                return;
+            }
+
+            btnLogin.Enabled = false;
+            lblStatus.Text = "Kullanıcı adı kontrol ediliyor...";
+
+            bool isTaken = await IsUsernameTakenOnServer(username);
+            if (isTaken)
+            {
+                btnLogin.Enabled = true;
+                lblStatus.Text = "Kayıt başarısız.";
+                ShowMessage("Bu kullanıcı adı zaten sunucuda kayıtlı. Lütfen başka bir kullanıcı adı seçin.", MessageBoxIcon.Error);
                 return;
             }
 
@@ -591,6 +625,8 @@ public partial class Form1 : Form
             {
                 ShowMessage("Bu kullanıcı adı zaten kayıtlı.", MessageBoxIcon.Error);
             }
+            
+            btnLogin.Enabled = true;
         }
         else
         {

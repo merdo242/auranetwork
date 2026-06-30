@@ -110,7 +110,7 @@ public class AccountService
             return false;
         }
 
-        if (_accounts.Count >= 1)
+        if (_accounts.Count >= 3)
         {
             return false;
         }
@@ -125,9 +125,9 @@ public class AccountService
         return true;
     }
 
-    public bool HasAccountRegistered()
+    public bool HasReachedRegisterLimit()
     {
-        return _accounts.Count >= 1;
+        return _accounts.Count >= 3;
     }
 
     public bool Login(string username, string password)
