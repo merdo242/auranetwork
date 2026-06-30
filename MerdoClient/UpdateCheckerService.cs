@@ -8,7 +8,7 @@ namespace MerdoClient;
 public class UpdateCheckerService
 {
     // Mevcut launcher sürümü
-    public const string CurrentVersion = "4.8";
+    public const string CurrentVersion = "4.9";
 
     // Güncelleme kontrolü için doğrudan bu GitHub deposundaki update.json dosyasını kullanıyoruz (100% ücretsiz & hızlı)
     private static readonly string UpdateUrl = $"https://raw.githubusercontent.com/merdo242/merdoclient/main/update.json?t={DateTime.UtcNow.Ticks}";
@@ -156,18 +156,32 @@ public class UpdateCheckerService
 
                 await Task.Delay(800);
 
-                // Inno Setup /SILENT ile kur — kurulum tamamlanana kadar bekle
-                var proc = Process.Start(new ProcessStartInfo
+                // Güvenilir güncelleme: önce uygulamadan çık, sonra installer çalışsın.
+                // Batch script, bu process tamamen kapanana kadar bekler, ardından installer'ı başlatır.
+                int currentPid = Environment.ProcessId;
+                string batchPath = Path.Combine(Path.GetTempPath(), "merdo_update.bat");
+
+                File.WriteAllText(batchPath,
+                    "@echo off\r\n" +
+                    ":wait\r\n" +
+                    $"tasklist /fi \"PID eq {currentPid}\" 2>nul | find \"{currentPid}\" >nul\r\n" +
+                    "if not errorlevel 1 (\r\n" +
+                    "    timeout /t 1 /nobreak >nul\r\n" +
+                    "    goto wait\r\n" +
+                    ")\r\n" +
+                    $"\"{tempPath}\" /SILENT /NORESTART\r\n" +
+                    "del \"%~f0\"\r\n");
+
+                // Batch'i arka planda başlat (pencere görünmez)
+                Process.Start(new ProcessStartInfo
                 {
-                    FileName  = tempPath,
-                    Arguments = "/SILENT /NORESTART /CLOSEAPPLICATIONS",
-                    UseShellExecute = true
+                    FileName        = "cmd.exe",
+                    Arguments       = $"/c \"{batchPath}\"",
+                    UseShellExecute = false,
+                    CreateNoWindow  = true
                 });
 
-                // Kurulumun bitmesini bekle (en fazla 3 dakika)
-                proc?.WaitForExit(180_000);
-
-                // Mevcut launcher'ı kapat
+                // Hemen çık — dosya kilidini aç, installer yerine yazabilsin
                 dlgForm.Invoke(() =>
                 {
                     dlgForm.Close();

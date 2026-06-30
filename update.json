@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "4.8",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe?v=4.8",
-  "Changelog": "- Önceki/sonraki butonları tamamen yenilendi (hover'da sariya dönüş). Ayarlar menüsü premium kart tasarımı ile yenilendi. Giriş paneliniz biraz daha büyütüldü."
+  "LatestVersion": "4.9",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe?v=4.9",
+  "Changelog": "- Güncelleme döngüsü kesin olarak düzeltildi: PID bazlı güncelleme sistemi, uygulama tamamen kapandıktan sonra installer'ı çalıştırıyor."
 }
