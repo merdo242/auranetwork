@@ -136,7 +136,7 @@ partial class Form1
         // 
         // Form1
         // 
-        this.ClientSize = new System.Drawing.Size(1000, 600);
+        this.ClientSize = new System.Drawing.Size(1200, 700);
         this.Controls.Add(this.pnlLogin);
         this.Controls.Add(this.pnlHome);
         this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -160,7 +160,7 @@ partial class Form1
         this.pnlLogin.Dock = System.Windows.Forms.DockStyle.Fill;
         this.pnlLogin.Location = new System.Drawing.Point(0, 0);
         this.pnlLogin.Name = "pnlLogin";
-        this.pnlLogin.Size = new System.Drawing.Size(1000, 600);
+        this.pnlLogin.Size = new System.Drawing.Size(1200, 700);
 
         // 
         // pnlLeftNewsCard
@@ -479,7 +479,7 @@ partial class Form1
         this.pnlHome.Dock = System.Windows.Forms.DockStyle.Fill;
         this.pnlHome.Location = new System.Drawing.Point(0, 0);
         this.pnlHome.Name = "pnlHome";
-        this.pnlHome.Size = new System.Drawing.Size(1000, 600);
+        this.pnlHome.Size = new System.Drawing.Size(1200, 700);
         this.pnlHome.Visible = false;
 
         // 
