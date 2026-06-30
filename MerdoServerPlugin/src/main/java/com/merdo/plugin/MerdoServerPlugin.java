@@ -11,6 +11,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import java.io.File;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -144,7 +147,20 @@ public class MerdoServerPlugin extends JavaPlugin implements Listener {
         if (!merdoClients.contains(player.getUniqueId())) return;
         merdoClients.remove(player.getUniqueId());
 
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + player.getName() + " parent addtemp vip 30d");
+        File dataFile = new File(getDataFolder(), "data.yml");
+        FileConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
+        String uuidStr = player.getUniqueId().toString();
+
+        if (!data.getBoolean("rewards." + uuidStr, false)) {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + player.getName() + " parent addtemp vip 30d");
+            data.set("rewards." + uuidStr, true);
+            try {
+                data.save(dataFile);
+            } catch (IOException e) {
+                getLogger().severe("Could not save data.yml");
+            }
+        }
+
         Bukkit.broadcastMessage("§e§l✨ §b" + player.getName() + " §eMerdo Client ayrıcalığıyla sunucuya katıldı!");
     }
 }
