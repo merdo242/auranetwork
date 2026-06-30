@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "7.1",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=7.1",
-  "Changelog": "- Oyun içi ana menü tasarımı daha şık hale getirildi ve orantılar düzeltildi.\n- Client Ayarları menüsü eklendi.\n- FPS, Ping ve Keystrokes (Tuş basım) göstergeleri eklendi."
+  "LatestVersion": "7.2",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=7.2",
+  "Changelog": "- Oyuna girerken çökme sorunu düzeltildi (InGameHud Mixin hatası)."
 }

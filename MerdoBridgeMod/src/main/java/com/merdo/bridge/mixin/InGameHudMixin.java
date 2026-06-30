@@ -10,11 +10,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.client.render.RenderTickCounter;
+
 @Mixin(InGameHud.class)
 public class InGameHudMixin {
 
     @Inject(method = "render", at = @At("RETURN"))
-    private void onRender(DrawContext context, float tickDelta, CallbackInfo ci) {
+    private void onRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.options.hudHidden || client.player == null) return;
 
