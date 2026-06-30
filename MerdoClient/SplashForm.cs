@@ -267,7 +267,7 @@ public class SplashForm : Form
     {
         if (_largeLogo == null)
         {
-            try { _largeLogo = Image.FromFile(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "logo_large.png")); } catch { }
+            try { _largeLogo = Image.FromFile(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "logo_large_new.png")); } catch { }
         }
         if (_largeLogo != null)
         {
