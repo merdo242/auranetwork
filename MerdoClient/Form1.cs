@@ -1020,6 +1020,15 @@ public partial class Form1 : Form
                             UpdateRoleBadge(roleStr);
                         }
                     }
+                    
+                    if (doc.RootElement.TryGetProperty("balance", out var balanceProp))
+                    {
+                        if (balanceProp.ValueKind == System.Text.Json.JsonValueKind.Number)
+                        {
+                            double balance = balanceProp.GetDouble();
+                            Invoke(() => lblBalance.Text = $"💲 Güncel Bakiye : {balance:N0}");
+                        }
+                    }
                 }
                 catch { }
 

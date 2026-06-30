@@ -47,6 +47,7 @@ partial class Form1
     private System.Windows.Forms.Panel pnlAvatar;
     private System.Windows.Forms.Label lblWelcome;
     private System.Windows.Forms.Panel pnlRoleBadge;
+    private System.Windows.Forms.Label lblBalance;
     private System.Windows.Forms.Label lblRole;
     private System.Windows.Forms.Button btnPlay;
     private System.Windows.Forms.Button btnExit;
@@ -110,6 +111,7 @@ partial class Form1
         this.pnlAvatar = new System.Windows.Forms.Panel();
         this.lblWelcome = new System.Windows.Forms.Label();
         this.pnlRoleBadge = new System.Windows.Forms.Panel();
+        this.lblBalance = new System.Windows.Forms.Label();
         this.lblRole = new System.Windows.Forms.Label();
         this.btnPlay = new System.Windows.Forms.Button();
         this.btnExit = new System.Windows.Forms.Button();
@@ -538,6 +540,7 @@ partial class Form1
         this.pnlHomeRightCard.Controls.Add(this.pnlAvatar);
         this.pnlHomeRightCard.Controls.Add(this.lblWelcome);
         this.pnlHomeRightCard.Controls.Add(this.pnlRoleBadge);
+        this.pnlHomeRightCard.Controls.Add(this.lblBalance);
         this.pnlHomeRightCard.Controls.Add(this.btnPlay);
         this.pnlHomeRightCard.Controls.Add(this.btnExit);
         this.pnlHomeRightCard.Controls.Add(this.lblConnectionsTitle);
@@ -589,6 +592,17 @@ partial class Form1
         this.lblRole.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 
         // 
+        // lblBalance
+        // 
+        this.lblBalance.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this.lblBalance.ForeColor = System.Drawing.Color.FromArgb(255, 204, 0);
+        this.lblBalance.Location = new System.Drawing.Point(0, 205);
+        this.lblBalance.Name = "lblBalance";
+        this.lblBalance.Size = new System.Drawing.Size(320, 20);
+        this.lblBalance.Text = "💲 Güncel Bakiye : Yükleniyor...";
+        this.lblBalance.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+
+        // 
         // btnPlay
         // 
         this.btnPlay.BackColor = System.Drawing.Color.FromArgb(255, 204, 0);
@@ -596,7 +610,7 @@ partial class Form1
         this.btnPlay.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this.btnPlay.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.btnPlay.ForeColor = System.Drawing.Color.Black;
-        this.btnPlay.Location = new System.Drawing.Point(30, 215);
+        this.btnPlay.Location = new System.Drawing.Point(30, 235);
         this.btnPlay.Name = "btnPlay";
         this.btnPlay.Size = new System.Drawing.Size(260, 38);
         this.btnPlay.Text = "➔ OYNA";
@@ -612,7 +626,7 @@ partial class Form1
         this.btnExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this.btnExit.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.btnExit.ForeColor = System.Drawing.Color.FromArgb(220, 50, 50);
-        this.btnExit.Location = new System.Drawing.Point(30, 265);
+        this.btnExit.Location = new System.Drawing.Point(30, 285);
         this.btnExit.Name = "btnExit";
         this.btnExit.Size = new System.Drawing.Size(260, 34);
         this.btnExit.Text = "↺ ÇIKIŞ YAP";
@@ -625,7 +639,7 @@ partial class Form1
         this.lblConnectionsTitle.AutoSize = true;
         this.lblConnectionsTitle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.lblConnectionsTitle.ForeColor = System.Drawing.Color.White;
-        this.lblConnectionsTitle.Location = new System.Drawing.Point(30, 318);
+        this.lblConnectionsTitle.Location = new System.Drawing.Point(30, 335);
         this.lblConnectionsTitle.Name = "lblConnectionsTitle";
         this.lblConnectionsTitle.Size = new System.Drawing.Size(95, 15);
         this.lblConnectionsTitle.Text = "🔗 BAĞLANTILAR";
@@ -636,9 +650,9 @@ partial class Form1
         this.btnRules.BackColor = System.Drawing.Color.FromArgb(35, 35, 40);
         this.btnRules.FlatAppearance.BorderSize = 0;
         this.btnRules.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this.btnRules.Font = new System.Drawing.Font("Segoe UI", 8.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this.btnRules.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.btnRules.ForeColor = System.Drawing.Color.White;
-        this.btnRules.Location = new System.Drawing.Point(30, 345);
+        this.btnRules.Location = new System.Drawing.Point(30, 360);
         this.btnRules.Name = "btnRules";
         this.btnRules.Size = new System.Drawing.Size(80, 32);
         this.btnRules.Text = "KURALLAR";
@@ -650,9 +664,9 @@ partial class Form1
         this.btnWebsite.BackColor = System.Drawing.Color.FromArgb(35, 35, 40);
         this.btnWebsite.FlatAppearance.BorderSize = 0;
         this.btnWebsite.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this.btnWebsite.Font = new System.Drawing.Font("Segoe UI", 8.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this.btnWebsite.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.btnWebsite.ForeColor = System.Drawing.Color.White;
-        this.btnWebsite.Location = new System.Drawing.Point(120, 345);
+        this.btnWebsite.Location = new System.Drawing.Point(120, 360);
         this.btnWebsite.Name = "btnWebsite";
         this.btnWebsite.Size = new System.Drawing.Size(80, 32);
         this.btnWebsite.Text = "SİTE";
@@ -664,9 +678,9 @@ partial class Form1
         this.btnDiscordLink.BackColor = System.Drawing.Color.FromArgb(35, 35, 40);
         this.btnDiscordLink.FlatAppearance.BorderSize = 0;
         this.btnDiscordLink.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this.btnDiscordLink.Font = new System.Drawing.Font("Segoe UI", 8.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+        this.btnDiscordLink.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.btnDiscordLink.ForeColor = System.Drawing.Color.White;
-        this.btnDiscordLink.Location = new System.Drawing.Point(210, 345);
+        this.btnDiscordLink.Location = new System.Drawing.Point(210, 360);
         this.btnDiscordLink.Name = "btnDiscordLink";
         this.btnDiscordLink.Size = new System.Drawing.Size(80, 32);
         this.btnDiscordLink.Text = "DISCORD";
