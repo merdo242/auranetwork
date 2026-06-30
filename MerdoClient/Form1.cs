@@ -62,6 +62,7 @@ public partial class Form1 : Form
         DoubleBuffered = true;
         BackColor = Color.FromArgb(8, 8, 10);
         StartPosition = FormStartPosition.CenterScreen;
+        try { this.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { }
         
         // Setup Panels
         pnlHome.Visible = false;
@@ -365,7 +366,8 @@ public partial class Form1 : Form
     {
         var panel = (Panel)sender!;
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-        using var brush = new SolidBrush(Color.FromArgb(255, 204, 0)); // Yellow bg
+        var bgColor = panel.Tag is Color c ? c : Color.FromArgb(255, 204, 0); // Use tag color or default yellow
+        using var brush = new SolidBrush(bgColor);
         using var path = GetRoundedRectanglePath(new Rectangle(0, 0, panel.Width - 1, panel.Height - 1), 4);
         e.Graphics.FillPath(brush, path);
     }
@@ -735,7 +737,36 @@ public partial class Form1 : Form
                     var roleStr = roleProp.GetString();
                     if (!string.IsNullOrEmpty(roleStr))
                     {
-                        Invoke(() => lblRole.Text = roleStr.ToUpper());
+                        Invoke(() =>
+                        {
+                            lblRole.Text = roleStr.ToUpper();
+                            // Set badge color based on role
+                            var roleLower = roleStr.ToLower();
+                            Color badgeColor;
+                            if (roleLower.Contains("kurucu") || roleLower.Contains("founder"))
+                                badgeColor = Color.FromArgb(255, 165, 0); // Orange/Gold
+                            else if (roleLower.Contains("admin") || roleLower.Contains("owner"))
+                                badgeColor = Color.FromArgb(220, 50, 50);  // Red
+                            else if (roleLower.Contains("mod"))
+                                badgeColor = Color.FromArgb(130, 80, 220); // Purple
+                            else if (roleLower.Contains("vip"))
+                                badgeColor = Color.FromArgb(0, 180, 220);  // Blue
+                            else
+                                badgeColor = Color.FromArgb(255, 204, 0);  // Yellow (default Oyuncu)
+
+                            // Resize badge panel to fit text
+                            using var g = pnlRoleBadge.CreateGraphics();
+                            var sz = g.MeasureString(lblRole.Text, lblRole.Font);
+                            int newW = (int)sz.Width + 20;
+                            pnlRoleBadge.Width  = newW;
+                            lblRole.Width       = newW;
+                            // Re-center badge horizontally
+                            pnlRoleBadge.Left = (pnlHomeRightCard.Width - newW) / 2;
+
+                            // Store color for paint
+                            pnlRoleBadge.Tag = badgeColor;
+                            pnlRoleBadge.Invalidate();
+                        });
                     }
                 }
             }

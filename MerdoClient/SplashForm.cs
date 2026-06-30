@@ -152,33 +152,8 @@ public class SplashForm : Form
             g.FillEllipse(brush, p.X - p.Size / 2, p.Y - p.Size / 2, p.Size, p.Size);
         }
 
-        // --- Logo + Başlık ---
+        // --- Logo + Başlık + Altyazı ---
         DrawLogo(g, 16, 30);
-
-        // "MERDO" bold yazısı
-        using (var titleFont = new Font("Segoe UI", 22F, FontStyle.Bold))
-        using (var titleBrush = new SolidBrush(Color.White))
-            g.DrawString("MERDO", titleFont, titleBrush, 112, 30);
-
-        // LAUNCHER badge
-        Rectangle badge = new Rectangle(232, 38, 90, 22);
-        using (var badgePath = RoundedRect(badge, 5))
-        using (var yellowBrush = new SolidBrush(Color.FromArgb(255, 204, 0)))
-            g.FillPath(yellowBrush, badgePath);
-
-        using (var bFont = new Font("Segoe UI", 8F, FontStyle.Bold))
-        using (var bBrush = new SolidBrush(Color.Black))
-        {
-            var sz = g.MeasureString("LAUNCHER", bFont);
-            g.DrawString("LAUNCHER", bFont, bBrush,
-                badge.X + (badge.Width  - sz.Width)  / 2,
-                badge.Y + (badge.Height - sz.Height) / 2);
-        }
-
-        // --- Altyazı ---
-        using (var subFont  = new Font("Segoe UI", 9F, FontStyle.Regular))
-        using (var subBrush = new SolidBrush(Color.FromArgb(100, 100, 110)))
-            g.DrawString("Minecraft Launcher v2.0", subFont, subBrush, 114, 62);
 
         // --- Divider ---
         using (var divPen = new Pen(Color.FromArgb(30, 30, 35), 1))
@@ -264,18 +239,53 @@ public class SplashForm : Form
     private static Image? _largeLogo;
     private static void DrawLogo(Graphics g, int x, int y)
     {
+        g.SmoothingMode      = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+        g.InterpolationMode  = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+        g.CompositingMode    = System.Drawing.Drawing2D.CompositingMode.SourceOver;
+        g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+
+        // --- Small logo (40x40) ---
         if (_largeLogo == null)
-        {
             try { _largeLogo = Image.FromFile(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "logo_large_new.png")); } catch { }
-        }
+
+        int iconSize = 40;
+        int iconX = x + 8;
+        int iconY = y + 14;
+
         if (_largeLogo != null)
         {
-            g.InterpolationMode  = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-            g.CompositingMode    = System.Drawing.Drawing2D.CompositingMode.SourceOver;
-            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-            // Draw directly at x,y – no negative offset
-            g.DrawImage(_largeLogo, x, y, 90, 90);
+            g.DrawImage(_largeLogo, iconX, iconY, iconSize, iconSize);
         }
+
+        // --- "MERDO" bold text ---
+        int textX = iconX + iconSize + 10;
+        int textY = y + 18;
+        using (var font  = new Font("Segoe UI", 14F, FontStyle.Bold))
+        using (var brush = new SolidBrush(Color.White))
+            g.DrawString("MERDO", font, brush, textX, textY);
+
+        // --- "LAUNCHER" yellow badge ---
+        int badgeX = textX + 82;
+        int badgeY = y + 22;
+        int badgeW = 78;
+        int badgeH = 20;
+        using (var badgePath = RoundedRect(new Rectangle(badgeX, badgeY, badgeW, badgeH), 5))
+        using (var yellowBrush = new SolidBrush(Color.FromArgb(255, 200, 0)))
+            g.FillPath(yellowBrush, badgePath);
+
+        using (var font  = new Font("Segoe UI", 7.5F, FontStyle.Bold))
+        using (var brush = new SolidBrush(Color.Black))
+        {
+            var sz = g.MeasureString("LAUNCHER", font);
+            g.DrawString("LAUNCHER", font, brush,
+                badgeX + (badgeW - sz.Width) / 2f,
+                badgeY + (badgeH - sz.Height) / 2f);
+        }
+
+        // --- Altyazı ---
+        using (var subFont  = new Font("Segoe UI", 9F, FontStyle.Regular))
+        using (var subBrush = new SolidBrush(Color.FromArgb(100, 100, 110)))
+            g.DrawString("Minecraft Launcher v2.0", subFont, subBrush, textX, badgeY + 22);
     }
 }
 
