@@ -353,28 +353,12 @@ public partial class Form1 : Form
         if (panel.Width <= 0 || panel.Height <= 0) return;
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
-        // Draw background image if available, else Gradient
-        if (_mainBgImage == null)
-        {
-            try { _mainBgImage = Image.FromFile(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "news_bg.jpg")); } catch { }
-        }
-        
-        if (_mainBgImage != null && panel == pnlHome)
-        {
-            e.Graphics.DrawImage(_mainBgImage, new Rectangle(0, 0, panel.Width, panel.Height));
-            // Dark overlay for readability
-            using var overlayBrush = new SolidBrush(Color.FromArgb(190, 10, 10, 14));
-            e.Graphics.FillRectangle(overlayBrush, panel.ClientRectangle);
-        }
-        else
-        {
-            using var bg = new LinearGradientBrush(
-                panel.ClientRectangle,
-                Color.FromArgb(10, 10, 14),
-                Color.FromArgb(18, 18, 24),
-                LinearGradientMode.Vertical);
-            e.Graphics.FillRectangle(bg, panel.ClientRectangle);
-        }
+        using var bg = new LinearGradientBrush(
+            panel.ClientRectangle,
+            Color.FromArgb(10, 10, 14),
+            Color.FromArgb(18, 18, 24),
+            LinearGradientMode.Vertical);
+        e.Graphics.FillRectangle(bg, panel.ClientRectangle);
 
         // Draw logo
         DrawLogoBadge(e.Graphics, 0, 0);
@@ -622,10 +606,32 @@ public partial class Form1 : Form
     
     private void PnlLeftNewsCard_Paint(object? sender, PaintEventArgs e)
     {
-        var slide = _newsSlides[_currentSlideIndex];
-        
+        var panel = (Panel)sender!;
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
         e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+
+        // Draw background image if available
+        if (_mainBgImage == null)
+        {
+            try { _mainBgImage = Image.FromFile(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "news_bg.jpg")); } catch { }
+        }
+
+        using var path = GetRoundedRectanglePath(new Rectangle(0, 0, panel.Width - 1, panel.Height - 1), 12);
+        if (_mainBgImage != null)
+        {
+            e.Graphics.SetClip(path);
+            e.Graphics.DrawImage(_mainBgImage, new Rectangle(0, 0, panel.Width, panel.Height));
+            // Dark overlay for readability
+            using var overlayBrush = new SolidBrush(Color.FromArgb(170, 15, 15, 18));
+            e.Graphics.FillRectangle(overlayBrush, panel.ClientRectangle);
+            e.Graphics.ResetClip();
+        }
+
+        // Draw Border
+        using var borderPen = new Pen(Color.FromArgb(35, 35, 40), 1);
+        e.Graphics.DrawPath(borderPen, path);
+
+        var slide = _newsSlides[_currentSlideIndex];
         
         double ease = Math.Sin(_newsAnimProgress * Math.PI / 2); // 0 to 1
         int alpha = (int)(255 * ease);
