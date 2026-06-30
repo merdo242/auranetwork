@@ -17,7 +17,7 @@ public class MinecraftLauncherService
     }
 
     /// <summary>Minecraft'ı başlatır. Arka planda (Task.Run içinde) çağrılmalıdır.</summary>
-    public LauncherResult StartMinecraft(string username)
+    public LauncherResult StartMinecraft(string username, Action<string>? onProgress = null)
     {
         if (string.IsNullOrWhiteSpace(username))
             return new LauncherResult(false, "Minecraft'ı başlatmak için kullanıcı adı gereklidir.");
@@ -28,10 +28,39 @@ public class MinecraftLauncherService
             var launcher = new MinecraftLauncher(path);
             var settings = _settingsService.Settings;
 
+            // --- İndirme durumunu bildiren olaylar ---
+            launcher.FileChanged += (e) =>
+            {
+                onProgress?.Invoke($"İndiriliyor: {e.FileName} ({e.ProgressedFileCount}/{e.TotalFileCount})");
+            };
+
+            // --- OptiFine'ı otomatik indir ve kur ---
+            string optifineName = "ForgeOptiFine 1.21.8";
+            string optiPath = Path.Combine(path.BasePath, "versions", optifineName);
+            if (!Directory.Exists(optiPath))
+            {
+                onProgress?.Invoke("OptiFine 1.21.8 paketi indiriliyor (25 MB)... Lütfen bekleyin.");
+                try 
+                {
+                    using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(10) };
+                    var zipBytes = client.GetByteArrayAsync("https://github.com/merdo242/merdoclient/raw/main/installer/ForgeOptiFine_1.21.8.zip").GetAwaiter().GetResult();
+                    var tempZip = Path.Combine(Path.GetTempPath(), "merdo_optifine.zip");
+                    System.IO.File.WriteAllBytes(tempZip, zipBytes);
+                    System.IO.Compression.ZipFile.ExtractToDirectory(tempZip, optiPath, true);
+                    System.IO.File.Delete(tempZip);
+                    onProgress?.Invoke("OptiFine başarıyla indirildi.");
+                } 
+                catch (Exception ex) 
+                {
+                    return new LauncherResult(false, "OptiFine indirilemedi: " + ex.Message + "\nİnternet bağlantınızı kontrol edin.");
+                }
+            }
+
             // --- OptiFine sürümünü otomatik bul (yoksa 1.21.8 vanilla) ---
             string launchVersion = FindOptifineVersion(path.BasePath) ?? FixedVersion;
 
             // --- Java yolunu bul ---
+            onProgress?.Invoke("Java kontrol ediliyor...");
             string javaPath = !string.IsNullOrEmpty(settings.JavaPath) && File.Exists(settings.JavaPath)
                 ? settings.JavaPath
                 : FindSystemJavaPath();
@@ -53,6 +82,7 @@ public class MinecraftLauncherService
             };
 
             // Process'i oluştur (Task.Run içinde çalıştığından deadlock yok)
+            onProgress?.Invoke("Minecraft dosyaları hazırlanıyor...");
             var process = launcher.BuildProcessAsync(launchVersion, launchOptions, default)
                                   .AsTask()
                                   .ConfigureAwait(false)

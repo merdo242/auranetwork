@@ -8,7 +8,7 @@ namespace MerdoClient;
 public class UpdateCheckerService
 {
     // Mevcut launcher sürümü
-    public const string CurrentVersion = "2.5";
+    public const string CurrentVersion = "2.6";
 
     // Güncelleme kontrolü için doğrudan bu GitHub deposundaki update.json dosyasını kullanıyoruz (100% ücretsiz & hızlı)
     private const string UpdateUrl = "https://raw.githubusercontent.com/merdo242/merdoclient/main/update.json";
@@ -44,14 +44,19 @@ public class UpdateCheckerService
                   $"   Mevcut sürümünüz : v{CurrentVersion}\n" +
                   $"   Yeni sürüm       : v{data.LatestVersion}\n\n" +
                   $"📋 Değişiklikler:\n{data.Changelog}\n\n" +
-                  $"Güncellemeyi şimdi indirip otomatik kurmak ister misiniz?";
+                  $"Devam etmek için güncellemeyi yüklemelisiniz. Şimdi yüklensin mi?";
 
         var result = MessageBox.Show(parentForm, msg,
-            "🔄 Merdo Launcher — Güncelleme Mevcut",
+            "🔄 Zorunlu Güncelleme Mevcut",
             MessageBoxButtons.YesNo,
-            MessageBoxIcon.Information);
+            MessageBoxIcon.Warning);
 
-        if (result != DialogResult.Yes) return;
+        if (result != DialogResult.Yes)
+        {
+            Application.Exit();
+            Environment.Exit(0);
+            return;
+        }
 
         // Otomatik indir ve kur
         DownloadAndInstall(parentForm, data);

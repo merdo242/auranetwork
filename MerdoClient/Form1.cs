@@ -690,14 +690,14 @@ public partial class Form1 : Form
 
         // UI'ı kilitle, ilerleme çubuğunu başlat
         btnPlay.Enabled = false;
-        lblStatus.Text  = "Minecraft açılıyor, lütfen bekleyin...";
+        lblStatus.Text  = "Minecraft hazırlanıyor...";
         pbLaunch.Value  = 4;
         _launchProgress = 4;
         _launchTimer.Start();
 
         // Minecraft'ı arka planda başlat — UI donmasın
         var result = await System.Threading.Tasks.Task.Run(
-            () => _minecraftLauncherService.StartMinecraft(_currentUser));
+            () => _minecraftLauncherService.StartMinecraft(_currentUser, msg => Invoke(() => lblStatus.Text = msg)));
 
         _launchTimer.Stop();
         btnPlay.Enabled = true;
