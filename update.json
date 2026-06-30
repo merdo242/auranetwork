@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "4.5",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe?v=4.5",
-  "Changelog": "- Giriş paneli arayüz hizalaması (tasarıma sıfıra sıfır oturması için) kusursuzlaştırıldı."
+  "LatestVersion": "4.6",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Setup.exe?v=4.6",
+  "Changelog": "- Kayıtlı hesap satırı büyütüldü, simgeler düzgün gösterildi, silme (x) butonu sadece üzerine gelince göründü."
 }

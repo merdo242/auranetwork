@@ -513,7 +513,7 @@ public partial class Form1 : Form
             lblSavedAccountsPlaceholder.Visible = false;
             
             int yOffset = 0;
-            int itemHeight = 36;
+            int itemHeight = 44; // biraz daha büyük
             
             for (int i = 0; i < saved.Count; i++)
             {
@@ -537,13 +537,14 @@ public partial class Form1 : Form
                 
                 MakeControlRounded(pnlAcc, 6);
 
+                // Gerçek emoji görünümü için Segoe UI Emoji fontu
                 var lblIcon = new Label
                 {
                     Text = "👤",
-                    Font = new Font("Segoe UI", 11F),
+                    Font = new Font("Segoe UI Emoji", 13F),
                     ForeColor = Color.White,
                     AutoSize = true,
-                    Location = new Point(10, 7),
+                    Location = new Point(10, (itemHeight - 22) / 2),
                     BackColor = Color.Transparent,
                     Cursor = Cursors.Hand
                 };
@@ -551,10 +552,10 @@ public partial class Form1 : Form
                 var lblUser = new Label
                 {
                     Text = acc.Username,
-                    Font = new Font("Segoe UI", 9.5F, FontStyle.Bold),
+                    Font = new Font("Segoe UI", 10F, FontStyle.Bold),
                     ForeColor = Color.White,
                     AutoSize = true,
-                    Location = new Point(35, 9),
+                    Location = new Point(40, (itemHeight - 17) / 2),
                     BackColor = Color.Transparent,
                     Cursor = Cursors.Hand
                 };
@@ -565,28 +566,46 @@ public partial class Form1 : Form
                     Font = new Font("Segoe UI", 10F),
                     ForeColor = Color.FromArgb(255, 204, 0),
                     AutoSize = true,
-                    Location = new Point(lblUser.Right + 2, 8),
                     BackColor = Color.Transparent,
                     Cursor = Cursors.Hand
                 };
+                lblArrow.Location = new Point(lblUser.Right + 4, (itemHeight - 17) / 2);
 
+                // × sadece hover'da görünsün
                 var lblDelete = new Label
                 {
-                    Text = "✖",
-                    Font = new Font("Segoe UI", 9F, FontStyle.Bold),
-                    ForeColor = Color.Red,
+                    Text = "✕",
+                    Font = new Font("Segoe UI", 10F, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(180, 60, 60),
                     AutoSize = true,
                     BackColor = Color.Transparent,
-                    Cursor = Cursors.Hand
+                    Cursor = Cursors.Hand,
+                    Visible = false   // başlangıçta gizli
                 };
-                lblDelete.Location = new Point(pnlAcc.Width - 25, 10);
+                lblDelete.Location = new Point(pnlAcc.Width - 28, (itemHeight - 18) / 2);
+
+                // Hover → × göster / gizle
+                EventHandler showDelete = (s, ev) => lblDelete.Visible = true;
+                EventHandler hideDelete = (s, ev) => lblDelete.Visible = false;
+
+                pnlAcc.MouseEnter += showDelete;
+                pnlAcc.MouseLeave += hideDelete;
+                lblIcon.MouseEnter += showDelete;
+                lblIcon.MouseLeave += hideDelete;
+                lblUser.MouseEnter += showDelete;
+                lblUser.MouseLeave += hideDelete;
+                lblArrow.MouseEnter += showDelete;
+                lblArrow.MouseLeave += hideDelete;
+                lblDelete.MouseEnter += showDelete;
+                lblDelete.MouseLeave += hideDelete;
                 
-                pnlAcc.Layout += (s, ev) => 
+                pnlAcc.Layout += (s, ev) =>
                 {
-                    lblArrow.Left = lblUser.Right + 2;
+                    lblArrow.Left = lblUser.Right + 4;
+                    lblDelete.Left = pnlAcc.Width - 28;
                 };
 
-                lblDelete.Click += (s, ev) => 
+                lblDelete.Click += (s, ev) =>
                 {
                     _accountService.RemoveSavedAccount(acc.Username);
                     UpdateSavedAccountsUI();
