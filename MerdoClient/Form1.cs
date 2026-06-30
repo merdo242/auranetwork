@@ -854,7 +854,8 @@ public partial class Form1 : Form
         SetupPlaceholder(txtUsername, "Kullanıcı Adı");
         SetupPlaceholder(txtPassword, "Şifre", true);
         
-        Text = "Chicken Launcher - Giriş Yap";
+        this.ClientSize = new Size(1200, 700);
+        Text = "Merdo Launcher - Giriş Yap";
         pnlHome.Visible = false;
         pnlLogin.Visible = true;
         
@@ -997,6 +998,17 @@ public partial class Form1 : Form
             _transitionProgress = 1;
             _transitionTimer.Stop();
         }
+
+        // Animate size from 1200x700 to 1000x620
+        int targetW = 1000;
+        int targetH = 620;
+        int diffW = 1200 - targetW;
+        int diffH = 700 - targetH;
+        
+        // Easing function for smooth shrink
+        double ease = Math.Sin(_transitionProgress * Math.PI / 2);
+        
+        this.ClientSize = new Size(1200 - (int)(diffW * ease), 700 - (int)(diffH * ease));
 
         int loginAlpha = (int)(255 * (1 - _transitionProgress));
         int homeAlpha = (int)(255 * _transitionProgress);
