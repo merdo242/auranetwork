@@ -12,9 +12,18 @@ public class MerdoBridgeMod implements ClientModInitializer {
             String token = System.getenv("MERDO_TOKEN");
             if (token != null && !token.trim().isEmpty()) {
                 System.out.println("[MerdoBridgeMod] Token bulundu, sunucuya aktariliyor...");
-                if (client.getNetworkHandler() != null) {
-                    client.getNetworkHandler().sendCommand("merdoauth " + token.trim());
-                }
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(2500); // 2.5 saniye bekle
+                        client.execute(() -> {
+                            if (client.getNetworkHandler() != null) {
+                                client.getNetworkHandler().sendCommand("merdoauth " + token.trim());
+                            }
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }).start();
             } else {
                 System.out.println("[MerdoBridgeMod] Token bulunamadi, normal giris yapiliyor.");
             }
