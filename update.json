@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "7.6",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=7.6",
-  "Changelog": "- Ekran küçültüldüğünde menülerin iç içe girmesi sorunu çözüldü.\\n- Launcher üzerindeki 'Güncel Bakiye' yazısı kaldırıldı."
+  "LatestVersion": "7.7",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=7.7",
+  "Changelog": "- İnternetten indirilen güncelleme dosyasının Windows Güvenliği (SmartScreen) tarafından engellenmesi sorunu çözüldü."
 }

@@ -8,7 +8,7 @@ namespace MerdoClient;
 public class UpdateCheckerService
 {
     // Mevcut launcher sürümü
-    public const string CurrentVersion = "7.6";
+    public const string CurrentVersion = "7.7";
 
     // Güncelleme kontrolü için doğrudan bu GitHub deposundaki update.json dosyasını kullanıyoruz (100% ücretsiz & hızlı)
     private static readonly string UpdateUrl = $"https://raw.githubusercontent.com/merdo242/merdoclient/main/update.json?t={DateTime.UtcNow.Ticks}";
@@ -165,11 +165,11 @@ public class UpdateCheckerService
 
                 await Task.Delay(800);
 
-                // Inno Setup'ı başlatırken kısa bir gecikme ekliyoruz ki MerdoLauncher.exe tamamen kapansın
+                // Inno Setup'ı başlatırken dosyayı SmartScreen'den kurtarmak için Unblock-File kullanıyoruz
                 Process.Start(new ProcessStartInfo
                 {
                     FileName        = "cmd.exe",
-                    Arguments       = $"/c ping 127.0.0.1 -n 3 > nul & \"{tempPath}\" /VERYSILENT /SUPPRESSMSGBOXES /FORCECLOSEAPPLICATIONS",
+                    Arguments       = $"/c powershell -NoProfile -Command \"Unblock-File -Path '{tempPath}'\" & ping 127.0.0.1 -n 3 > nul & \"{tempPath}\" /VERYSILENT /SUPPRESSMSGBOXES /FORCECLOSEAPPLICATIONS",
                     CreateNoWindow  = true,
                     WindowStyle     = ProcessWindowStyle.Hidden,
                     UseShellExecute = false
