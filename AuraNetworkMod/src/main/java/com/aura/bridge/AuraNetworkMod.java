@@ -6,7 +6,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 public class AuraNetworkMod implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        System.out.println("[AuraNetworkMod] Aura Network Mod yuklendi!");
+        System.out.println("[AuraNetworkMod] Aura Network Mod yuklendi!"); AuraClientSettings.load();
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             String token = System.getenv("AURA_TOKEN");
