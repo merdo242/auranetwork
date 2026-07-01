@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "8.2",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=8.2",
-  "Changelog": "- 3D Skinin boyutu büyütüldü ve konumu ayarlandı.\\n- Sağ paneldeki taşan yazılar daha düzgün bir şekilde alt satıra alındı.\\n- İsmin yamuk durma sorunu düzeltildi."
+  "LatestVersion": "8.3",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=8.3",
+  "Changelog": "- Oyundaki arka plan tamamen güncellendi, yeni tasarım eklendi."
 }
