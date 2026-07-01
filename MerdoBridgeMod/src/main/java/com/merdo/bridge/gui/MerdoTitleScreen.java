@@ -34,6 +34,11 @@ public class MerdoTitleScreen extends Screen {
     protected void init() {
         int leftX = 40;
         int startY = this.height / 2 - 70;
+        if (this.width >= 540) {
+            startY = Math.max(startY, 160);
+        } else {
+            startY = Math.max(startY, 90);
+        }
 
         // Tekli Oyuncu
         this.addDrawableChild(ButtonWidget.builder(getCustomFontText("Tekli Oyuncu"), button -> {
@@ -98,12 +103,17 @@ public class MerdoTitleScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
 
         // Arka plandaki blurdan/karanliktan logoyu göstermek için siyah şeffaf arka plan çiziyoruz
+        int startY = this.height / 2 - 70;
         if (this.width >= 540) {
-            context.drawTexture(LOGO_TEXTURE, 80, 20, 0, 0, 80, 80, 80, 80);
-            context.drawTexture(TEXT_LOGO_TEXTURE, 30, 110, 0, 0, 180, 38, 180, 38);
+            startY = Math.max(startY, 160);
+            int logoY = startY - 140;
+            context.drawTexture(LOGO_TEXTURE, 80, logoY, 0, 0, 80, 80, 80, 80);
+            context.drawTexture(TEXT_LOGO_TEXTURE, 30, logoY + 90, 0, 0, 180, 38, 180, 38);
         } else {
-            context.drawTexture(LOGO_TEXTURE, 40, 10, 0, 0, 40, 40, 80, 80);
-            context.drawTexture(TEXT_LOGO_TEXTURE, 15, 60, 0, 0, 90, 19, 90, 19);
+            startY = Math.max(startY, 90);
+            int logoY = startY - 70;
+            context.drawTexture(LOGO_TEXTURE, 100, logoY, 0, 0, 40, 40, 80, 80);
+            context.drawTexture(TEXT_LOGO_TEXTURE, 75, logoY + 45, 0, 0, 90, 19, 90, 19);
         }
 
         if (this.width >= 540) {
