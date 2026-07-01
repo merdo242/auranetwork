@@ -101,6 +101,8 @@ public class MerdoTitleScreen extends Screen {
 
         super.render(context, mouseX, mouseY, delta);
 
+        com.mojang.blaze3d.systems.RenderSystem.enableBlend();
+
         // Draw Logo (1024x1024 file, drawn as 80x80 to keep square aspect ratio)
         context.drawTexture(LOGO_TEXTURE, 80, 20, 0, 0, 80, 80, 80, 80);
 
