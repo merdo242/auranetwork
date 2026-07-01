@@ -99,6 +99,8 @@ public class MerdoTitleScreen extends Screen {
         // Draw Left Panel semi-transparent background
         context.fill(20, 0, 220, this.height, 0x66000000);
 
+        super.render(context, mouseX, mouseY, delta);
+
         // Draw Logo (1024x1024 file, drawn as 80x80 to keep square aspect ratio)
         context.drawTexture(LOGO_TEXTURE, 80, 20, 0, 0, 80, 80, 80, 80);
 
@@ -124,7 +126,5 @@ public class MerdoTitleScreen extends Screen {
         if (this.playerSkinId != null) {
             context.drawTexture(this.playerSkinId, rightPanelX + 20, rightPanelY + 50, 0, 0, 70, 140, 70, 140);
         }
-
-        super.render(context, mouseX, mouseY, delta);
     }
 }

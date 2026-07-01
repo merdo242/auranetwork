@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "7.2",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=7.2",
-  "Changelog": "- Oyuna girerken çökme sorunu düzeltildi (InGameHud Mixin hatası)."
+  "LatestVersion": "7.3",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=7.3",
+  "Changelog": "- Ana menüdeki logo ve karakterin blurlu (bulanık) görünme sorunu düzeltildi.\n- Oyun içi (ESC) menüsündeki fazlalık olan Chicken Ayarları butonu kaldırıldı."
 }
