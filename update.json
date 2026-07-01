@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "8.5",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=8.5",
-  "Changelog": "- Launcher'daki ve oyun içindeki logolar yeni logo tasarımıyla değiştirildi."
+  "LatestVersion": "8.6",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=8.6",
+  "Changelog": "- Merdo Client yazısı ana logoya eklendi.\\n- Skin boyutu düzeltildi."
 }

@@ -17,6 +17,7 @@ import net.minecraft.client.util.SkinTextures;
 public class MerdoTitleScreen extends Screen {
     private static final Identifier BACKGROUND_TEXTURE = Identifier.of("merdobridge", "textures/gui/background.png");
     private static final Identifier LOGO_TEXTURE = Identifier.of("merdobridge", "textures/gui/logo.png");
+    private static final Identifier TEXT_LOGO_TEXTURE = Identifier.of("merdobridge", "textures/gui/text_logo.png");
     
     private PlayerEntityModel<LivingEntity> playerModelDefault;
     private PlayerEntityModel<LivingEntity> playerModelSlim;
@@ -99,8 +100,10 @@ public class MerdoTitleScreen extends Screen {
         // Arka plandaki blurdan/karanliktan logoyu göstermek için siyah şeffaf arka plan çiziyoruz
         if (this.width >= 540) {
             context.drawTexture(LOGO_TEXTURE, 80, 20, 0, 0, 80, 80, 80, 80);
+            context.drawTexture(TEXT_LOGO_TEXTURE, 30, 110, 0, 0, 180, 38, 180, 38);
         } else {
             context.drawTexture(LOGO_TEXTURE, 40, 10, 0, 0, 40, 40, 80, 80);
+            context.drawTexture(TEXT_LOGO_TEXTURE, 15, 60, 0, 0, 90, 19, 90, 19);
         }
 
         if (this.width >= 540) {
@@ -147,8 +150,8 @@ public class MerdoTitleScreen extends Screen {
             
             if (playerSkinId != null && modelToRender != null) {
                 int skinX = rightPanelX + 65;
-                int skinY = rightPanelY + 205;
-                int scale = 75;
+                int skinY = rightPanelY + 235;
+                int scale = 125;
                 
                 float pitch = (float)Math.atan((double)((skinY - 90 - mouseY) / 40.0F));
                 float yaw = (float)Math.atan((double)((skinX - mouseX) / 40.0F));
@@ -176,7 +179,7 @@ public class MerdoTitleScreen extends Screen {
                 // Draw Username above skin
                 String username = this.client.getSession().getUsername();
                 matrices.push();
-                matrices.translate(skinX, skinY - 165, 0);
+                matrices.translate(skinX, skinY - 250, 0);
                 context.drawCenteredTextWithShadow(this.textRenderer, getCustomFontText(username), 0, 0, 0xFFFFFF);
                 matrices.pop();
             }
