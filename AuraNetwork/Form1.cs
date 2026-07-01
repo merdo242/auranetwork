@@ -48,7 +48,7 @@ public partial class Form1 : Form
     private readonly NewsSlide[] _newsSlides = new[]
     {
         new NewsSlide("TURNUVALAR", "KAZANMAYA HAZIR OL", "Haftalık turnuvalara katıl, rakiplerinle yarış ve büyük ödüllerin sahibi ol!"),
-        new NewsSlide("GÜNCELLEME", "YENİ SÜRÜM YAYINLANDI", "Merdo Launcher v2.0 ile daha yüksek FPS ve optimize edilmiş ram kullanımı sizleri bekliyor."),
+        new NewsSlide("GÜNCELLEME", "YENİ SÜRÜM YAYINLANDI", "Aura Network v2.0 ile daha yüksek FPS ve optimize edilmiş ram kullanımı sizleri bekliyor."),
         new NewsSlide("ETKİNLİKLER", "BU HAFTA SONU %50 EKSTRA", "Hafta sonu boyunca geçerli tüm etkinliklerde ekstra kredi kazanma şansını kaçırma!")
     };
     
@@ -60,7 +60,7 @@ public partial class Form1 : Form
         InitializeComponent();
         
         // Setup Form properties
-        Text = "Merdo Launcher - Giriş Yap";
+        Text = "Aura Network - Giriş Yap";
         StartPosition = FormStartPosition.CenterScreen;
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false;
@@ -422,7 +422,7 @@ public partial class Form1 : Form
             {
                 using var client = new System.Net.Http.HttpClient();
                 client.Timeout = TimeSpan.FromSeconds(5);
-                client.DefaultRequestHeaders.UserAgent.ParseAdd("MerdoLauncher/2.0");
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("AuraNetwork/2.0");
 
                 var response = await client.GetStringAsync("https://api.mcsrvstat.us/2/91.132.49.16");
                 using var doc = System.Text.Json.JsonDocument.Parse(response);
@@ -804,7 +804,7 @@ public partial class Form1 : Form
         {
             using var client = new System.Net.Http.HttpClient();
             client.Timeout = System.TimeSpan.FromSeconds(5);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("MerdoLauncher/2.0");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("AuraNetwork/2.0");
 
             var response = await client.GetStringAsync($"http://91.132.49.16:8880/check?username={System.Uri.EscapeDataString(username.ToLower())}");
             using var doc = System.Text.Json.JsonDocument.Parse(response);
@@ -960,7 +960,7 @@ public partial class Form1 : Form
         SetupPlaceholder(txtPassword, "Şifre", true);
         
         this.ClientSize = new Size(1200, 700);
-        Text = "Merdo Launcher - Giriş Yap";
+        Text = "Aura Network - Giriş Yap";
         pnlHome.Visible = false;
         pnlLogin.Visible = true;
         _newsAutoTimer.Stop();
@@ -1009,7 +1009,7 @@ public partial class Form1 : Form
     private void StartTransition()
     {
         pnlHome.Visible = true;
-        Text = "Merdo Launcher - Oyun Ekranı";
+        Text = "Aura Network - Oyun Ekranı";
         _transitionProgress = 0;
         _transitionTimer.Start();
         
@@ -1031,7 +1031,7 @@ public partial class Form1 : Form
 
             using var client = new System.Net.Http.HttpClient();
             client.Timeout = System.TimeSpan.FromSeconds(5);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("MerdoLauncher/2.0");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("AuraNetwork/2.0");
 
             // 1. Fetch Rank from 8080 API
             try

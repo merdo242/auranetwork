@@ -1,6 +1,6 @@
-package com.merdo.bridge;
+package com.aura.bridge;
 
-public class MerdoClientSettings {
+public class AuraNetworkSettings {
     public static boolean showFPS = true;
     public static boolean showPing = true;
     public static boolean showKeystrokes = true;

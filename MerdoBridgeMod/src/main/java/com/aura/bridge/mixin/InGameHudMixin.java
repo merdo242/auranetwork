@@ -1,6 +1,6 @@
-package com.merdo.bridge.mixin;
+package com.aura.bridge.mixin;
 
-import com.merdo.bridge.MerdoClientSettings;
+import com.aura.bridge.AuraNetworkSettings;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -23,14 +23,14 @@ public class InGameHudMixin {
         int yOffset = 5;
 
         // Draw FPS
-        if (MerdoClientSettings.showFPS) {
+        if (AuraNetworkSettings.showFPS) {
             String fpsStr = "FPS: " + client.getCurrentFps();
             context.drawTextWithShadow(client.textRenderer, fpsStr, 5, yOffset, 0x00FF00);
             yOffset += 10;
         }
 
         // Draw Ping
-        if (MerdoClientSettings.showPing) {
+        if (AuraNetworkSettings.showPing) {
             int ping = 0;
             if (client.getNetworkHandler() != null) {
                 PlayerListEntry entry = client.getNetworkHandler().getPlayerListEntry(client.player.getUuid());
@@ -44,21 +44,21 @@ public class InGameHudMixin {
         }
 
         // Draw Coords
-        if (MerdoClientSettings.showCoords) {
+        if (AuraNetworkSettings.showCoords) {
             String coordsStr = String.format("XYZ: %d / %d / %d", client.player.getBlockX(), client.player.getBlockY(), client.player.getBlockZ());
             context.drawTextWithShadow(client.textRenderer, coordsStr, 5, yOffset, 0xFFFFFF);
             yOffset += 10;
         }
 
         // Draw Biome
-        if (MerdoClientSettings.showBiome && client.world != null) {
+        if (AuraNetworkSettings.showBiome && client.world != null) {
             String biomeStr = "Biome: " + client.world.getBiome(client.player.getBlockPos()).getKey().map(k -> k.getValue().getPath()).orElse("unknown");
             context.drawTextWithShadow(client.textRenderer, biomeStr, 5, yOffset, 0xFFFFFF);
             yOffset += 10;
         }
 
         // Draw Keystrokes
-        if (MerdoClientSettings.showKeystrokes) {
+        if (AuraNetworkSettings.showKeystrokes) {
             int startX = 5;
             int startY = yOffset + 10;
             

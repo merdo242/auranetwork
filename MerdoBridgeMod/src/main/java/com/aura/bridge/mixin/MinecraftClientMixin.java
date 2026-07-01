@@ -1,6 +1,6 @@
-package com.merdo.bridge.mixin;
+package com.aura.bridge.mixin;
 
-import com.merdo.bridge.gui.MerdoTitleScreen;
+import com.aura.bridge.gui.AuraTitleScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
@@ -16,7 +16,7 @@ public class MinecraftClientMixin {
         if (screen != null && screen.getClass() == TitleScreen.class) {
             // Prevent infinite loop
             ci.cancel();
-            MinecraftClient.getInstance().setScreen(new MerdoTitleScreen());
+            MinecraftClient.getInstance().setScreen(new AuraTitleScreen());
         }
     }
 }

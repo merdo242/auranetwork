@@ -1,6 +1,6 @@
-package com.merdo.bridge.gui;
+package com.aura.bridge.gui;
 
-import com.merdo.bridge.settings.ChickenSettings;
+import com.aura.bridge.settings.ChickenSettings;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;

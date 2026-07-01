@@ -1,6 +1,6 @@
-package com.merdo.bridge.mixin;
+package com.aura.bridge.mixin;
 
-import com.merdo.bridge.settings.ChickenSettings;
+import com.aura.bridge.settings.ChickenSettings;
 import net.minecraft.client.option.SimpleOption;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

@@ -1,20 +1,20 @@
 {
   "schemaVersion": 1,
-  "id": "merdobridge",
+  "id": "auranetwork",
   "version": "${version}",
-  "name": "Merdo Bridge Mod",
-  "description": "Sends authentication tokens from Merdo Launcher to the server.",
+  "name": "Aura Network Mod",
+  "description": "Sends authentication tokens from Aura Network to the server.",
   "authors": [
-    "MerdoClient"
+    "AuraNetwork"
   ],
   "contact": {
-    "homepage": "https://github.com/merdo242/merdoclient"
+    "homepage": "https://github.com/merdo242/AuraNetwork"
   },
   "license": "MIT",
   "environment": "client",
   "entrypoints": {
     "client": [
-      "com.merdo.bridge.MerdoBridgeMod"
+      "com.aura.bridge.AuraNetworkMod"
     ]
   },
   "depends": {
@@ -24,6 +24,6 @@
     "fabric-api": "*"
   },
   "mixins": [
-    "merdobridge.mixins.json"
+    "auranetwork.mixins.json"
   ]
 }

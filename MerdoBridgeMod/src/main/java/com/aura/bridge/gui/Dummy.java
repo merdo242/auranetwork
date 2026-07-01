@@ -1,4 +1,4 @@
-package com.merdo.bridge.gui;
+package com.aura.bridge.gui;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.text.Text;

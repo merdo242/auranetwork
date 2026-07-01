@@ -1,4 +1,4 @@
-package com.merdo.bridge.gui;
+package com.aura.bridge.gui;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
@@ -14,16 +14,16 @@ import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.client.util.SkinTextures;
 
-public class MerdoTitleScreen extends Screen {
-    private static final Identifier BACKGROUND_TEXTURE = Identifier.of("merdobridge", "textures/gui/background.png");
-    private static final Identifier LOGO_TEXTURE = Identifier.of("merdobridge", "textures/gui/logo.png");
-    private static final Identifier TEXT_LOGO_TEXTURE = Identifier.of("merdobridge", "textures/gui/text_logo.png");
+public class AuraTitleScreen extends Screen {
+    private static final Identifier BACKGROUND_TEXTURE = Identifier.of("auranetwork", "textures/gui/background.png");
+    private static final Identifier LOGO_TEXTURE = Identifier.of("auranetwork", "textures/gui/logo.png");
+    private static final Identifier TEXT_LOGO_TEXTURE = Identifier.of("auranetwork", "textures/gui/text_logo.png");
     
     private PlayerEntityModel<LivingEntity> playerModelDefault;
     private PlayerEntityModel<LivingEntity> playerModelSlim;
 
-    public MerdoTitleScreen() {
-        super(Text.literal("Merdo Launcher"));
+    public AuraTitleScreen() {
+        super(Text.literal("Aura Network"));
     }
 
     private Text getCustomFontText(String string) {
@@ -108,12 +108,12 @@ public class MerdoTitleScreen extends Screen {
             startY = Math.max(startY, 160);
             int logoY = startY - 140;
             context.drawTexture(LOGO_TEXTURE, 80, logoY, 0, 0, 80, 80, 80, 80);
-            context.drawTexture(TEXT_LOGO_TEXTURE, 30, logoY + 90, 0, 0, 180, 38, 180, 38);
+            // context.drawTexture(TEXT_LOGO_TEXTURE, 30, logoY + 90, 0, 0, 180, 38, 180, 38);
         } else {
             startY = Math.max(startY, 90);
             int logoY = startY - 70;
             context.drawTexture(LOGO_TEXTURE, 100, logoY, 0, 0, 40, 40, 80, 80);
-            context.drawTexture(TEXT_LOGO_TEXTURE, 75, logoY + 45, 0, 0, 90, 19, 90, 19);
+            // context.drawTexture(TEXT_LOGO_TEXTURE, 75, logoY + 45, 0, 0, 90, 19, 90, 19);
         }
 
         if (this.width >= 540) {
@@ -125,14 +125,14 @@ public class MerdoTitleScreen extends Screen {
             context.fill(rightPanelX, rightPanelY, rightPanelX + rightPanelWidth, rightPanelY + rightPanelHeight, 0xAA000000);
 
             // Title
-            context.drawTextWithShadow(this.textRenderer, getCustomFontText("Yenilenmis Haliyle MerdoClient v0.0.1"), rightPanelX + 130, rightPanelY + 20, 0xFFFFFF);
+            context.drawTextWithShadow(this.textRenderer, getCustomFontText("Yenilenmis Haliyle AuraNetwork v0.0.1"), rightPanelX + 130, rightPanelY + 20, 0xFFFFFF);
             context.fill(rightPanelX + 130, rightPanelY + 35, rightPanelX + rightPanelWidth - 20, rightPanelY + 36, 0x55FFFFFF);
             
             // Text
             String[] lines = {
                 ">> Selam!",
                 "",
-                "MerdoClient'in yenilenmis halinin",
+                "AuraNetwork'in yenilenmis halinin",
                 "ilk surumune hos geldiniz.",
                 "",
                 "Bu surumle birlikte yeni ve",

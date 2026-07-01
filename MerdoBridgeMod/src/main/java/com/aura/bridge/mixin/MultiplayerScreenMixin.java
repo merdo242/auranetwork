@@ -1,4 +1,4 @@
-package com.merdo.bridge.mixin;
+package com.aura.bridge.mixin;
 
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.network.ServerInfo;

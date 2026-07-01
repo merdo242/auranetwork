@@ -156,7 +156,7 @@ public class MinecraftLauncherService
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.EnvironmentVariables["MERDO_TOKEN"] = password;
+            process.StartInfo.EnvironmentVariables["AURA_TOKEN"] = password;
 
             process.Start();
 

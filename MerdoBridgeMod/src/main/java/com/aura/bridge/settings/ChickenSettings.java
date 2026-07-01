@@ -1,4 +1,4 @@
-package com.merdo.bridge.settings;
+package com.aura.bridge.settings;
 
 public class ChickenSettings {
     public static boolean fullbright = false;

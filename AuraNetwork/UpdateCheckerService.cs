@@ -11,7 +11,7 @@ public class UpdateCheckerService
     public const string CurrentVersion = "8.11";
 
     // Güncelleme kontrolü için doğrudan bu GitHub deposundaki update.json dosyasını kullanıyoruz (100% ücretsiz & hızlı)
-    private static readonly string UpdateUrl = $"https://raw.githubusercontent.com/merdo242/merdoclient/main/update.json?t={DateTime.UtcNow.Ticks}";
+    private static readonly string UpdateUrl = $"https://raw.githubusercontent.com/merdo242/auranetwork/main/update.json?t={DateTime.UtcNow.Ticks}";
 
     public static void CheckForUpdates(Form parentForm, Action<UpdateResponse>? onFetchCompleted = null)
     {

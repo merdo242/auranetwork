@@ -1,19 +1,19 @@
 [Setup]
-AppName=Merdo Launcher
+AppName=Aura Network
 AppVersion=8.11
-AppPublisher=MerdoNetwork
-AppPublisherURL=https://merdonetwork.com
-DefaultDirName={autopf}\Merdo Launcher
-DefaultGroupName=Merdo Launcher
+AppPublisher=AuraNetwork
+AppPublisherURL=https://AuraNetwork.com
+DefaultDirName={autopf}\Aura Network
+DefaultGroupName=Aura Network
 OutputDir=..\installer
-OutputBaseFilename=MerdoLauncher_Installer
+OutputBaseFilename=AuraNetwork_Installer
 SetupIconFile=
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
-UninstallDisplayIcon={app}\MerdoLauncher.exe
+UninstallDisplayIcon={app}\AuraNetwork.exe
 ArchitecturesInstallIn64BitMode=x64compatible
 
 [Languages]
@@ -30,8 +30,8 @@ Source: "..\publish\Resources\news_bg.jpg"; DestDir: "{app}\Resources"; Flags: i
 Source: "..\MerdoClient\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\Merdo Launcher"; Filename: "{app}\MerdoLauncher.exe"; IconFilename: "{app}\icon.ico"
-Name: "{autodesktop}\Merdo Launcher"; Filename: "{app}\MerdoLauncher.exe"; IconFilename: "{app}\icon.ico"; Tasks: desktopicon
+Name: "{group}\Aura Network"; Filename: "{app}\AuraNetwork.exe"; IconFilename: "{app}\icon.ico"
+Name: "{autodesktop}\Aura Network"; Filename: "{app}\AuraNetwork.exe"; IconFilename: "{app}\icon.ico"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\MerdoLauncher.exe"; Description: "Merdo Launcher'ı başlat"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\AuraNetwork.exe"; Description: "Aura Network'ı başlat"; Flags: nowait postinstall skipifsilent

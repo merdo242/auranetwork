@@ -1,6 +1,6 @@
-package com.merdo.bridge.mixin;
+package com.aura.bridge.mixin;
 
-import com.merdo.bridge.gui.MerdoSettingsScreen;
+import com.aura.bridge.gui.AuraSettingsScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -20,7 +20,7 @@ public class GameMenuScreenMixin extends Screen {
     @Inject(method = "init", at = @At("TAIL"))
     private void addClientSettingsButton(CallbackInfo ci) {
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Client Ayarlari"), button -> {
-            this.client.setScreen(new MerdoSettingsScreen(this));
+            this.client.setScreen(new AuraSettingsScreen(this));
         }).dimensions(this.width / 2 - 102, this.height / 4 + 144 - 16, 204, 20).build());
     }
 }
