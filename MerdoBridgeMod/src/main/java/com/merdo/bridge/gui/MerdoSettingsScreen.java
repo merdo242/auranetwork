@@ -37,10 +37,22 @@ public class MerdoSettingsScreen extends Screen {
             button.setMessage(Text.literal("Keystrokes: " + (MerdoClientSettings.showKeystrokes ? "Acik" : "Kapali")));
         }).dimensions(centerX - 100, startY + 50, 200, 20).build());
 
+        // Koordinat Göstergesi
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("Koordinat (XYZ): " + (MerdoClientSettings.showCoords ? "Acik" : "Kapali")), button -> {
+            MerdoClientSettings.showCoords = !MerdoClientSettings.showCoords;
+            button.setMessage(Text.literal("Koordinat (XYZ): " + (MerdoClientSettings.showCoords ? "Acik" : "Kapali")));
+        }).dimensions(centerX - 100, startY + 75, 200, 20).build());
+
+        // Biyom Göstergesi
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("Biyom (Biome): " + (MerdoClientSettings.showBiome ? "Acik" : "Kapali")), button -> {
+            MerdoClientSettings.showBiome = !MerdoClientSettings.showBiome;
+            button.setMessage(Text.literal("Biyom (Biome): " + (MerdoClientSettings.showBiome ? "Acik" : "Kapali")));
+        }).dimensions(centerX - 100, startY + 100, 200, 20).build());
+
         // Geri Dön
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Geri Don"), button -> {
             this.client.setScreen(this.parent);
-        }).dimensions(centerX - 100, startY + 90, 200, 20).build());
+        }).dimensions(centerX - 100, startY + 140, 200, 20).build());
     }
 
     @Override

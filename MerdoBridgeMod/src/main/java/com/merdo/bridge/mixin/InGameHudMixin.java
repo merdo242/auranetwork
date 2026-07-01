@@ -43,6 +43,20 @@ public class InGameHudMixin {
             yOffset += 10;
         }
 
+        // Draw Coords
+        if (MerdoClientSettings.showCoords) {
+            String coordsStr = String.format("XYZ: %d / %d / %d", client.player.getBlockX(), client.player.getBlockY(), client.player.getBlockZ());
+            context.drawTextWithShadow(client.textRenderer, coordsStr, 5, yOffset, 0xFFFFFF);
+            yOffset += 10;
+        }
+
+        // Draw Biome
+        if (MerdoClientSettings.showBiome && client.world != null) {
+            String biomeStr = "Biome: " + client.world.getBiome(client.player.getBlockPos()).getKey().map(k -> k.getValue().getPath()).orElse("unknown");
+            context.drawTextWithShadow(client.textRenderer, biomeStr, 5, yOffset, 0xFFFFFF);
+            yOffset += 10;
+        }
+
         // Draw Keystrokes
         if (MerdoClientSettings.showKeystrokes) {
             int startX = 5;
