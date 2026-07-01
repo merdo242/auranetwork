@@ -17,6 +17,57 @@ public class MinecraftLauncherService
     }
 
     /// <summary>Minecraft'Ä± baÅŸlatÄ±r. Arka planda (Task.Run iÃ§inde) Ã§aÄŸrÄ±lmalÄ±dÄ±r.</summary>
+        private static readonly string[] CheatKeywords = new[]
+    {
+        "xray", "x-ray", "wurst", "meteor", "aristois", "liquidbounce", 
+        "bleachhack", "kappahack", "inertia", "mathax", "matix", "impact", 
+        "sigma", "vape", "raven", "skillclient", "wolfram", "jigsaw", 
+        "flux", "flare", "huzuni", "nodus", "autoclicker", "macro"
+    };
+
+    private void ScanForCheats(string modsDir, Action<string>? onProgress)
+    {
+        if (!Directory.Exists(modsDir)) return;
+        
+        onProgress?.Invoke("Anti-Cheat taramasý yapýlýyor...");
+        
+        var files = Directory.GetFiles(modsDir, "*.jar", SearchOption.AllDirectories);
+        bool cheatFound = false;
+        
+        foreach (var file in files)
+        {
+            string fileName = Path.GetFileName(file).ToLowerInvariant();
+            
+            foreach (var keyword in CheatKeywords)
+            {
+                if (fileName.Contains(keyword))
+                {
+                    try
+                    {
+                        File.Delete(file);
+                        cheatFound = true;
+                        // Use MessageBox to alert the user
+                        System.Windows.Forms.MessageBox.Show(
+                            "Güvenlik Korumasý:\nSisteminizde yasaklý bir hile modu tespit edildi ve otomatik olarak silindi!\nSilinen dosya: " + Path.GetFileName(file),
+                            "AuraNW Anti-Cheat",
+                            System.Windows.Forms.MessageBoxButtons.OK,
+                            System.Windows.Forms.MessageBoxIcon.Warning);
+                    }
+                    catch
+                    {
+                        // Ignore if we can't delete
+                    }
+                    break;
+                }
+            }
+        }
+        
+        if (cheatFound)
+        {
+            onProgress?.Invoke("Hile dosyalarý baþarýyla temizlendi!");
+            System.Threading.Thread.Sleep(1500); // Kullanýcýnýn görmesi için biraz bekle
+        }
+    }
     public LauncherResult StartMinecraft(string username, string password, Action<string>? onProgress = null)
     {
         if (string.IsNullOrWhiteSpace(username))
@@ -64,6 +115,8 @@ public class MinecraftLauncherService
             // --- Sesli Sohbet (Simple Voice Chat) modunu otomatik kur ---
             string modsDir = Path.Combine(path.BasePath, "mods");
             if (!Directory.Exists(modsDir)) Directory.CreateDirectory(modsDir);
+
+            ScanForCheats(modsDir, onProgress);
 
             string voiceChatName = "voicechat-fabric-1.21.1-2.6.20.jar";
             string voiceChatPath = Path.Combine(modsDir, voiceChatName);
