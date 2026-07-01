@@ -26,7 +26,7 @@ public class MerdoTitleScreen extends Screen {
     }
 
     private Text getCustomFontText(String string) {
-        return Text.literal(string).styled(style -> style.withFont(Identifier.of("minecraft", "uniform")));
+        return Text.literal(string);
     }
 
     @Override
@@ -94,16 +94,14 @@ public class MerdoTitleScreen extends Screen {
         com.mojang.blaze3d.systems.RenderSystem.defaultBlendFunc();
         com.mojang.blaze3d.systems.RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 
+        super.render(context, mouseX, mouseY, delta);
+
         // Arka plandaki blurdan/karanliktan logoyu göstermek için siyah şeffaf arka plan çiziyoruz
         if (this.width >= 540) {
-            context.fill(70, 10, 170, 110, 0x66000000); // Logonun arkasındaki hafif karanlık alan
             context.drawTexture(LOGO_TEXTURE, 80, 20, 0, 0, 80, 80, 80, 80);
         } else {
-            context.fill(30, 0, 90, 60, 0x66000000); // Logonun arkasındaki hafif karanlık alan
             context.drawTexture(LOGO_TEXTURE, 40, 10, 0, 0, 40, 40, 80, 80);
         }
-
-        super.render(context, mouseX, mouseY, delta);
 
         if (this.width >= 540) {
             int rightPanelWidth = 340;
@@ -157,9 +155,8 @@ public class MerdoTitleScreen extends Screen {
                 matrices.translate((float)skinX, (float)skinY, 50.0F);
                 matrices.scale((float)(-scale), (float)scale, (float)scale);
                 
-                matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Z.rotationDegrees(180.0F));
                 matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_X.rotationDegrees(pitch * 20.0F));
-                matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Y.rotationDegrees(yaw * 20.0F));
+                matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Y.rotationDegrees(yaw * 20.0F + 180.0F));
 
                 modelToRender.setVisible(true);
                 modelToRender.head.pitch = pitch;

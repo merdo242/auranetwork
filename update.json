@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "8.0",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=8.0",
-  "Changelog": "- İsteğiniz üzerine Client Ayarları butonu ana menüden kaldırıldı ve oyun içi (ESC) menüsüne taşındı.\\n- Kısayol hatasına sebep olan kurulum gecikmeleri çözüldü."
+  "LatestVersion": "8.1",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=8.1",
+  "Changelog": "- 3D Skinin ters durma sorunu düzeltildi.\\n- Logonun oyunun arka planına uygulanan genel blur efektinden etkilenme sorunu düzeltildi.\\n- İnce font eski klasik Minecraft fontuna geri döndürüldü."
 }
