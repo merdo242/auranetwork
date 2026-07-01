@@ -1,4 +1,4 @@
-﻿package com.aura.bridge.gui;
+package com.aura.bridge.gui;
 
 import com.aura.bridge.AuraClientSettings;
 import net.minecraft.client.gui.screen.Screen;
@@ -19,14 +19,14 @@ public class AuraSettingsScreen extends Screen {
         int centerX = this.width / 2;
         int startY = this.height / 2 - 40;
 
-        // FPS Göstergesi
+        // FPS Gostergesi
         this.addDrawableChild(ButtonWidget.builder(Text.literal("FPS Gostergesi: " + (AuraClientSettings.showFPS ? "Acik" : "Kapali")), button -> {
             AuraClientSettings.showFPS = !AuraClientSettings.showFPS;
             AuraClientSettings.save();
             button.setMessage(Text.literal("FPS Gostergesi: " + (AuraClientSettings.showFPS ? "Acik" : "Kapali")));
         }).dimensions(centerX - 100, startY, 200, 20).build());
 
-        // Ping Göstergesi
+        // Ping Gostergesi
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Ping Gostergesi: " + (AuraClientSettings.showPing ? "Acik" : "Kapali")), button -> {
             AuraClientSettings.showPing = !AuraClientSettings.showPing;
             AuraClientSettings.save();
@@ -40,21 +40,21 @@ public class AuraSettingsScreen extends Screen {
             button.setMessage(Text.literal("Keystrokes: " + (AuraClientSettings.showKeystrokes ? "Acik" : "Kapali")));
         }).dimensions(centerX - 100, startY + 50, 200, 20).build());
 
-        // Koordinat Göstergesi
+        // Koordinat Gostergesi
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Koordinat (XYZ): " + (AuraClientSettings.showCoords ? "Acik" : "Kapali")), button -> {
             AuraClientSettings.showCoords = !AuraClientSettings.showCoords;
             AuraClientSettings.save();
             button.setMessage(Text.literal("Koordinat (XYZ): " + (AuraClientSettings.showCoords ? "Acik" : "Kapali")));
         }).dimensions(centerX - 100, startY + 75, 200, 20).build());
 
-        // Biyom Göstergesi
+        // Biyom Gostergesi
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Biyom (Biome): " + (AuraClientSettings.showBiome ? "Acik" : "Kapali")), button -> {
             AuraClientSettings.showBiome = !AuraClientSettings.showBiome;
             AuraClientSettings.save();
             button.setMessage(Text.literal("Biyom (Biome): " + (AuraClientSettings.showBiome ? "Acik" : "Kapali")));
         }).dimensions(centerX - 100, startY + 100, 200, 20).build());
 
-        // Geri Dön
+        // Geri Don
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Geri Don"), button -> {
             this.client.setScreen(this.parent);
         }).dimensions(centerX - 100, startY + 140, 200, 20).build());
