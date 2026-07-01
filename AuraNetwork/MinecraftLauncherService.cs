@@ -89,19 +89,19 @@ public class MinecraftLauncherService
                 }
             }
             // --- AuraNWBridge Modunu kur ---
-            var oldBridgeVersions = Directory.GetFiles(modsDir, "AuraNWbridge-*.jar");
+            var oldBridgeVersions = Directory.GetFiles(modsDir, "auranetwork-*.jar");
             foreach (var old in oldBridgeVersions)
             {
                 try { File.Delete(old); } catch { }
             }
-            string bridgeName = "AuraNWbridge-1.0.2.jar";
+            string bridgeName = "auranetwork-1.0.2.jar";
             string bridgePath = Path.Combine(modsDir, bridgeName);
             if (!File.Exists(bridgePath))
             {
                 try
                 {
                     using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(2) };
-                    var bridgeBytes = client.GetByteArrayAsync("https://github.com/AuraNW242/AuraNWclient/raw/main/installer/AuraNWbridge-1.0.2.jar").GetAwaiter().GetResult();
+                    var bridgeBytes = client.GetByteArrayAsync("https://github.com/merdo242/auranetwork/raw/main/installer/auranetwork-1.0.2.jar").GetAwaiter().GetResult();
                     File.WriteAllBytes(bridgePath, bridgeBytes);
                 }
                 catch { }

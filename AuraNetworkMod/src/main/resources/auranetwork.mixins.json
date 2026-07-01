@@ -12,7 +12,8 @@
     "MultiplayerScreenMixin",
     "CreativeInventoryScreenMixin",
     "InGameHudMixin",
-    "GameMenuScreenMixin"
+    "GameMenuScreenMixin",
+    "WindowMixin"
   ],
   "injectors": {
     "defaultRequire": 1

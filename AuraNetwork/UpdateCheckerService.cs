@@ -8,7 +8,7 @@ namespace AuraNetwork;
 public class UpdateCheckerService
 {
     // Mevcut launcher sürümü
-    public const string CurrentVersion = "8.14";
+    public const string CurrentVersion = "8.15";
 
     // Güncelleme kontrolü için doğrudan bu GitHub deposundaki update.json dosyasını kullanıyoruz (100% ücretsiz & hızlı)
     private static readonly string UpdateUrl = $"https://raw.githubusercontent.com/AuraNW242/auranetwork/main/update.json?t={DateTime.UtcNow.Ticks}";
