@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "8.4",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=8.4",
-  "Changelog": "- Yeni arka plan görselindeki siyah pembe ekran (kayıp doku) hatası düzeltildi, format uyuşmazlığı giderildi."
+  "LatestVersion": "8.5",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=8.5",
+  "Changelog": "- Launcher'daki ve oyun içindeki logolar yeni logo tasarımıyla değiştirildi."
 }
