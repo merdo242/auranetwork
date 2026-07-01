@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "8.1",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=8.1",
-  "Changelog": "- 3D Skinin ters durma sorunu düzeltildi.\\n- Logonun oyunun arka planına uygulanan genel blur efektinden etkilenme sorunu düzeltildi.\\n- İnce font eski klasik Minecraft fontuna geri döndürüldü."
+  "LatestVersion": "8.2",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=8.2",
+  "Changelog": "- 3D Skinin boyutu büyütüldü ve konumu ayarlandı.\\n- Sağ paneldeki taşan yazılar daha düzgün bir şekilde alt satıra alındı.\\n- İsmin yamuk durma sorunu düzeltildi."
 }

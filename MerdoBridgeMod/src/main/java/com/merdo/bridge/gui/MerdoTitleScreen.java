@@ -119,14 +119,17 @@ public class MerdoTitleScreen extends Screen {
             String[] lines = {
                 ">> Selam!",
                 "",
-                "MerdoClient'in yenilenmis halinin ilk surumune hos",
-                "geldiniz.",
-                "Bu yeni surumle birlikte yeni ve kristal pvp'ye uygun",
-                "modlar, tamamen yenilenmis bir arayuz",
-                "ve daha hizli bir oyun zevki sizlere sunmayi hedefliyoruz.",
+                "MerdoClient'in yenilenmis halinin",
+                "ilk surumune hos geldiniz.",
                 "",
-                "Client hakkindaki geri donusleriniz icin sitemiz uzerinden",
-                "destek talebi olusturabilirsiniz."
+                "Bu surumle birlikte yeni ve",
+                "kristal pvp'ye uygun modlar,",
+                "tamamen yenilenmis bir arayuz",
+                "ve daha hizli bir oyun zevki",
+                "sizlere sunmayi hedefliyoruz.",
+                "",
+                "Client hakkindaki geri donusleriniz",
+                "icin destek talebi olusturabilirsiniz."
             };
             
             int textY = rightPanelY + 50;
@@ -144,8 +147,8 @@ public class MerdoTitleScreen extends Screen {
             
             if (playerSkinId != null && modelToRender != null) {
                 int skinX = rightPanelX + 65;
-                int skinY = rightPanelY + 190;
-                int scale = 55;
+                int skinY = rightPanelY + 205;
+                int scale = 75;
                 
                 float pitch = (float)Math.atan((double)((skinY - 90 - mouseY) / 40.0F));
                 float yaw = (float)Math.atan((double)((skinX - mouseX) / 40.0F));
@@ -173,8 +176,7 @@ public class MerdoTitleScreen extends Screen {
                 // Draw Username above skin
                 String username = this.client.getSession().getUsername();
                 matrices.push();
-                matrices.translate(skinX, skinY - 150, 0);
-                matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Z.rotationDegrees(-15.0F));
+                matrices.translate(skinX, skinY - 165, 0);
                 context.drawCenteredTextWithShadow(this.textRenderer, getCustomFontText(username), 0, 0, 0xFFFFFF);
                 matrices.pop();
             }
