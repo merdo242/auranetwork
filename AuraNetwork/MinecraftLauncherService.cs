@@ -17,7 +17,7 @@ public class MinecraftLauncherService
     }
 
     /// <summary>Minecraft'Ä± baÅŸlatÄ±r. Arka planda (Task.Run iÃ§inde) Ã§aÄŸrÄ±lmalÄ±dÄ±r.</summary>
-        private static readonly string[] CheatKeywords = new[]
+    private static readonly string[] CheatKeywords = new[]
     {
         "xray", "x-ray", "wurst", "meteor", "aristois", "liquidbounce", 
         "bleachhack", "kappahack", "inertia", "mathax", "matix", "impact", 
@@ -29,7 +29,7 @@ public class MinecraftLauncherService
     {
         if (!Directory.Exists(modsDir)) return;
         
-        onProgress?.Invoke("Anti-Cheat taramasý yapýlýyor...");
+        onProgress?.Invoke("Anti-Cheat taramasÄ± yapÄ±lÄ±yor...");
         
         var files = Directory.GetFiles(modsDir, "*.jar", SearchOption.AllDirectories);
         bool cheatFound = false;
@@ -46,17 +46,13 @@ public class MinecraftLauncherService
                     {
                         File.Delete(file);
                         cheatFound = true;
-                        // Use MessageBox to alert the user
                         System.Windows.Forms.MessageBox.Show(
-                            "Güvenlik Korumasý:\nSisteminizde yasaklý bir hile modu tespit edildi ve otomatik olarak silindi!\nSilinen dosya: " + Path.GetFileName(file),
+                            "GÃ¼venlik KorumasÄ±:\nSisteminizde yasaklÄ± bir hile modu tespit edildi ve otomatik olarak silindi!\nSilinen dosya: " + Path.GetFileName(file),
                             "AuraNW Anti-Cheat",
                             System.Windows.Forms.MessageBoxButtons.OK,
                             System.Windows.Forms.MessageBoxIcon.Warning);
                     }
-                    catch
-                    {
-                        // Ignore if we can't delete
-                    }
+                    catch { }
                     break;
                 }
             }
@@ -64,10 +60,11 @@ public class MinecraftLauncherService
         
         if (cheatFound)
         {
-            onProgress?.Invoke("Hile dosyalarý baþarýyla temizlendi!");
-            System.Threading.Thread.Sleep(1500); // Kullanýcýnýn görmesi için biraz bekle
+            onProgress?.Invoke("Hile dosyalarÄ± baÅŸarÄ±yla temizlendi!");
+            System.Threading.Thread.Sleep(1500);
         }
     }
+
     public LauncherResult StartMinecraft(string username, string password, Action<string>? onProgress = null)
     {
         if (string.IsNullOrWhiteSpace(username))
@@ -141,7 +138,7 @@ public class MinecraftLauncherService
                     // Hata olursa en azÄ±ndan oyuna devam etsin, sessiz kalalÄ±m
                 }
             }
-                        // --- AuraNWBridge Modunu kur ---
+            // --- AuraNWBridge Modunu kur ---
             var oldMods = new[] { "auranetwork-*.jar", "merdobridge-*.jar", "chickenclient-*.jar" };
             foreach (var pattern in oldMods)
             {
@@ -344,4 +341,3 @@ public class MinecraftLauncherService
 }
 
 public sealed record LauncherResult(bool Success, string Message);
-
