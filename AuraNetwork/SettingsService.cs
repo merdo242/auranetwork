@@ -1,7 +1,7 @@
 using System.Text.Json;
 using CmlLib.Core;
 
-namespace MerdoClient;
+namespace AuraNetwork;
 
 public class SettingsService
 {

@@ -27,7 +27,7 @@ Name: "startmenu"; Description: "Başlat menüsüne kısayol ekle"; GroupDescrip
 Source: "..\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\publish\Resources\logo_small.png"; DestDir: "{app}\Resources"; Flags: ignoreversion
 Source: "..\publish\Resources\news_bg.jpg"; DestDir: "{app}\Resources"; Flags: ignoreversion
-Source: "..\MerdoClient\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\AuraNetwork\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\Aura Network"; Filename: "{app}\AuraNetwork.exe"; IconFilename: "{app}\icon.ico"

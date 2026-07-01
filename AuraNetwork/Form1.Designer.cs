@@ -1,4 +1,4 @@
-namespace MerdoClient;
+namespace AuraNetwork;
 
 partial class Form1
 {

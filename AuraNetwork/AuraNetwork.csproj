@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyName>MerdoLauncher</AssemblyName>
+    <AssemblyName>AuraNetwork</AssemblyName>
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
 

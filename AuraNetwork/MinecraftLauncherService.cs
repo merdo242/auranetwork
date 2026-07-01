@@ -2,7 +2,7 @@ using CmlLib.Core;
 using CmlLib.Core.Auth;
 using CmlLib.Core.ProcessBuilder;
 
-namespace MerdoClient;
+namespace AuraNetwork;
 
 public class MinecraftLauncherService
 {

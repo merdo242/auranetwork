@@ -1,6 +1,6 @@
 using System.Net.NetworkInformation;
 
-namespace MerdoClient;
+namespace AuraNetwork;
 
 static class Program
 {

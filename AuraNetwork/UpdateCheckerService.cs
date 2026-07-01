@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Windows.Forms;
 
-namespace MerdoClient;
+namespace AuraNetwork;
 
 public class UpdateCheckerService
 {

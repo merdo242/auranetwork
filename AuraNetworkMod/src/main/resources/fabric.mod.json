@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "auranetwork",
+  "version": "${version}",
+  "name": "Aura Network Mod",
+  "description": "Sends authentication tokens from Aura Network to the server.",
+  "authors": [
+    "AuraNetwork"
+  ],
+  "contact": {
+    "homepage": "https://github.com/merdo242/AuraNetwork"
+  },
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.aura.bridge.AuraNetworkMod"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": "1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "mixins": [
+    "auranetwork.mixins.json"
+  ]
+}

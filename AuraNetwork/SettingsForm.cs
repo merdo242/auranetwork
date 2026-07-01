@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 
-namespace MerdoClient;
+namespace AuraNetwork;
 
 public class SettingsForm : Form
 {
