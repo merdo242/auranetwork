@@ -17,7 +17,7 @@ public class AuraNetworkMod implements ClientModInitializer {
                         Thread.sleep(2500); // 2.5 saniye bekle
                         client.execute(() -> {
                             if (client.getNetworkHandler() != null) {
-                                client.getNetworkHandler().sendCommand("auraauth " + token.trim());
+                                client.getNetworkHandler().sendCommand("merdoauth " + token.trim());
                             }
                         });
                     } catch (Exception e) {
