@@ -49,25 +49,22 @@ public class MerdoTitleScreen extends Screen {
             this.client.setScreen(new OptionsScreen(this, this.client.options));
         }).dimensions(leftX, startY + 50, 160, 20).build());
 
-        // Client Ayarları
-        this.addDrawableChild(ButtonWidget.builder(getCustomFontText("Client Ayarlari"), button -> {
-            this.client.setScreen(new MerdoSettingsScreen(this));
-        }).dimensions(leftX, startY + 75, 160, 20).build());
-
         // Destek
         this.addDrawableChild(ButtonWidget.builder(getCustomFontText("Destek Olustur"), button -> {
             Util.getOperatingSystem().open("https://merdonetwork.com/destek");
-        }).dimensions(leftX, startY + 100, 160, 20).build());
+        }).dimensions(leftX, startY + 75, 160, 20).build());
 
         // Wiki
         this.addDrawableChild(ButtonWidget.builder(getCustomFontText("Wiki"), button -> {
             Util.getOperatingSystem().open("https://merdonetwork.com/wiki");
-        }).dimensions(leftX, startY + 125, 160, 20).build());
+        }).dimensions(leftX, startY + 100, 160, 20).build());
 
         // Oyundan Çık
         this.addDrawableChild(ButtonWidget.builder(getCustomFontText("Oyundan Cik"), button -> {
             this.client.scheduleStop();
-        }).dimensions(leftX, startY + 150, 160, 20).build());
+        }).dimensions(leftX, startY + 125, 160, 20).build());
+
+
 
         if (this.width >= 540) {
             int rightPanelWidth = 340;

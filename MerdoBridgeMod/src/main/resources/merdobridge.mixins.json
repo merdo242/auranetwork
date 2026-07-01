@@ -11,7 +11,8 @@
     "InGameOverlayRendererMixin",
     "MultiplayerScreenMixin",
     "CreativeInventoryScreenMixin",
-    "InGameHudMixin"
+    "InGameHudMixin",
+    "GameMenuScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
