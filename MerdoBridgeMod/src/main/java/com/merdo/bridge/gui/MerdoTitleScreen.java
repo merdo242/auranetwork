@@ -107,26 +107,28 @@ public class MerdoTitleScreen extends Screen {
         context.drawTexture(LOGO_TEXTURE, 80, 20, 0, 0, 80, 80, 80, 80);
 
         // Draw Right Panel
-        int rightPanelWidth = 260;
-        int rightPanelHeight = 220;
-        int rightPanelX = this.width - rightPanelWidth - 40;
-        int rightPanelY = (this.height - rightPanelHeight) / 2;
-        
-        context.fill(rightPanelX, rightPanelY, rightPanelX + rightPanelWidth, rightPanelY + rightPanelHeight, 0xAA000000); // Darker black
+        if (this.width >= 540) {
+            int rightPanelWidth = 260;
+            int rightPanelHeight = 220;
+            int rightPanelX = this.width - rightPanelWidth - 40;
+            int rightPanelY = (this.height - rightPanelHeight) / 2;
+            
+            context.fill(rightPanelX, rightPanelY, rightPanelX + rightPanelWidth, rightPanelY + rightPanelHeight, 0xAA000000); // Darker black
 
-        // Welcome Header
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("MERDOCLIENT'A HOSGELDIN"), rightPanelX + rightPanelWidth / 2, rightPanelY + 15, 0xFFAA00);
-        context.fill(rightPanelX + 20, rightPanelY + 30, rightPanelX + rightPanelWidth - 20, rightPanelY + 31, 0x55FFFFFF);
+            // Welcome Header
+            context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("MERDOCLIENT'A HOSGELDIN"), rightPanelX + rightPanelWidth / 2, rightPanelY + 15, 0xFFAA00);
+            context.fill(rightPanelX + 20, rightPanelY + 30, rightPanelX + rightPanelWidth - 20, rightPanelY + 31, 0x55FFFFFF);
 
-        // Username
-        String username = this.client.getSession().getUsername();
-        context.drawText(this.textRenderer, Text.literal("Oyuncu: " + username), rightPanelX + 110, rightPanelY + 60, 0xFFFFFF, true);
-        context.drawText(this.textRenderer, Text.literal("Surum: v0.0.1"), rightPanelX + 110, rightPanelY + 80, 0xAAAAAA, true);
-        context.drawText(this.textRenderer, Text.literal("Durum: Baglandi"), rightPanelX + 110, rightPanelY + 100, 0x55FF55, true);
+            // Username
+            String username = this.client.getSession().getUsername();
+            context.drawText(this.textRenderer, Text.literal("Oyuncu: " + username), rightPanelX + 110, rightPanelY + 60, 0xFFFFFF, true);
+            context.drawText(this.textRenderer, Text.literal("Surum: v0.0.1"), rightPanelX + 110, rightPanelY + 80, 0xAAAAAA, true);
+            context.drawText(this.textRenderer, Text.literal("Durum: Baglandi"), rightPanelX + 110, rightPanelY + 100, 0x55FF55, true);
 
-        // Draw Skin (150x300 file, drawn as 70x140 to keep 1:2 aspect ratio)
-        if (this.playerSkinId != null) {
-            context.drawTexture(this.playerSkinId, rightPanelX + 20, rightPanelY + 50, 0, 0, 70, 140, 70, 140);
+            // Draw Skin (150x300 file, drawn as 70x140 to keep 1:2 aspect ratio)
+            if (this.playerSkinId != null) {
+                context.drawTexture(this.playerSkinId, rightPanelX + 20, rightPanelY + 50, 0, 0, 70, 140, 70, 140);
+            }
         }
     }
 }

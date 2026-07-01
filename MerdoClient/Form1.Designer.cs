@@ -600,6 +600,7 @@ partial class Form1
         this.lblBalance.Name = "lblBalance";
         this.lblBalance.Size = new System.Drawing.Size(320, 20);
         this.lblBalance.Text = "💲 Güncel Bakiye : Yükleniyor...";
+        this.lblBalance.Visible = false;
         this.lblBalance.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 
         // 
