@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "7.8",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=7.8",
-  "Changelog": "- Minecraft ana menüsü (UI) tamamen yenilendi! (ChickenClient tarzı tasarım, Discord butonu ve fareyi takip eden 3 boyutlu karakter modeli eklendi)\\n- Ana menüdeki logonun arkasında beliren siyahlık (artefakt) tamamen düzeltildi."
+  "LatestVersion": "7.9",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=7.9",
+  "Changelog": "- 3D Skin modelindeki kaplama bozukluğu düzeltildi (gerçek Minecraft alt yapısıyla bağlandı).\\n- Özel yazılar eklendi.\\n- Logonun arkasına hafif bir gölge/blur eklendi."
 }
