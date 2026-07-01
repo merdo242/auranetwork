@@ -531,12 +531,12 @@ public partial class Form1 : Form
             g.DrawImage(_largeLogo, iconX, iconY, iconSize, iconSize);
         }
 
-        // --- "MERDO" bold text ---
+        // --- "AuraNW" bold text ---
         int textX = iconX + iconSize + 10;
         int textY = y + 18;
         using (var font  = new Font("Segoe UI", 14F, FontStyle.Bold))
         using (var brush = new SolidBrush(Color.White))
-            g.DrawString("MERDO", font, brush, textX, textY);
+            g.DrawString("AuraNW", font, brush, textX, textY);
 
         // --- "LAUNCHER" yellow badge ---
         int badgeX = textX + 82;
@@ -1183,10 +1183,10 @@ public partial class Form1 : Form
     private void ShowMessage(string message, MessageBoxIcon icon)
     {
         if (icon == MessageBoxIcon.Error)
-            MerdoDialog.ShowError(this, message);
+            AuraDialog.ShowError(this, message);
         else if (icon == MessageBoxIcon.Warning)
-            MerdoDialog.ShowWarning(this, message);
+            AuraDialog.ShowWarning(this, message);
         else
-            MerdoDialog.ShowInfo(this, message);
+            AuraDialog.ShowInfo(this, message);
     }
 }

@@ -145,7 +145,7 @@ partial class Form1
         this.MaximizeBox = false;
         this.Name = "Form1";
         this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-        this.Text = "Merdo Launcher - Giriş Yap";
+        this.Text = "AuraNW Launcher - Giriş Yap";
         this.BackColor = System.Drawing.Color.FromArgb(8, 8, 10);
 
         // 
@@ -567,7 +567,7 @@ partial class Form1
         this.lblWelcome.Location = new System.Drawing.Point(0, 135);
         this.lblWelcome.Name = "lblWelcome";
         this.lblWelcome.Size = new System.Drawing.Size(320, 30);
-        this.lblWelcome.Text = "MERDO242";
+        this.lblWelcome.Text = "AuraNW242";
         this.lblWelcome.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 
         // 

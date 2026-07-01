@@ -48,8 +48,8 @@ public class MinecraftLauncherService
                 try 
                 {
                     using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(10) };
-                    var zipBytes = client.GetByteArrayAsync("https://github.com/merdo242/merdoclient/raw/main/installer/Merdo_Fabric_1.21.1.zip").GetAwaiter().GetResult();
-                    var tempZip = Path.Combine(Path.GetTempPath(), "merdo_fabric_1.21.1.zip");
+                    var zipBytes = client.GetByteArrayAsync("https://github.com/AuraNW242/AuraNWclient/raw/main/installer/AuraNW_Fabric_1.21.1.zip").GetAwaiter().GetResult();
+                    var tempZip = Path.Combine(Path.GetTempPath(), "AuraNW_fabric_1.21.1.zip");
                     System.IO.File.WriteAllBytes(tempZip, zipBytes);
                     System.IO.Compression.ZipFile.ExtractToDirectory(tempZip, path.BasePath, true);
                     System.IO.File.Delete(tempZip);
@@ -88,20 +88,20 @@ public class MinecraftLauncherService
                     // Hata olursa en azından oyuna devam etsin, sessiz kalalım
                 }
             }
-            // --- MerdoBridge Modunu kur ---
-            var oldBridgeVersions = Directory.GetFiles(modsDir, "merdobridge-*.jar");
+            // --- AuraNWBridge Modunu kur ---
+            var oldBridgeVersions = Directory.GetFiles(modsDir, "AuraNWbridge-*.jar");
             foreach (var old in oldBridgeVersions)
             {
                 try { File.Delete(old); } catch { }
             }
-            string bridgeName = "merdobridge-1.0.2.jar";
+            string bridgeName = "AuraNWbridge-1.0.2.jar";
             string bridgePath = Path.Combine(modsDir, bridgeName);
             if (!File.Exists(bridgePath))
             {
                 try
                 {
                     using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(2) };
-                    var bridgeBytes = client.GetByteArrayAsync("https://github.com/merdo242/merdoclient/raw/main/installer/merdobridge-1.0.2.jar").GetAwaiter().GetResult();
+                    var bridgeBytes = client.GetByteArrayAsync("https://github.com/AuraNW242/AuraNWclient/raw/main/installer/AuraNWbridge-1.0.2.jar").GetAwaiter().GetResult();
                     File.WriteAllBytes(bridgePath, bridgeBytes);
                 }
                 catch { }

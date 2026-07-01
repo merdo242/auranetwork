@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace AuraNetwork;
 
-public class MerdoDialog : Form
+public class AuraDialog : Form
 {
     public enum DialogType { Warning, Info, Error, Update }
 
@@ -13,7 +13,7 @@ public class MerdoDialog : Form
     private readonly DialogType _type;
     private bool _hasCancelBtn;
 
-    private MerdoDialog(string message, DialogType type, bool hasCancel = false)
+    private AuraDialog(string message, DialogType type, bool hasCancel = false)
     {
         _message = message;
         _type = type;
@@ -23,16 +23,16 @@ public class MerdoDialog : Form
 
     // ── Public static helpers ───────────────────────────────────────────────
     public static void ShowWarning(IWin32Window? owner, string message)
-        => new MerdoDialog(message, DialogType.Warning).ShowDialog(owner);
+        => new AuraDialog(message, DialogType.Warning).ShowDialog(owner);
 
     public static void ShowInfo(IWin32Window? owner, string message)
-        => new MerdoDialog(message, DialogType.Info).ShowDialog(owner);
+        => new AuraDialog(message, DialogType.Info).ShowDialog(owner);
 
     public static void ShowError(IWin32Window? owner, string message)
-        => new MerdoDialog(message, DialogType.Error).ShowDialog(owner);
+        => new AuraDialog(message, DialogType.Error).ShowDialog(owner);
 
     public static DialogResult ShowYesNo(IWin32Window? owner, string message)
-        => new MerdoDialog(message, DialogType.Update, hasCancel: true).ShowDialog(owner);
+        => new AuraDialog(message, DialogType.Update, hasCancel: true).ShowDialog(owner);
 
     // ── UI Construction ─────────────────────────────────────────────────────
     private void InitUI()

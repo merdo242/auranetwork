@@ -130,7 +130,7 @@ public class SettingsForm : Form
 
     private void BuildUI()
     {
-        Text            = "Merdo Launcher — Ayarlar";
+        Text            = "AuraNW Launcher — Ayarlar";
         Size            = new Size(580, 680);
         FormBorderStyle = FormBorderStyle.None;     // borderless
         MaximizeBox     = false;

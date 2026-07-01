@@ -207,7 +207,7 @@ public class SplashForm : Form
         using (var verFont = new Font("Segoe UI", 8F))
         using (var verBrush = new SolidBrush(Color.FromArgb(60, 60, 70)))
         {
-            string ver = "© 2026 Merdo Network  •  v2.0";
+            string ver = "© 2026 AuraNW Network  •  v2.0";
             var sz = g.MeasureString(ver, verFont);
             g.DrawString(ver, verFont, verBrush, (Width - sz.Width) / 2, Height - 28);
         }
@@ -259,12 +259,12 @@ public class SplashForm : Form
             g.DrawImage(_largeLogo, iconX, iconY, iconSize, iconSize);
         }
 
-        // --- "MERDO" bold text ---
+        // --- "AuraNW" bold text ---
         int textX = iconX + iconSize + 10;
         int textY = y + 18;
         using (var font  = new Font("Segoe UI", 14F, FontStyle.Bold))
         using (var brush = new SolidBrush(Color.White))
-            g.DrawString("MERDO", font, brush, textX, textY);
+            g.DrawString("AuraNW", font, brush, textX, textY);
 
         // --- "LAUNCHER" yellow badge ---
         int badgeX = textX + 82;

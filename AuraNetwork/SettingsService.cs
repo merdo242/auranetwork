@@ -7,7 +7,7 @@ public class SettingsService
 {
     private static readonly string AppDataPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "MerdoLauncher");
+        "AuraNWLauncher");
 
     private static readonly string SettingsFilePath = Path.Combine(AppDataPath, "settings.json");
 

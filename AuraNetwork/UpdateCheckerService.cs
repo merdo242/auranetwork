@@ -8,10 +8,10 @@ namespace AuraNetwork;
 public class UpdateCheckerService
 {
     // Mevcut launcher sürümü
-    public const string CurrentVersion = "8.13";
+    public const string CurrentVersion = "8.14";
 
     // Güncelleme kontrolü için doğrudan bu GitHub deposundaki update.json dosyasını kullanıyoruz (100% ücretsiz & hızlı)
-    private static readonly string UpdateUrl = $"https://raw.githubusercontent.com/merdo242/auranetwork/main/update.json?t={DateTime.UtcNow.Ticks}";
+    private static readonly string UpdateUrl = $"https://raw.githubusercontent.com/AuraNW242/auranetwork/main/update.json?t={DateTime.UtcNow.Ticks}";
 
     public static void CheckForUpdates(Form parentForm, Action<UpdateResponse>? onFetchCompleted = null)
     {
@@ -20,7 +20,7 @@ public class UpdateCheckerService
             try
             {
                 using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(8) };
-                client.DefaultRequestHeaders.UserAgent.ParseAdd("MerdoLauncher/2.0");
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("AuraNWLauncher/2.0");
 
                 var response = await client.GetStringAsync(UpdateUrl);
                 var data = JsonSerializer.Deserialize<UpdateResponse>(response,
@@ -44,13 +44,13 @@ public class UpdateCheckerService
 
     private static void ShowUpdateDialog(Form parentForm, UpdateResponse data)
     {
-        var msg = $"⚡ Merdo Launcher için yeni bir sürüm mevcut!\n\n" +
+        var msg = $"⚡ AuraNW Launcher için yeni bir sürüm mevcut!\n\n" +
                   $"   Mevcut sürümünüz : v{CurrentVersion}\n" +
                   $"   Yeni sürüm       : v{data.LatestVersion}\n\n" +
                   $"📋 Değişiklikler:\n{data.Changelog}\n\n" +
                   $"Devam etmek için güncellemeyi yüklemelisiniz. Şimdi yüklensin mi?";
 
-        var result = MerdoDialog.ShowYesNo(parentForm, msg);
+        var result = AuraDialog.ShowYesNo(parentForm, msg);
 
         if (result != DialogResult.Yes)
         {
@@ -67,14 +67,14 @@ public class UpdateCheckerService
     {
         if (string.IsNullOrEmpty(data.DownloadUrl))
         {
-            MerdoDialog.ShowWarning(parentForm, "İndirme bağlantısı bulunamadı. Lütfen web sitesini ziyaret edin.");
+            AuraDialog.ShowWarning(parentForm, "İndirme bağlantısı bulunamadı. Lütfen web sitesini ziyaret edin.");
             return;
         }
 
         // İndirme penceresi
         var dlgForm = new Form
         {
-            Text            = "Merdo Launcher Güncelleniyor...",
+            Text            = "AuraNW Launcher Güncelleniyor...",
             Size            = new System.Drawing.Size(420, 130),
             FormBorderStyle = FormBorderStyle.FixedDialog,
             MaximizeBox     = false,
@@ -116,10 +116,10 @@ public class UpdateCheckerService
         {
             try
             {
-                string tempPath = Path.Combine(Path.GetTempPath(), "MerdoLauncher_Update.exe");
+                string tempPath = Path.Combine(Path.GetTempPath(), "AuraNWLauncher_Update.exe");
 
                 using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(10) };
-                client.DefaultRequestHeaders.UserAgent.ParseAdd("MerdoLauncher/2.0");
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("AuraNWLauncher/2.0");
 
                 string downloadUrl = data.DownloadUrl;
                 if (!string.IsNullOrEmpty(downloadUrl)) {
@@ -183,7 +183,7 @@ public class UpdateCheckerService
                 dlgForm.Invoke(() =>
                 {
                     dlgForm.Close();
-                    MerdoDialog.ShowError(parentForm,
+                    AuraDialog.ShowError(parentForm,
                         $"İndirme sırasında hata oluştu:\n{ex.Message}\n\nEl ile güncellemek için:\n{data.DownloadUrl}");
                 });
             }

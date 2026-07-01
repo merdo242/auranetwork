@@ -23,7 +23,7 @@ public class AccountService
     {
         AppDataPath = customPath ?? Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "MerdoLauncher"
+            "AuraNWLauncher"
         );
         AccountsFilePath = Path.Combine(AppDataPath, "accounts.json");
         SavedAccountsFilePath = Path.Combine(AppDataPath, "saved_accounts.json");

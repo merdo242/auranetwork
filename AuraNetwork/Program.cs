@@ -17,7 +17,7 @@ static class Program
         if (!IsInternetAvailable())
         {
             MessageBox.Show(
-                "Merdo Launcher'a erişmek için internet bağlantısı gereklidir.\n\nLütfen bağlantınızı kontrol edip tekrar deneyin.",
+                "AuraNW Launcher'a erişmek için internet bağlantısı gereklidir.\n\nLütfen bağlantınızı kontrol edip tekrar deneyin.",
                 "Bağlantı Yok",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
