@@ -1,12 +1,12 @@
 [Setup]
 AppName=Aura Network
-AppVersion=8.21
+AppVersion=8.22
 AppPublisher=AuraNetwork
 AppPublisherURL=https://AuraNetwork.com
 DefaultDirName={autopf}\Aura Network
 DefaultGroupName=Aura Network
 OutputDir=..\installer
-OutputBaseFilename=AuraNetwork_Installer
+OutputBaseFilename=AuraNetwork_Installer_v8.22
 SetupIconFile=
 Compression=lzma2/ultra64
 SolidCompression=yes
