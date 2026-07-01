@@ -8,10 +8,10 @@ namespace AuraNetwork;
 public class UpdateCheckerService
 {
     // Mevcut launcher sürümü
-    public const string CurrentVersion = "8.15";
+    public const string CurrentVersion = "8.16";
 
     // Güncelleme kontrolü için doğrudan bu GitHub deposundaki update.json dosyasını kullanıyoruz (100% ücretsiz & hızlı)
-    private static readonly string UpdateUrl = $"https://raw.githubusercontent.com/AuraNW242/auranetwork/main/update.json?t={DateTime.UtcNow.Ticks}";
+    private static readonly string UpdateUrl = $"https://raw.githubusercontent.com/merdo242/auranetwork/main/update.json?t={DateTime.UtcNow.Ticks}";
 
     public static void CheckForUpdates(Form parentForm, Action<UpdateResponse>? onFetchCompleted = null)
     {
