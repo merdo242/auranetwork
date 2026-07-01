@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "8.6",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=8.6",
-  "Changelog": "- Merdo Client yazısı ana logoya eklendi.\\n- Skin boyutu düzeltildi."
+  "LatestVersion": "8.8",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=8.8",
+  "Changelog": "- Skin kordinatları tamamen düzeltildi, ekranın altına taşma sorunu giderildi."
 }

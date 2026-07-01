@@ -150,8 +150,8 @@ public class MerdoTitleScreen extends Screen {
             
             if (playerSkinId != null && modelToRender != null) {
                 int skinX = rightPanelX + 65;
-                int skinY = rightPanelY + 235;
-                int scale = 125;
+                int skinY = rightPanelY + 70;
+                int scale = 100;
                 
                 float pitch = (float)Math.atan((double)((skinY - 90 - mouseY) / 40.0F));
                 float yaw = (float)Math.atan((double)((skinX - mouseX) / 40.0F));
@@ -179,7 +179,7 @@ public class MerdoTitleScreen extends Screen {
                 // Draw Username above skin
                 String username = this.client.getSession().getUsername();
                 matrices.push();
-                matrices.translate(skinX, skinY - 250, 0);
+                matrices.translate(skinX, skinY - 30, 0);
                 context.drawCenteredTextWithShadow(this.textRenderer, getCustomFontText(username), 0, 0, 0xFFFFFF);
                 matrices.pop();
             }
