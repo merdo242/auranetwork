@@ -11,6 +11,12 @@ import net.minecraft.util.Identifier;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Util;
+import net.minecraft.client.render.entity.model.PlayerEntityModel;
+import net.minecraft.client.render.entity.model.EntityModelLayers;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.OverlayTexture;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
@@ -21,6 +27,7 @@ public class MerdoTitleScreen extends Screen {
     
     private Identifier playerSkinId = null;
     private boolean skinLoading = false;
+    private PlayerEntityModel<LivingEntity> playerModel;
 
     public MerdoTitleScreen() {
         super(Text.literal("Merdo Launcher"));
@@ -66,8 +73,23 @@ public class MerdoTitleScreen extends Screen {
             this.client.scheduleStop();
         }).dimensions(leftX, startY + 150, 160, 20).build());
 
+        if (this.width >= 540) {
+            int rightPanelWidth = 340;
+            int rightPanelHeight = 260;
+            int rightPanelX = this.width - rightPanelWidth - 40;
+            int rightPanelY = (this.height - rightPanelHeight) / 2;
+            
+            this.addDrawableChild(ButtonWidget.builder(Text.literal("Discord"), button -> {
+                Util.getOperatingSystem().open("https://discord.gg/merdonetwork");
+            }).dimensions(rightPanelX + 130, rightPanelY + 210, 190, 20).build());
+        }
+
         if (this.playerSkinId == null && !skinLoading) {
             loadPlayerSkin();
+        }
+
+        if (this.playerModel == null) {
+            this.playerModel = new PlayerEntityModel<>(this.client.getEntityModelLoader().getModelPart(EntityModelLayers.PLAYER), false);
         }
     }
 
@@ -76,14 +98,15 @@ public class MerdoTitleScreen extends Screen {
         String username = this.client.getSession().getUsername();
         CompletableFuture.runAsync(() -> {
             try {
-                URL url = new URL("https://minotar.net/armor/body/" + username + "/150.png");
+                // Skini raw 64x64 texture olarak al
+                URL url = new URL("https://minotar.net/skin/" + username);
                 InputStream is = url.openStream();
                 NativeImage image = NativeImage.read(is);
                 is.close();
                 
                 this.client.execute(() -> {
                     NativeImageBackedTexture texture = new NativeImageBackedTexture(image);
-                    this.playerSkinId = this.client.getTextureManager().registerDynamicTexture("player_skin", texture);
+                    this.playerSkinId = this.client.getTextureManager().registerDynamicTexture("player_skin_raw", texture);
                 });
             } catch (Exception e) {
                 e.printStackTrace();
@@ -96,38 +119,87 @@ public class MerdoTitleScreen extends Screen {
         // Draw background
         context.drawTexture(BACKGROUND_TEXTURE, 0, 0, 0, 0, this.width, this.height, this.width, this.height);
 
-        // Draw Left Panel semi-transparent background
-        context.fill(20, 0, 220, this.height, 0x66000000);
+        com.mojang.blaze3d.systems.RenderSystem.enableBlend();
+        com.mojang.blaze3d.systems.RenderSystem.defaultBlendFunc();
+
+        // Draw Logo (Hide or scale down if screen is too small to prevent overlap)
+        if (this.width >= 540) {
+            context.drawTexture(LOGO_TEXTURE, 80, 20, 0, 0, 80, 80, 80, 80);
+        } else {
+            context.drawTexture(LOGO_TEXTURE, 40, 10, 0, 0, 40, 40, 80, 80);
+        }
 
         super.render(context, mouseX, mouseY, delta);
 
-        com.mojang.blaze3d.systems.RenderSystem.enableBlend();
-
-        // Draw Logo (1024x1024 file, drawn as 80x80 to keep square aspect ratio)
-        context.drawTexture(LOGO_TEXTURE, 80, 20, 0, 0, 80, 80, 80, 80);
-
-        // Draw Right Panel
         if (this.width >= 540) {
-            int rightPanelWidth = 260;
-            int rightPanelHeight = 220;
+            int rightPanelWidth = 340;
+            int rightPanelHeight = 260;
             int rightPanelX = this.width - rightPanelWidth - 40;
             int rightPanelY = (this.height - rightPanelHeight) / 2;
             
-            context.fill(rightPanelX, rightPanelY, rightPanelX + rightPanelWidth, rightPanelY + rightPanelHeight, 0xAA000000); // Darker black
+            context.fill(rightPanelX, rightPanelY, rightPanelX + rightPanelWidth, rightPanelY + rightPanelHeight, 0xAA000000);
 
-            // Welcome Header
-            context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("MERDOCLIENT'A HOSGELDIN"), rightPanelX + rightPanelWidth / 2, rightPanelY + 15, 0xFFAA00);
-            context.fill(rightPanelX + 20, rightPanelY + 30, rightPanelX + rightPanelWidth - 20, rightPanelY + 31, 0x55FFFFFF);
+            // Title
+            context.drawTextWithShadow(this.textRenderer, Text.literal("Yenilenmis Haliyle MerdoClient v0.0.1"), rightPanelX + 130, rightPanelY + 20, 0xFFFFFF);
+            context.fill(rightPanelX + 130, rightPanelY + 35, rightPanelX + rightPanelWidth - 20, rightPanelY + 36, 0x55FFFFFF);
+            
+            // Text
+            String[] lines = {
+                ">> Selam!",
+                "",
+                "MerdoClient'in yenilenmis halinin ilk surumune hos",
+                "geldiniz.",
+                "Bu yeni surumle birlikte yeni ve kristal pvp'ye uygun",
+                "modlar, tamamen yenilenmis bir arayuz",
+                "ve daha hizli bir oyun zevki sizlere sunmayi hedefliyoruz.",
+                "",
+                "Client hakkindaki geri donusleriniz icin sitemiz uzerinden",
+                "destek talebi olusturabilirsiniz."
+            };
+            
+            int textY = rightPanelY + 50;
+            for(String line : lines) {
+                context.drawText(this.textRenderer, Text.literal(line), rightPanelX + 130, textY, 0xAAAAAA, false);
+                textY += 12;
+            }
+            
+            // Draw 3D Skin
+            if (this.playerSkinId != null && this.playerModel != null) {
+                int skinX = rightPanelX + 65;
+                int skinY = rightPanelY + 190;
+                int scale = 55;
+                
+                float pitch = (float)Math.atan((double)((skinY - 90 - mouseY) / 40.0F));
+                float yaw = (float)Math.atan((double)((skinX - mouseX) / 40.0F));
+                
+                net.minecraft.client.util.math.MatrixStack matrices = context.getMatrices();
+                matrices.push();
+                matrices.translate((float)skinX, (float)skinY, 50.0F);
+                matrices.scale((float)(-scale), (float)scale, (float)scale);
+                
+                matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Z.rotationDegrees(180.0F));
+                matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_X.rotationDegrees(pitch * 20.0F));
+                matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Y.rotationDegrees(yaw * 20.0F));
 
-            // Username
-            String username = this.client.getSession().getUsername();
-            context.drawText(this.textRenderer, Text.literal("Oyuncu: " + username), rightPanelX + 110, rightPanelY + 60, 0xFFFFFF, true);
-            context.drawText(this.textRenderer, Text.literal("Surum: v0.0.1"), rightPanelX + 110, rightPanelY + 80, 0xAAAAAA, true);
-            context.drawText(this.textRenderer, Text.literal("Durum: Baglandi"), rightPanelX + 110, rightPanelY + 100, 0x55FF55, true);
-
-            // Draw Skin (150x300 file, drawn as 70x140 to keep 1:2 aspect ratio)
-            if (this.playerSkinId != null) {
-                context.drawTexture(this.playerSkinId, rightPanelX + 20, rightPanelY + 50, 0, 0, 70, 140, 70, 140);
+                this.playerModel.setVisible(true);
+                this.playerModel.head.pitch = pitch;
+                this.playerModel.head.yaw = yaw;
+                this.playerModel.rightArm.pitch = -0.1f;
+                this.playerModel.leftArm.pitch = -0.1f;
+                this.playerModel.rightLeg.pitch = 0.1f;
+                this.playerModel.leftLeg.pitch = -0.1f;
+                
+                this.playerModel.render(matrices, context.getVertexConsumers().getBuffer(net.minecraft.client.render.RenderLayer.getEntityCutoutNoCull(this.playerSkinId)), 15728880, net.minecraft.client.render.OverlayTexture.DEFAULT_UV);
+                context.draw(); 
+                matrices.pop();
+                
+                // Draw Username above skin
+                String username = this.client.getSession().getUsername();
+                matrices.push();
+                matrices.translate(skinX, skinY - 150, 0);
+                matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Z.rotationDegrees(-15.0F));
+                context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(username), 0, 0, 0xFFFFFF);
+                matrices.pop();
             }
         }
     }

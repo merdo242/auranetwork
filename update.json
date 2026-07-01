@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "7.7",
-  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=7.7",
-  "Changelog": "- İnternetten indirilen güncelleme dosyasının Windows Güvenliği (SmartScreen) tarafından engellenmesi sorunu çözüldü."
+  "LatestVersion": "7.8",
+  "DownloadUrl": "https://github.com/merdo242/merdoclient/raw/main/installer/MerdoLauncher_Installer.exe?v=7.8",
+  "Changelog": "- Minecraft ana menüsü (UI) tamamen yenilendi! (ChickenClient tarzı tasarım, Discord butonu ve fareyi takip eden 3 boyutlu karakter modeli eklendi)\\n- Ana menüdeki logonun arkasında beliren siyahlık (artefakt) tamamen düzeltildi."
 }
