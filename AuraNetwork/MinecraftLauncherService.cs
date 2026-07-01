@@ -141,11 +141,15 @@ public class MinecraftLauncherService
                     // Hata olursa en azından oyuna devam etsin, sessiz kalalım
                 }
             }
-            // --- AuraNWBridge Modunu kur ---
-            var oldBridgeVersions = Directory.GetFiles(modsDir, "auranetwork-*.jar");
-            foreach (var old in oldBridgeVersions)
+                        // --- AuraNWBridge Modunu kur ---
+            var oldMods = new[] { "auranetwork-*.jar", "merdobridge-*.jar", "chickenclient-*.jar" };
+            foreach (var pattern in oldMods)
             {
-                try { File.Delete(old); } catch { }
+                var files = Directory.GetFiles(modsDir, pattern);
+                foreach (var old in files)
+                {
+                    try { File.Delete(old); } catch { }
+                }
             }
             string bridgeName = "auranetwork-1.0.6.jar";
             string bridgePath = Path.Combine(modsDir, bridgeName);
@@ -340,3 +344,4 @@ public class MinecraftLauncherService
 }
 
 public sealed record LauncherResult(bool Success, string Message);
+
