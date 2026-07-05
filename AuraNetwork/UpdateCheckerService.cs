@@ -25,7 +25,21 @@ public class UpdateCheckerService
                     return asmInfo.FileVersion;
             }
 
-            // Fallback: uygulama exe'sinin dosya sürümü
+            // Fallback: aynı klasörde bulunan AuraNetwork.dll dosyasını kontrol et
+            try
+            {
+                var exeDir = System.IO.Path.GetDirectoryName(Application.ExecutablePath) ?? string.Empty;
+                var dllPath = System.IO.Path.Combine(exeDir, "AuraNetwork.dll");
+                if (System.IO.File.Exists(dllPath))
+                {
+                    var dllInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(dllPath);
+                    if (!string.IsNullOrEmpty(dllInfo.FileVersion))
+                        return dllInfo.FileVersion;
+                }
+            }
+            catch { }
+
+            // Son çare: uygulama exe'sinin dosya sürümü
             var info = System.Diagnostics.FileVersionInfo.GetVersionInfo(Application.ExecutablePath);
             if (!string.IsNullOrEmpty(info.FileVersion))
                 return info.FileVersion;
