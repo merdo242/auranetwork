@@ -467,7 +467,7 @@ partial class Form1
         this.btnWebsiteLink.Location = new System.Drawing.Point(1060, 648);
         this.btnWebsiteLink.Name = "btnWebsiteLink";
         this.btnWebsiteLink.Size = new System.Drawing.Size(120, 34);
-        this.btnWebsiteLink.Text = "chickennw.com";
+        this.btnWebsiteLink.Text = "91.132.49.16";
         this.btnWebsiteLink.UseVisualStyleBackColor = false;
 
         // 
@@ -513,7 +513,7 @@ partial class Form1
         this.lblHomeLeftTitle.Location = new System.Drawing.Point(30, 85);
         this.lblHomeLeftTitle.Name = "lblHomeLeftTitle";
         this.lblHomeLeftTitle.Size = new System.Drawing.Size(325, 45);
-        this.lblHomeLeftTitle.Text = "CHICKEN NETWORK";
+        this.lblHomeLeftTitle.Text = "AURA NETWORK";
 
         // 
         // pnlHomeLeftLine
@@ -531,7 +531,7 @@ partial class Form1
         this.lblHomeLeftText.Location = new System.Drawing.Point(30, 155);
         this.lblHomeLeftText.Name = "lblHomeLeftText";
         this.lblHomeLeftText.Size = new System.Drawing.Size(490, 220);
-        this.lblHomeLeftText.Text = "Chicken Network sunucusunda Skyblock, Survival, OP Skyblock dahil bir sürü eğlenceli oyun modunda oynayabilir ve eğlenebilirsin. Arkadaşlarınla klan/ada kurabilir ve diğer oyuncularla savaşarak ganimet elde edebilirsin.\r\n\r\nYaşadığın tüm sorunlar için site desteğinden bizimle iletişime geçmekten lütfen çekinme. Ayrıca sunucu oylama ve çekilişlerine katılmak için Discord sunucumuza katılabilirsin. Discord sunucusuna katılan oyuncular 1 haftalık VIP üyelik kazanır.";
+        this.lblHomeLeftText.Text = "Aura Network sunucusunda Skyblock, Survival, OP Skyblock dahil bir sürü eğlenceli oyun modunda oynayabilir ve eğlenebilirsin. Arkadaşlarınla klan/ada kurabilir ve diğer oyuncularla savaşarak ganimet elde edebilirsin.\r\n\r\nYaşadığın tüm sorunlar için site desteğinden bizimle iletişime geçmekten lütfen çekinme. Ayrıca sunucu oylama ve çekilişlerine katılmak için Discord sunucumuza katılabilirsin. Discord sunucusuna katılan oyuncular 1 haftalık VIP üyelik kazanır.";
 
         // 
         // pnlHomeRightCard

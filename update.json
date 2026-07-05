@@ -1,5 +1,5 @@
 {
-  "LatestVersion": "8.24",
-  "DownloadUrl": "https://raw.githubusercontent.com/merdo242/auranetwork/main/installer/AuraNetwork_Installer.exe",
-  "Changelog": "- Launcher, oyun içi menü ve masaüstü ikonu, yeni ve eşsiz Sakura konseptli AuraNW logosuyla tamamen yenilendi.\n- Hile Koruması eklendi.\n- Launcher ayarları menüsü ve HUD sorunu düzeltildi."
+  "LatestVersion": "8.25",
+  "DownloadUrl": "https://raw.githubusercontent.com/merdo242/merdoclient/main/installer/AuraNetwork_Installer.exe",
+  "Changelog": "- GitHub deposu yolu güncellendi.\n- Launcher güncelleme sistemi yeniden doğrulandı.\n- Kurulum paketi sürüm bilgisi eşleştirildi."
 }
