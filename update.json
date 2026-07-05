@@ -1,5 +1,5 @@
 {
   "LatestVersion": "8.25",
-  "DownloadUrl": "https://raw.githubusercontent.com/merdo242/merdoclient/main/installer/AuraNetwork_Installer.exe",
+  "DownloadUrl": "https://raw.githubusercontent.com/merdo242/auranetwork/main/installer/AuraNetwork_Installer.exe",
   "Changelog": "- GitHub deposu yolu güncellendi.\n- Launcher güncelleme sistemi yeniden doğrulandı.\n- Kurulum paketi sürüm bilgisi eşleştirildi."
 }
