@@ -7,56 +7,24 @@ namespace AuraNetwork;
 
 public class UpdateCheckerService
 {
-    // Mevcut launcher sürümünü derlemeye gömülü sabitten almak yerine
-    // çalışırken yürütülebilir dosyanın dosya sürümünü okuyarak alıyoruz.
-    // Bu, kullanıcının güncelleme sonrası gerçekten yeni sürümü çalıştırıp
-    // çalıştırmadığını doğru şekilde tespit etmemizi sağlar.
-    private static string GetCurrentVersion()
-    {
-        try
-        {
-            // Öncelikle giriş assembly'sinin (genellikle AuraNetwork.dll) konumunu deneyelim.
-            var asm = System.Reflection.Assembly.GetEntryAssembly();
-            var asmPath = asm?.Location;
-            if (!string.IsNullOrEmpty(asmPath) && System.IO.File.Exists(asmPath))
-            {
-                var asmInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(asmPath);
-                if (!string.IsNullOrEmpty(asmInfo.FileVersion))
-                    return asmInfo.FileVersion;
-            }
+    // Mevcut launcher sürümü — otomatik olarak assembly (csproj) versiyonundan alınır
+    public static string CurrentVersion =>
+        System.Reflection.Assembly.GetExecutingAssembly()
+            .GetName()?.Version?.ToString(2) ?? "0.0";
 
-            // Fallback: aynı klasörde bulunan AuraNetwork.dll dosyasını kontrol et
-            try
-            {
-                var exeDir = System.IO.Path.GetDirectoryName(Application.ExecutablePath) ?? string.Empty;
-                var dllPath = System.IO.Path.Combine(exeDir, "AuraNetwork.dll");
-                if (System.IO.File.Exists(dllPath))
-                {
-                    var dllInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(dllPath);
-                    if (!string.IsNullOrEmpty(dllInfo.FileVersion))
-                        return dllInfo.FileVersion;
-                }
-            }
-            catch { }
-
-            // Son çare: uygulama exe'sinin dosya sürümü
-            var info = System.Diagnostics.FileVersionInfo.GetVersionInfo(Application.ExecutablePath);
-            if (!string.IsNullOrEmpty(info.FileVersion))
-                return info.FileVersion;
-
-            return asm?.GetName().Version?.ToString() ?? "0.0.0";
-        }
-        catch
-        {
-            return "0.0.0";
-        }
-    }
-
-    // Güncelleme kontrolü için doğrudan bu GitHub deposundaki update.json dosyasını kullanıyoruz
+    // Güncelleme kontrolü için doğrudan bu GitHub deposundaki update.json dosyasını kullanıyoruz (100% ücretsiz & hızlı)
     private static readonly string UpdateUrl = $"https://raw.githubusercontent.com/merdo242/auranetwork/main/update.json?t={DateTime.UtcNow.Ticks}";
+
+    // Aynı sürümün tekrar tekrar bildirilmesini engellemek için cache
+    private static string? _lastCheckedVersion = null;
 
     public static void CheckForUpdates(Form parentForm, Action<UpdateResponse>? onFetchCompleted = null)
     {
+        // Eğer mevcut sürüm zaten kontrol edilmişse tekrar kontrol etme
+        if (_lastCheckedVersion == CurrentVersion)
+            return;
+        _lastCheckedVersion = CurrentVersion;
+
         Task.Run(async () =>
         {
             try
@@ -71,8 +39,7 @@ public class UpdateCheckerService
                 if (data != null)
                 {
                     onFetchCompleted?.Invoke(data);
-                    var current = GetCurrentVersion();
-                    if (IsNewerVersion(data.LatestVersion, current))
+                    if (IsNewerVersion(data.LatestVersion, CurrentVersion))
                     {
                         parentForm.Invoke(() => ShowUpdateDialog(parentForm, data));
                     }
@@ -87,10 +54,9 @@ public class UpdateCheckerService
 
     private static void ShowUpdateDialog(Form parentForm, UpdateResponse data)
     {
-        var cur = GetCurrentVersion();
         var msg = $"⚡ AuraNW Launcher için yeni bir sürüm mevcut!\n\n" +
-              $"   Mevcut sürümünüz : v{cur}\n" +
-              $"   Yeni sürüm       : v{data.LatestVersion}\n\n" +
+                  $"   Mevcut sürümünüz : v{CurrentVersion}\n" +
+                  $"   Yeni sürüm       : v{data.LatestVersion}\n\n" +
                   $"📋 Değişiklikler:\n{data.Changelog}\n\n" +
                   $"Devam etmek için güncellemeyi yüklemelisiniz. Şimdi yüklensin mi?";
 
@@ -98,8 +64,7 @@ public class UpdateCheckerService
 
         if (result != DialogResult.Yes)
         {
-            Application.Exit();
-            Environment.Exit(0);
+            // Kullanıcı reddetti — uygulama kapanmaz, normal devam eder
             return;
         }
 
