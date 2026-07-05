@@ -15,11 +15,21 @@ public class UpdateCheckerService
     {
         try
         {
+            // Öncelikle giriş assembly'sinin (genellikle AuraNetwork.dll) konumunu deneyelim.
+            var asm = System.Reflection.Assembly.GetEntryAssembly();
+            var asmPath = asm?.Location;
+            if (!string.IsNullOrEmpty(asmPath) && System.IO.File.Exists(asmPath))
+            {
+                var asmInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(asmPath);
+                if (!string.IsNullOrEmpty(asmInfo.FileVersion))
+                    return asmInfo.FileVersion;
+            }
+
+            // Fallback: uygulama exe'sinin dosya sürümü
             var info = System.Diagnostics.FileVersionInfo.GetVersionInfo(Application.ExecutablePath);
             if (!string.IsNullOrEmpty(info.FileVersion))
                 return info.FileVersion;
 
-            var asm = System.Reflection.Assembly.GetEntryAssembly();
             return asm?.GetName().Version?.ToString() ?? "0.0.0";
         }
         catch
