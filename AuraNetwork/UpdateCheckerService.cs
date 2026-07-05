@@ -7,10 +7,28 @@ namespace AuraNetwork;
 
 public class UpdateCheckerService
 {
-    // Mevcut launcher sürümü
-    public const string CurrentVersion = "8.25";
+    // Mevcut launcher sürümünü derlemeye gömülü sabitten almak yerine
+    // çalışırken yürütülebilir dosyanın dosya sürümünü okuyarak alıyoruz.
+    // Bu, kullanıcının güncelleme sonrası gerçekten yeni sürümü çalıştırıp
+    // çalıştırmadığını doğru şekilde tespit etmemizi sağlar.
+    private static string GetCurrentVersion()
+    {
+        try
+        {
+            var info = System.Diagnostics.FileVersionInfo.GetVersionInfo(Application.ExecutablePath);
+            if (!string.IsNullOrEmpty(info.FileVersion))
+                return info.FileVersion;
 
-    // Güncelleme kontrolü için doğrudan bu GitHub deposundaki update.json dosyasını kullanıyoruz (100% ücretsiz & hızlı)
+            var asm = System.Reflection.Assembly.GetEntryAssembly();
+            return asm?.GetName().Version?.ToString() ?? "0.0.0";
+        }
+        catch
+        {
+            return "0.0.0";
+        }
+    }
+
+    // Güncelleme kontrolü için doğrudan bu GitHub deposundaki update.json dosyasını kullanıyoruz
     private static readonly string UpdateUrl = $"https://raw.githubusercontent.com/merdo242/auranetwork/main/update.json?t={DateTime.UtcNow.Ticks}";
 
     public static void CheckForUpdates(Form parentForm, Action<UpdateResponse>? onFetchCompleted = null)
@@ -29,7 +47,8 @@ public class UpdateCheckerService
                 if (data != null)
                 {
                     onFetchCompleted?.Invoke(data);
-                    if (IsNewerVersion(data.LatestVersion, CurrentVersion))
+                    var current = GetCurrentVersion();
+                    if (IsNewerVersion(data.LatestVersion, current))
                     {
                         parentForm.Invoke(() => ShowUpdateDialog(parentForm, data));
                     }
@@ -44,9 +63,10 @@ public class UpdateCheckerService
 
     private static void ShowUpdateDialog(Form parentForm, UpdateResponse data)
     {
+        var cur = GetCurrentVersion();
         var msg = $"⚡ AuraNW Launcher için yeni bir sürüm mevcut!\n\n" +
-                  $"   Mevcut sürümünüz : v{CurrentVersion}\n" +
-                  $"   Yeni sürüm       : v{data.LatestVersion}\n\n" +
+              $"   Mevcut sürümünüz : v{cur}\n" +
+              $"   Yeni sürüm       : v{data.LatestVersion}\n\n" +
                   $"📋 Değişiklikler:\n{data.Changelog}\n\n" +
                   $"Devam etmek için güncellemeyi yüklemelisiniz. Şimdi yüklensin mi?";
 
