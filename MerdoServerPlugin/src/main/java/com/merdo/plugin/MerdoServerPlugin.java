@@ -14,6 +14,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
@@ -25,15 +27,35 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 public class MerdoServerPlugin extends JavaPlugin implements Listener {
 
     private final Set<UUID> merdoClients = new HashSet<>();
     private AuthMeApi authMeApi;
     private HttpServer httpServer;
+
+    // Chat sistemi icin
+    private final Queue<ChatMessage> chatMessages = new ConcurrentLinkedQueue<>();
+    private long lastMessageId = 0;
+    private static final int MAX_CHAT_MESSAGES = 200;
+
+    public static class ChatMessage {
+        public final long id;
+        public final String username;
+        public final String role;
+        public final String message;
+        public final long timestamp;
+
+        public ChatMessage(long id, String username, String role, String message) {
+            this.id = id;
+            this.username = username;
+            this.role = role;
+            this.message = message;
+            this.timestamp = System.currentTimeMillis() / 1000;
+        }
+    }
 
     @Override
     public void onEnable() {
@@ -69,6 +91,8 @@ public class MerdoServerPlugin extends JavaPlugin implements Listener {
         try {
             int port = getConfig().getInt("http-port", 8880);
             httpServer = HttpServer.create(new InetSocketAddress(port), 0);
+            
+            // /check endpoint (mevcut)
             httpServer.createContext("/check", new HttpHandler() {
                 @Override
                 public void handle(HttpExchange exchange) throws IOException {
@@ -98,13 +122,12 @@ public class MerdoServerPlugin extends JavaPlugin implements Listener {
                                     if (user != null) {
                                         String prefix = user.getCachedData().getMetaData().getPrefix();
                                         
-                                        // If prefix is null (e.g. offline user or inherited), try from their primary group
                                         if (prefix == null || prefix.trim().isEmpty()) {
                                             net.luckperms.api.model.group.Group group = api.getGroupManager().getGroup(user.getPrimaryGroup());
                                             if (group != null) {
                                                 prefix = group.getCachedData().getMetaData().getPrefix();
                                                 if (prefix == null || prefix.trim().isEmpty()) {
-                                                    prefix = group.getDisplayName(); // fallback to display name if prefix doesn't exist
+                                                    prefix = group.getDisplayName();
                                                 }
                                             }
                                         }
@@ -142,12 +165,171 @@ public class MerdoServerPlugin extends JavaPlugin implements Listener {
                     os.close();
                 }
             });
+
+            // /chat/send endpoint - mesaj gonderme
+            httpServer.createContext("/chat/send", new HttpHandler() {
+                @Override
+                public void handle(HttpExchange exchange) throws IOException {
+                    try {
+                        String query = exchange.getRequestURI().getQuery();
+                        String username = null;
+                        String password = null;
+                        String message = null;
+                        
+                        if (query != null) {
+                            for (String param : query.split("&")) {
+                                String[] pair = param.split("=");
+                                if (pair.length > 1) {
+                                    String key = URLDecoder.decode(pair[0], "UTF-8");
+                                    String val = URLDecoder.decode(pair[1], "UTF-8");
+                                    if (key.equalsIgnoreCase("username")) username = val;
+                                    else if (key.equalsIgnoreCase("password")) password = val;
+                                    else if (key.equalsIgnoreCase("message")) message = val;
+                                }
+                            }
+                        }
+
+                        String response;
+                        if (username == null || password == null || message == null || message.trim().isEmpty()) {
+                            response = "{\"success\":false,\"error\":\"Eksik parametreler\"}";
+                        } else if (!authMeApi.isRegistered(username)) {
+                            response = "{\"success\":false,\"error\":\"Kullanici kayitli degil\"}";
+                        } else if (!authMeApi.checkPassword(username, password)) {
+                            response = "{\"success\":false,\"error\":\"Sifre yanlis\"}";
+                        } else {
+                            // Rolu al
+                            String role = "OYUNCU";
+                            try {
+                                LuckPerms api = LuckPermsProvider.get();
+                                java.util.UUID uuid = api.getUserManager().lookupUniqueId(username).join();
+                                if (uuid != null) {
+                                    User user = api.getUserManager().loadUser(uuid).join();
+                                    if (user != null) {
+                                        String prefix = user.getCachedData().getMetaData().getPrefix();
+                                        if (prefix == null || prefix.trim().isEmpty()) {
+                                            net.luckperms.api.model.group.Group group = api.getGroupManager().getGroup(user.getPrimaryGroup());
+                                            if (group != null) {
+                                                prefix = group.getCachedData().getMetaData().getPrefix();
+                                                if (prefix == null || prefix.trim().isEmpty()) {
+                                                    prefix = group.getDisplayName();
+                                                }
+                                            }
+                                        }
+                                        if (prefix != null && !prefix.trim().isEmpty()) {
+                                            role = prefix.replaceAll("(?i)[&§][0-9a-fk-or]", "")
+                                                         .replaceAll("(?i)[&§]#[0-9a-f]{6}", "")
+                                                         .replaceAll("(?i)<#[0-9a-f]{6}>", "")
+                                                         .replaceAll("[\\[\\]]", "")
+                                                         .trim();
+                                        } else {
+                                            role = user.getPrimaryGroup();
+                                        }
+                                        if (role.equalsIgnoreCase("default")) role = "OYUNCU";
+                                    }
+                                }
+                            } catch (Exception ignored) { }
+
+                            // Mesaji kuyruga ekle
+                            long msgId;
+                            synchronized (MerdoServerPlugin.this) {
+                                lastMessageId++;
+                                msgId = lastMessageId;
+                            }
+                            chatMessages.add(new ChatMessage(msgId, username, role.toUpperCase(), message.trim()));
+                            
+                            // Fazla mesajlari temizle
+                            while (chatMessages.size() > MAX_CHAT_MESSAGES) {
+                                chatMessages.poll();
+                            }
+
+                            // Oyun ici sohbette de goster
+                            Bukkit.broadcastMessage("§7[§6AuraChat§7] §" + getRoleColorCode(role) + username + "§7: " + message);
+
+                            response = "{\"success\":true,\"id\":" + msgId + "}";
+                        }
+
+                        exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
+                        byte[] responseBytes = response.getBytes("UTF-8");
+                        exchange.sendResponseHeaders(200, responseBytes.length);
+                        OutputStream os = exchange.getResponseBody();
+                        os.write(responseBytes);
+                        os.close();
+                    } catch (Exception e) {
+                        String error = "{\"success\":false,\"error\":\"" + e.getMessage() + "\"}";
+                        exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
+                        byte[] responseBytes = error.getBytes("UTF-8");
+                        exchange.sendResponseHeaders(200, responseBytes.length);
+                        OutputStream os = exchange.getResponseBody();
+                        os.write(responseBytes);
+                        os.close();
+                    }
+                }
+            });
+
+            // /chat/messages endpoint - mesajlari cekme (polling)
+            httpServer.createContext("/chat/messages", new HttpHandler() {
+                @Override
+                public void handle(HttpExchange exchange) throws IOException {
+                    String query = exchange.getRequestURI().getQuery();
+                    long sinceId = 0;
+                    if (query != null) {
+                        for (String param : query.split("&")) {
+                            String[] pair = param.split("=");
+                            if (pair.length > 1 && pair[0].equalsIgnoreCase("since")) {
+                                try { sinceId = Long.parseLong(pair[1]); } catch (Exception ignored) { }
+                            }
+                        }
+                    }
+
+                    StringBuilder json = new StringBuilder("{\"messages\":[");
+                    boolean first = true;
+                    for (ChatMessage msg : chatMessages) {
+                        if (msg.id > sinceId) {
+                            if (!first) json.append(",");
+                            json.append("{\"id\":").append(msg.id)
+                                .append(",\"username\":\"").append(escapeJson(msg.username))
+                                .append("\",\"role\":\"").append(escapeJson(msg.role))
+                                .append("\",\"message\":\"").append(escapeJson(msg.message))
+                                .append("\",\"timestamp\":").append(msg.timestamp)
+                                .append("}");
+                            first = false;
+                        }
+                    }
+                    json.append("]}");
+
+                    exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
+                    exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
+                    byte[] responseBytes = json.toString().getBytes("UTF-8");
+                    exchange.sendResponseHeaders(200, responseBytes.length);
+                    OutputStream os = exchange.getResponseBody();
+                    os.write(responseBytes);
+                    os.close();
+                }
+            });
+
             httpServer.setExecutor(null);
             httpServer.start();
             getLogger().info("HTTP Sunucusu port " + port + " uzerinde baslatildi.");
         } catch (Exception e) {
             getLogger().severe("HTTP Sunucusu baslatilamadi: " + e.getMessage());
         }
+    }
+
+    private String getRoleColorCode(String role) {
+        String r = role.toLowerCase();
+        if (r.contains("kurucu") || r.contains("founder")) return "6";
+        if (r.contains("admin") || r.contains("owner")) return "c";
+        if (r.contains("mod")) return "5";
+        if (r.contains("vip")) return "b";
+        return "f";
+    }
+
+    private String escapeJson(String s) {
+        return s.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
     }
 
     private void stopHttpServer() {
@@ -176,7 +358,7 @@ public class MerdoServerPlugin extends JavaPlugin implements Listener {
                         authMeApi.forceLogin(player);
                         handleMerdoLogin(player);
                     } else {
-                        player.kickPlayer("§cMerdo Client şifreniz sunucudaki şifrenizle eşleşmiyor!");
+                        player.kickPlayer("§cAuraNW Client şifreniz sunucudaki şifrenizle eşleşmiyor!");
                     }
                 } else {
                     player.performCommand("register " + password + " " + password);
@@ -224,6 +406,6 @@ public class MerdoServerPlugin extends JavaPlugin implements Listener {
             }
         }
 
-        Bukkit.broadcastMessage("§e§l✨ §b" + player.getName() + " §eMerdo Client ayrıcalığıyla sunucuya katıldı!");
+        Bukkit.broadcastMessage("§e§l✨ §b" + player.getName() + " §eAuraNW Client ayrıcalığıyla sunucuya katıldı!");
     }
 }
