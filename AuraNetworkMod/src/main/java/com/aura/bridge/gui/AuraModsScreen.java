@@ -76,12 +76,21 @@ public class AuraModsScreen extends Screen {
                     final String finalDisplayName = displayName;
 
                     this.addDrawableChild(ButtonWidget.builder(Text.literal(finalDisplayName + ": " + (isEnabled ? "Acik" : "Kapali")), button -> {
+                        File jarFile = new File(modsDir, modKey + ".jar");
+                        File disabledFile = new File(modsDir, modKey + ".disabled");
+
                         if (disabledMods.contains(modKey)) {
                             disabledMods.remove(modKey);
                             button.setMessage(Text.literal(finalDisplayName + ": Acik"));
+                            if (disabledFile.exists()) {
+                                disabledFile.renameTo(jarFile);
+                            }
                         } else {
                             disabledMods.add(modKey);
                             button.setMessage(Text.literal(finalDisplayName + ": Kapali"));
+                            if (jarFile.exists()) {
+                                jarFile.renameTo(disabledFile);
+                            }
                         }
                         saveDisabledMods();
                         this.requiresRestart = true;
@@ -110,3 +119,4 @@ public class AuraModsScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
     }
 }
+
