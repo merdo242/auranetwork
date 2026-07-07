@@ -214,6 +214,37 @@ public class MinecraftLauncherService
                 catch { }
             }
 
+            // Simple RPC Konfigürasyonunu (App ID ve yazılar) oluştur
+            try
+            {
+                string rpcConfigDir = Path.Combine(path.BasePath, "config", "simple-rpc");
+                if (!Directory.Exists(rpcConfigDir)) Directory.CreateDirectory(rpcConfigDir);
+                
+                string rpcConfigFile = Path.Combine(rpcConfigDir, "simple-rpc.toml");
+                // Mod ayarlarını bozmamak için sadece dosya yoksa sıfırdan yazıyoruz, 
+                // ya da her açılışta ezebiliriz ki güncel ID hep kullanılsın. Her açılışta ezelim:
+                string tomlContent = """
+                    [general]
+                      applicationID = "1524029476084781126"
+                      clientID = "1524029476084781126"
+                      enabled = true
+                      version = 33
+                      launcherIntegration = false
+
+                    [image]
+                      largeImageKey = "logo"
+                      largeImageText = "Aura Network"
+                      smallImageKey = "minecraft"
+                      smallImageText = "AuraNW Client"
+
+                    [text]
+                      details = "AuraNW Client ile oynuyor"
+                      state = "Sunucu: Aura Network"
+                    """;
+                File.WriteAllText(rpcConfigFile, tomlContent);
+            }
+            catch { }
+
             // --- AuraNWBridge Modunu kur ---
             var oldMods = new[] { "auranetwork-*.jar", "merdobridge-*.jar", "chickenclient-*.jar" };
             foreach (var pattern in oldMods)
