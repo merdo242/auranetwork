@@ -181,8 +181,10 @@ public class UpdateCheckerService
                 string batchPath = Path.Combine(Path.GetTempPath(), "auranw_update.bat");
                 string batchContent = $"""
                     @echo off
-                    ping 127.0.0.1 -n 3 > nul
+                    :retry
+                    ping 127.0.0.1 -n 2 > nul
                     copy /Y "{tempPath}" "{currentExe}"
+                    if errorlevel 1 goto retry
                     start "" "{currentExe}"
                     del "%~f0"
                     """;
