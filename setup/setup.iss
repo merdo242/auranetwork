@@ -1,6 +1,6 @@
-[Setup]
+﻿[Setup]
 AppName=Aura Network
-AppVersion=8.26
+AppVersion=8.25
 AppPublisher=AuraNetwork
 AppPublisherURL=https://AuraNetwork.com
 DefaultDirName={autopf}\Aura Network
