@@ -198,7 +198,7 @@ public class MinecraftLauncherService
             }
 
             // --- CraterLib (Simple RPC için gerekli) ---
-            string craterLibName = "CraterLib-Fabric-26.2-3.1.2.jar";
+            string craterLibName = "CraterLib-Fabric-1.21-3.1.2.jar";
             string craterLibPath = Path.Combine(modsDir, craterLibName);
             if (!File.Exists(craterLibPath))
             {
@@ -208,7 +208,7 @@ public class MinecraftLauncherService
                 try
                 {
                     using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(2) };
-                    var bytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/Nn8Wasaq/versions/YS1XJpDW/CraterLib-Fabric-26.2-3.1.2.jar").GetAwaiter().GetResult();
+                    var bytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/Nn8Wasaq/versions/7vCrReSb/CraterLib-Fabric-1.21-3.1.2.jar").GetAwaiter().GetResult();
                     File.WriteAllBytes(craterLibPath, bytes);
                 }
                 catch { }
