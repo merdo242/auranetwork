@@ -7,14 +7,37 @@ import net.minecraft.text.Text;
 import net.minecraft.client.gui.DrawContext;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.List;
 
 public class AuraModsScreen extends Screen {
     private final Screen parent;
     public boolean requiresRestart = false;
+    private Set<String> disabledMods = new HashSet<>();
+    private File disabledModsFile;
 
     public AuraModsScreen(Screen parent) {
         super(Text.literal("Mod Yoneticisi"));
         this.parent = parent;
+        this.disabledModsFile = new File(FabricLoader.getInstance().getGameDir().toFile(), "disabled_mods.txt");
+        loadDisabledMods();
+    }
+
+    private void loadDisabledMods() {
+        if (disabledModsFile.exists()) {
+            try {
+                List<String> lines = Files.readAllLines(disabledModsFile.toPath());
+                disabledMods.addAll(lines);
+            } catch (Exception e) {}
+        }
+    }
+
+    private void saveDisabledMods() {
+        try {
+            Files.write(disabledModsFile.toPath(), disabledMods);
+        } catch (Exception e) {}
     }
 
     @Override
@@ -29,38 +52,47 @@ public class AuraModsScreen extends Screen {
                 int yOffset = 0;
                 for (File file : files) {
                     String fileName = file.getName();
-                    // AuraNetwork core mods cannot be disabled to prevent breaking the client
                     if (fileName.contains("auranetwork") || fileName.contains("merdobridge") || fileName.contains("chickenclient") || fileName.contains("fabric-api")) {
                         continue;
                     }
 
-                    boolean isEnabled = fileName.endsWith(".jar");
-                    String displayName = fileName.replace(".jar", "").replace(".disabled", "");
+                    String modKey = fileName.replace(".jar", "").replace(".disabled", "");
+                    
+                    // Check if it's currently loaded as a jar, OR if it's marked as disabled in our txt
+                    // But to be accurate, we just rely on our txt file if it exists, otherwise fallback to extension
+                    boolean isEnabled = !disabledMods.contains(modKey);
+                    
+                    // Special case: if it ends with .disabled and it's not in the txt, we add it to the txt
+                    if (fileName.endsWith(".disabled") && !disabledMods.contains(modKey)) {
+                        disabledMods.add(modKey);
+                        isEnabled = false;
+                        saveDisabledMods();
+                    }
+
+                    String displayName = modKey;
                     if (displayName.length() > 25) {
                         displayName = displayName.substring(0, 25) + "...";
                     }
+                    final String finalDisplayName = displayName;
 
-                    this.addDrawableChild(ButtonWidget.builder(Text.literal(displayName + ": " + (isEnabled ? "Acik" : "Kapali")), button -> {
-                        boolean currentlyEnabled = file.getName().endsWith(".jar");
-                        String newName = currentlyEnabled ? file.getName().replace(".jar", ".disabled") : file.getName().replace(".disabled", ".jar");
-                        File newFile = new File(file.getParent(), newName);
-                        if (file.renameTo(newFile)) {
-                            this.requiresRestart = true;
-                            // Re-init the screen to reflect the change
-                            AuraModsScreen newScreen = new AuraModsScreen(this.parent);
-                            newScreen.requiresRestart = true;
-                            this.client.setScreen(newScreen);
+                    this.addDrawableChild(ButtonWidget.builder(Text.literal(finalDisplayName + ": " + (isEnabled ? "Acik" : "Kapali")), button -> {
+                        if (disabledMods.contains(modKey)) {
+                            disabledMods.remove(modKey);
+                            button.setMessage(Text.literal(finalDisplayName + ": Acik"));
+                        } else {
+                            disabledMods.add(modKey);
+                            button.setMessage(Text.literal(finalDisplayName + ": Kapali"));
                         }
+                        saveDisabledMods();
+                        this.requiresRestart = true;
                     }).dimensions(centerX - 100, startY + yOffset, 200, 20).build());
 
                     yOffset += 25;
-                    // Prevent buttons from going off-screen (basic limit)
                     if (startY + yOffset > this.height - 60) break;
                 }
             }
         }
 
-        // Geri Don button
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Geri Don"), button -> {
             this.client.setScreen(this.parent);
         }).dimensions(centerX - 100, this.height - 30, 200, 20).build());

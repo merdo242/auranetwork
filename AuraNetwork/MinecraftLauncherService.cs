@@ -166,7 +166,7 @@ public class MinecraftLauncherService
             // --- Chat Animation Modunu kur ---
             string chatAnimName = "chatanimation-fabric-1.3.1+mc1.21.jar";
             string chatAnimPath = Path.Combine(modsDir, chatAnimName);
-            if (!File.Exists(chatAnimPath))
+            if (!File.Exists(chatAnimPath) && !File.Exists(chatAnimPath + ".disabled"))
             {
                 var oldChatAnimVersions = Directory.GetFiles(modsDir, "chatanimation-*.jar");
                 foreach (var old in oldChatAnimVersions) { try { File.Delete(old); } catch { } }
@@ -183,7 +183,7 @@ public class MinecraftLauncherService
             // --- Chat Heads Modunu kur ---
             string chatHeadsName = "chat_heads-0.15.2-fabric-1.21.jar";
             string chatHeadsPath = Path.Combine(modsDir, chatHeadsName);
-            if (!File.Exists(chatHeadsPath))
+            if (!File.Exists(chatHeadsPath) && !File.Exists(chatHeadsPath + ".disabled"))
             {
                 var oldChatHeadsVersions = Directory.GetFiles(modsDir, "chat_heads-*.jar");
                 foreach (var old in oldChatHeadsVersions) { try { File.Delete(old); } catch { } }
@@ -200,7 +200,7 @@ public class MinecraftLauncherService
             // --- CraterLib (Simple RPC için gerekli) ---
             string craterLibName = "CraterLib-Fabric-1.21-3.1.2.jar";
             string craterLibPath = Path.Combine(modsDir, craterLibName);
-            if (!File.Exists(craterLibPath))
+            if (!File.Exists(craterLibPath) && !File.Exists(craterLibPath + ".disabled"))
             {
                 var oldCraterLibVersions = Directory.GetFiles(modsDir, "CraterLib-*.jar");
                 foreach (var old in oldCraterLibVersions) { try { File.Delete(old); } catch { } }
@@ -217,7 +217,7 @@ public class MinecraftLauncherService
             // --- Simple RPC Modunu kur ---
             string rpcName = "SimpleRPC-4.1.2.jar";
             string rpcPath = Path.Combine(modsDir, rpcName);
-            if (!File.Exists(rpcPath))
+            if (!File.Exists(rpcPath) && !File.Exists(rpcPath + ".disabled"))
             {
                 var oldRpcVersions = Directory.GetFiles(modsDir, "SimpleRPC-*.jar");
                 foreach (var old in oldRpcVersions) { try { File.Delete(old); } catch { } }
@@ -231,32 +231,56 @@ public class MinecraftLauncherService
                 catch { }
             }
 
-            // Simple RPC Konfigürasyonunu (App ID ve yazılar) oluştur
+            // Simple RPC Konfigürasyonunu oluştur (v4 formatında)
             try
             {
                 string rpcConfigDir = Path.Combine(path.BasePath, "config", "simple-rpc");
                 if (!Directory.Exists(rpcConfigDir)) Directory.CreateDirectory(rpcConfigDir);
                 
                 string rpcConfigFile = Path.Combine(rpcConfigDir, "simple-rpc.toml");
-                // Mod ayarlarını bozmamak için sadece dosya yoksa sıfırdan yazıyoruz, 
-                // ya da her açılışta ezebiliriz ki güncel ID hep kullanılsın. Her açılışta ezelim:
+                
                 string tomlContent = """
-                    [general]
-                      applicationID = "1524029476084781126"
-                      clientID = "1524029476084781126"
-                      enabled = true
-                      version = 33
-                      launcherIntegration = false
+                    appID = "1524029476084781126"
+                    version = 33
 
-                    [image]
-                      largeImageKey = "logo"
-                      largeImageText = "Aura Network"
-                      smallImageKey = "minecraft"
-                      smallImageText = "AuraNW Client"
+                    [main_menu]
+                        enabled = true
+                        [[main_menu.presence]]
+                            type = "PLAYING"
+                            description = "AuraNW Client ile oynuyor"
+                            state = "Ana Menü'de"
+                            largeImageKey = ["logo"]
+                            largeImageText = "Aura Network"
+                            buttons = []
 
-                    [text]
-                      details = "AuraNW Client ile oynuyor"
-                      state = "Sunucu: Aura Network"
+                    [multi_player]
+                        enabled = true
+                        [[multi_player.presence]]
+                            type = "PLAYING"
+                            description = "AuraNW Client ile oynuyor"
+                            state = "Oyunda"
+                            largeImageKey = ["logo"]
+                            largeImageText = "Aura Network"
+                            buttons = []
+                            
+                    [single_player]
+                        enabled = true
+                        [[single_player.presence]]
+                            type = "PLAYING"
+                            description = "AuraNW Client ile oynuyor"
+                            state = "Oyunda"
+                            largeImageKey = ["logo"]
+                            largeImageText = "Aura Network"
+                            buttons = []
+                            
+                    [generic]
+                        [[generic.presence]]
+                            type = "PLAYING"
+                            description = "AuraNW Client ile oynuyor"
+                            state = ""
+                            largeImageKey = ["logo"]
+                            largeImageText = "Aura Network"
+                            buttons = []
                     """;
                 File.WriteAllText(rpcConfigFile, tomlContent);
             }
