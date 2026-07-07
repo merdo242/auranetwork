@@ -296,16 +296,29 @@ public class MinecraftLauncherService
                     try { File.Delete(old); } catch { }
                 }
             }
-                        // --- CIT Resewn Modunu kur (OptiFine CIT destegi icin) ---
-            string citName = "citresewn-1.2.2+1.21.jar";
-            string citPath = Path.Combine(modsDir, citName);
-            if (!File.Exists(citPath))
+                        
+
+                        // --- Cakisik modlari sil (Punchy & CIT Resewn vs) ---
+            var badMods = new[] { "punchy-*.jar", "citresewn-*.jar" };
+            foreach (var pattern in badMods)
+            {
+                var files = Directory.GetFiles(modsDir, pattern);
+                foreach (var bad in files)
+                {
+                    try { File.Delete(bad); } catch { }
+                }
+            }
+
+            // --- Polytone Modunu kur (CIT ve daha iyi OptiFine destegi icin) ---
+            string polytoneName = "polytone-fabric-1.21-3.8.8.jar";
+            string polytonePath = Path.Combine(modsDir, polytoneName);
+            if (!File.Exists(polytonePath))
             {
                 try
                 {
                     using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(2) };
-                    var citBytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/otVJckYQ/versions/JUnP9V1A/citresewn-1.2.2%2B1.21.jar").GetAwaiter().GetResult();
-                    File.WriteAllBytes(citPath, citBytes);
+                    var bytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/3qAYkBMB/versions/LWb7tKC7/polytone-fabric-1.21-3.8.8.jar").GetAwaiter().GetResult();
+                    File.WriteAllBytes(polytonePath, bytes);
                 }
                 catch { }
             }
@@ -534,5 +547,6 @@ public class MinecraftLauncherService
 }
 
 public sealed record LauncherResult(bool Success, string Message);
+
 
 
