@@ -174,17 +174,29 @@ public class UpdateCheckerService
 
                 await Task.Delay(800);
 
-                // Inno Setup'ı başlatırken dosyayı SmartScreen'den kurtarmak için Unblock-File kullanıyoruz
+                // Mevcut EXE yolunu al
+                string currentExe = System.Diagnostics.Process.GetCurrentProcess().MainModule!.FileName;
+
+                // Batch script: uygulama kapandıktan sonra yeni EXE'yi eskisinin üzerine yazar ve yeniden başlatır
+                string batchPath = Path.Combine(Path.GetTempPath(), "auranw_update.bat");
+                string batchContent = $"""
+                    @echo off
+                    ping 127.0.0.1 -n 3 > nul
+                    copy /Y "{tempPath}" "{currentExe}"
+                    start "" "{currentExe}"
+                    del "%~f0"
+                    """;
+                File.WriteAllText(batchPath, batchContent);
+
                 Process.Start(new ProcessStartInfo
                 {
-                    FileName        = "cmd.exe",
-                    Arguments       = $"/c powershell -NoProfile -Command \"Unblock-File -Path '{tempPath}'\" & ping 127.0.0.1 -n 3 > nul & \"{tempPath}\" /VERYSILENT /SUPPRESSMSGBOXES /FORCECLOSEAPPLICATIONS",
+                    FileName        = batchPath,
                     CreateNoWindow  = true,
                     WindowStyle     = ProcessWindowStyle.Hidden,
-                    UseShellExecute = false
+                    UseShellExecute = true
                 });
 
-                // Uygulamayı anında, beklemeden kapat
+                // Uygulamayı kapat — batch script devralacak
                 Environment.Exit(0);
             }
             catch (Exception ex)

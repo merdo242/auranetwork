@@ -9,10 +9,10 @@
     <AssemblyName>AuraNetwork</AssemblyName>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <!-- Assembly/File version for updater checks -->
-    <Version>8.28</Version>
-    <AssemblyVersion>8.28.0.0</AssemblyVersion>
-    <FileVersion>8.28.0.0</FileVersion>
-    <InformationalVersion>8.28</InformationalVersion>
+    <Version>8.29</Version>
+    <AssemblyVersion>8.29.0.0</AssemblyVersion>
+    <FileVersion>8.29.0.0</FileVersion>
+    <InformationalVersion>8.29</InformationalVersion>
   </PropertyGroup>
 
   <ItemGroup>
