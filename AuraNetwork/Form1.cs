@@ -9,7 +9,6 @@ public partial class Form1 : Form
     private readonly AccountService _accountService = new();
     private readonly SettingsService _settingsService = new();
     private readonly MinecraftLauncherService _minecraftLauncherService;
-    private readonly ChatService _chatService = new();
 
     private readonly System.Windows.Forms.Timer _transitionTimer = new();
     private readonly System.Windows.Forms.Timer _launchTimer = new();
@@ -207,9 +206,6 @@ public partial class Form1 : Form
 
         // Arkaplan müziğini başlat
         StartBackgroundMusic();
-
-        // Chat sistemini kur
-        SetupChat();
 
         // Check for updates asynchronously and update news slide if data arrives
         UpdateCheckerService.CheckForUpdates(this, updateInfo =>
@@ -1192,107 +1188,5 @@ public partial class Form1 : Form
             AuraDialog.ShowWarning(this, message);
         else
             AuraDialog.ShowInfo(this, message);
-    }
-
-    // ---- CHAT SİSTEMİ ----
-
-    private void SetupChat()
-    {
-        // Chat input placeholder
-        SetupChatPlaceholder(txtChatInput, "Mesaj yaz...");
-
-        // Chat send button
-        btnChatSend.Click += BtnChatSend_Click;
-        txtChatInput.KeyDown += (s, e) =>
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                e.SuppressKeyPress = true;
-                BtnChatSend_Click(s, e);
-            }
-        };
-
-        // Chat servisi olayları
-        _chatService.OnNewMessage += msg =>
-        {
-            try
-            {
-                if (lstChatMessages.IsDisposed) return;
-                lstChatMessages.BeginInvoke(() =>
-                {
-                    string display = $"[{msg.Role}] {msg.Username}: {msg.Message}";
-                    lstChatMessages.Items.Add(display);
-                    if (lstChatMessages.Items.Count > 50)
-                        lstChatMessages.Items.RemoveAt(0);
-                    lstChatMessages.TopIndex = lstChatMessages.Items.Count - 1;
-                });
-            }
-            catch { }
-        };
-
-        _chatService.OnError += error =>
-        {
-            try
-            {
-                if (lblStatus.IsDisposed) return;
-                lblStatus.BeginInvoke(() => lblStatus.Text = error);
-            }
-            catch { }
-        };
-
-        // Polling'i başlat
-        _chatService.StartPolling();
-    }
-
-    private void SetupChatPlaceholder(TextBox textBox, string placeholder)
-    {
-        textBox.Text = placeholder;
-        textBox.ForeColor = Color.FromArgb(85, 85, 94);
-
-        textBox.Enter += (s, e) =>
-        {
-            if (textBox.Text == placeholder)
-            {
-                textBox.Text = "";
-                textBox.ForeColor = Color.White;
-            }
-        };
-
-        textBox.Leave += (s, e) =>
-        {
-            if (string.IsNullOrWhiteSpace(textBox.Text))
-            {
-                textBox.Text = placeholder;
-                textBox.ForeColor = Color.FromArgb(85, 85, 94);
-            }
-        };
-    }
-
-    private async void BtnChatSend_Click(object? sender, EventArgs e)
-    {
-        if (string.IsNullOrWhiteSpace(_currentUser) || string.IsNullOrWhiteSpace(_currentPassword))
-        {
-            ShowMessage("Önce giriş yapmanız gerekiyor.", MessageBoxIcon.Warning);
-            return;
-        }
-
-        string message = txtChatInput.Text == "Mesaj yaz..." ? "" : txtChatInput.Text.Trim();
-        if (string.IsNullOrWhiteSpace(message))
-            return;
-
-        txtChatInput.Text = "Mesaj yaz...";
-        txtChatInput.ForeColor = Color.FromArgb(85, 85, 94);
-
-        bool success = await _chatService.SendMessage(_currentUser, _currentPassword, message);
-        if (!success)
-        {
-            lblStatus.Text = "Mesaj gönderilemedi, tekrar dene.";
-        }
-    }
-
-    protected override void OnFormClosing(FormClosingEventArgs e)
-    {
-        _chatService.Stop();
-        base.OnFormClosing(e);
     }
 }

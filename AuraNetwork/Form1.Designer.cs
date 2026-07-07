@@ -56,12 +56,6 @@ partial class Form1
     private System.Windows.Forms.Button btnWebsite;
     private System.Windows.Forms.Button btnDiscordLink;
     
-    // Chat Controls (inside pnlHome)
-    private System.Windows.Forms.Panel pnlChatPanel;
-    private System.Windows.Forms.ListBox lstChatMessages;
-    private System.Windows.Forms.TextBox txtChatInput;
-    private System.Windows.Forms.Button btnChatSend;
-    
     // Global Status Controls (inside pnlHome)
     private System.Windows.Forms.ProgressBar pbLaunch;
     private System.Windows.Forms.Label lblStatus;
@@ -125,12 +119,6 @@ partial class Form1
         this.btnRules = new System.Windows.Forms.Button();
         this.btnWebsite = new System.Windows.Forms.Button();
         this.btnDiscordLink = new System.Windows.Forms.Button();
-        
-        // Chat controls
-        this.pnlChatPanel = new System.Windows.Forms.Panel();
-        this.lstChatMessages = new System.Windows.Forms.ListBox();
-        this.txtChatInput = new System.Windows.Forms.TextBox();
-        this.btnChatSend = new System.Windows.Forms.Button();
         
         this.pbLaunch = new System.Windows.Forms.ProgressBar();
         this.lblStatus = new System.Windows.Forms.Label();
@@ -488,7 +476,6 @@ partial class Form1
         this.pnlHome.BackColor = System.Drawing.Color.FromArgb(8, 8, 10);
         this.pnlHome.Controls.Add(this.pnlHomeLeftCard);
         this.pnlHome.Controls.Add(this.pnlHomeRightCard);
-        this.pnlHome.Controls.Add(this.pnlChatPanel);
         this.pnlHome.Controls.Add(this.pbLaunch);
         this.pnlHome.Controls.Add(this.lblStatus);
         this.pnlHome.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -507,7 +494,7 @@ partial class Form1
         this.pnlHomeLeftCard.Controls.Add(this.lblHomeLeftText);
         this.pnlHomeLeftCard.Location = new System.Drawing.Point(50, 120);
         this.pnlHomeLeftCard.Name = "pnlHomeLeftCard";
-        this.pnlHomeLeftCard.Size = new System.Drawing.Size(550, 280);
+        this.pnlHomeLeftCard.Size = new System.Drawing.Size(550, 400);
 
         // 
         // pnlOnlinePlayers
@@ -523,7 +510,7 @@ partial class Form1
         this.lblHomeLeftTitle.AutoSize = true;
         this.lblHomeLeftTitle.Font = new System.Drawing.Font("Segoe UI", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
         this.lblHomeLeftTitle.ForeColor = System.Drawing.Color.White;
-        this.lblHomeLeftTitle.Location = new System.Drawing.Point(30, 75);
+        this.lblHomeLeftTitle.Location = new System.Drawing.Point(30, 85);
         this.lblHomeLeftTitle.Name = "lblHomeLeftTitle";
         this.lblHomeLeftTitle.Size = new System.Drawing.Size(325, 45);
         this.lblHomeLeftTitle.Text = "AURA NETWORK";
@@ -532,65 +519,19 @@ partial class Form1
         // pnlHomeLeftLine
         // 
         this.pnlHomeLeftLine.BackColor = System.Drawing.Color.FromArgb(255, 204, 0);
-        this.pnlHomeLeftLine.Location = new System.Drawing.Point(30, 126);
+        this.pnlHomeLeftLine.Location = new System.Drawing.Point(30, 136);
         this.pnlHomeLeftLine.Name = "pnlHomeLeftLine";
         this.pnlHomeLeftLine.Size = new System.Drawing.Size(490, 3);
 
         // 
         // lblHomeLeftText
         // 
-        this.lblHomeLeftText.Font = new System.Drawing.Font("Segoe UI", 8.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+        this.lblHomeLeftText.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
         this.lblHomeLeftText.ForeColor = System.Drawing.Color.FromArgb(170, 170, 180);
-        this.lblHomeLeftText.Location = new System.Drawing.Point(30, 140);
+        this.lblHomeLeftText.Location = new System.Drawing.Point(30, 155);
         this.lblHomeLeftText.Name = "lblHomeLeftText";
-        this.lblHomeLeftText.Size = new System.Drawing.Size(490, 130);
-        this.lblHomeLeftText.Text = "Aura Network sunucusunda Skyblock, Survival, OP Skyblock dahil bir sürü eğlenceli oyun modunda oynayabilir ve eğlenebilirsin. Arkadaşlarınla klan/ada kurabilir ve diğer oyuncularla savaşarak ganimet elde edebilirsin.\r\n\r\nYaşadığın tüm sorunlar için site desteğinden bizimle iletişime geçmekten lütfen çekinme.";
-
-        // 
-        // Chat Paneli
-        // 
-        this.pnlChatPanel.BackColor = System.Drawing.Color.Transparent;
-        this.pnlChatPanel.Location = new System.Drawing.Point(50, 412);
-        this.pnlChatPanel.Name = "pnlChatPanel";
-        this.pnlChatPanel.Size = new System.Drawing.Size(900, 120);
-        this.pnlChatPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.CardPanel_Paint);
-        
-        // lstChatMessages
-        this.lstChatMessages.BackColor = System.Drawing.Color.FromArgb(16, 16, 19);
-        this.lstChatMessages.BorderStyle = System.Windows.Forms.BorderStyle.None;
-        this.lstChatMessages.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this.lstChatMessages.ForeColor = System.Drawing.Color.FromArgb(200, 200, 210);
-        this.lstChatMessages.Location = new System.Drawing.Point(10, 10);
-        this.lstChatMessages.Name = "lstChatMessages";
-        this.lstChatMessages.Size = new System.Drawing.Size(775, 72);
-        this.lstChatMessages.TabIndex = 0;
-        this.lstChatMessages.SelectionMode = System.Windows.Forms.SelectionMode.None;
-        this.pnlChatPanel.Controls.Add(this.lstChatMessages);
-        
-        // txtChatInput
-        this.txtChatInput.BackColor = System.Drawing.Color.FromArgb(13, 13, 15);
-        this.txtChatInput.BorderStyle = System.Windows.Forms.BorderStyle.None;
-        this.txtChatInput.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-        this.txtChatInput.ForeColor = System.Drawing.Color.White;
-        this.txtChatInput.Location = new System.Drawing.Point(15, 88);
-        this.txtChatInput.Name = "txtChatInput";
-        this.txtChatInput.Size = new System.Drawing.Size(680, 17);
-        this.txtChatInput.TabIndex = 1;
-        this.txtChatInput.Text = "Mesaj yaz...";
-        this.pnlChatPanel.Controls.Add(this.txtChatInput);
-        
-        // btnChatSend
-        this.btnChatSend.BackColor = System.Drawing.Color.FromArgb(255, 204, 0);
-        this.btnChatSend.FlatAppearance.BorderSize = 0;
-        this.btnChatSend.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-        this.btnChatSend.Font = new System.Drawing.Font("Segoe UI", 8.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this.btnChatSend.ForeColor = System.Drawing.Color.Black;
-        this.btnChatSend.Location = new System.Drawing.Point(795, 85);
-        this.btnChatSend.Name = "btnChatSend";
-        this.btnChatSend.Size = new System.Drawing.Size(95, 25);
-        this.btnChatSend.Text = "GÖNDER";
-        this.btnChatSend.UseVisualStyleBackColor = false;
-        this.pnlChatPanel.Controls.Add(this.btnChatSend);
+        this.lblHomeLeftText.Size = new System.Drawing.Size(490, 220);
+        this.lblHomeLeftText.Text = "Aura Network sunucusunda Skyblock, Survival, OP Skyblock dahil bir sürü eğlenceli oyun modunda oynayabilir ve eğlenebilirsin. Arkadaşlarınla klan/ada kurabilir ve diğer oyuncularla savaşarak ganimet elde edebilirsin.\r\n\r\nYaşadığın tüm sorunlar için site desteğinden bizimle iletişime geçmekten lütfen çekinme. Ayrıca sunucu oylama ve çekilişlerine katılmak için Discord sunucumuza katılabilirsin. Discord sunucusuna katılan oyuncular 1 haftalık VIP üyelik kazanır.";
 
         // 
         // pnlHomeRightCard
@@ -608,7 +549,7 @@ partial class Form1
         this.pnlHomeRightCard.Controls.Add(this.btnDiscordLink);
         this.pnlHomeRightCard.Location = new System.Drawing.Point(630, 120);
         this.pnlHomeRightCard.Name = "pnlHomeRightCard";
-        this.pnlHomeRightCard.Size = new System.Drawing.Size(320, 280);
+        this.pnlHomeRightCard.Size = new System.Drawing.Size(320, 400);
 
         // 
         // pnlAvatar
