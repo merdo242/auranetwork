@@ -296,12 +296,7 @@ public class MinecraftLauncherService
                     try { File.Delete(old); } catch { }
                 }
             }
-                        
-
-                        
-            }
-
-                        // --- Eski CIT Resewn sil ---
+// --- Eski CIT Resewn sil ---
             var badMods = new[] { "citresewn-*.jar" };
             foreach (var pattern in badMods)
             {
@@ -322,20 +317,6 @@ public class MinecraftLauncherService
                     using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(2) };
                     var bytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/3qAYkBMB/versions/LWb7tKC7/polytone-fabric-1.21-3.8.8.jar").GetAwaiter().GetResult();
                     File.WriteAllBytes(polytonePath, bytes);
-                }
-                catch { }
-            }
-
-            // --- Punchy Modunu kur (Animasyonlar icin geri eklendi) ---
-            string punchyName = "punchy-2.6.1-fabric-1.21.1.jar";
-            string punchyPath = Path.Combine(modsDir, punchyName);
-            if (!File.Exists(punchyPath))
-            {
-                try
-                {
-                    using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(2) };
-                    var bytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/8aoMKplv/versions/qPyD1d9r/punchy-2.6.1-fabric-1.21.1.jar").GetAwaiter().GetResult();
-                    File.WriteAllBytes(punchyPath, bytes);
                 }
                 catch { }
             }
