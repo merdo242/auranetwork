@@ -1,4 +1,4 @@
-using CmlLib.Core;
+﻿using CmlLib.Core;
 using CmlLib.Core.Auth;
 using CmlLib.Core.ProcessBuilder;
 
@@ -296,14 +296,28 @@ public class MinecraftLauncherService
                     try { File.Delete(old); } catch { }
                 }
             }
-            string bridgeName = "auranetwork-1.0.7.jar";
+                        // --- CIT Resewn Modunu kur (OptiFine CIT destegi icin) ---
+            string citName = "citresewn-1.2.2+1.21.jar";
+            string citPath = Path.Combine(modsDir, citName);
+            if (!File.Exists(citPath))
+            {
+                try
+                {
+                    using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(2) };
+                    var citBytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/otVJckYQ/versions/JUnP9V1A/citresewn-1.2.2%2B1.21.jar").GetAwaiter().GetResult();
+                    File.WriteAllBytes(citPath, citBytes);
+                }
+                catch { }
+            }
+
+            string bridgeName = "auranetwork-1.0.8.jar";
             string bridgePath = Path.Combine(modsDir, bridgeName);
             if (!File.Exists(bridgePath))
             {
                 try
                 {
                     using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(2) };
-                    var bridgeBytes = client.GetByteArrayAsync("https://github.com/merdo242/auranetwork/raw/main/installer/auranetwork-1.0.7.jar").GetAwaiter().GetResult();
+                    var bridgeBytes = client.GetByteArrayAsync("https://github.com/merdo242/auranetwork/raw/main/installer/auranetwork-1.0.8.jar").GetAwaiter().GetResult();
                     File.WriteAllBytes(bridgePath, bridgeBytes);
                 }
                 catch { }
@@ -520,4 +534,5 @@ public class MinecraftLauncherService
 }
 
 public sealed record LauncherResult(bool Success, string Message);
+
 

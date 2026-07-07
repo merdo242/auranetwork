@@ -2,6 +2,7 @@ package com.aura.bridge;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.minecraft.text.Text;
 
 public class AuraNetworkMod implements ClientModInitializer {
     @Override
@@ -11,11 +12,13 @@ public class AuraNetworkMod implements ClientModInitializer {
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             String token = System.getenv("AURA_TOKEN");
             if (token != null && !token.trim().isEmpty()) {
-                System.out.println("[AuraNetworkMod] Token bulundu, sunucuya aktariliyor...");
                 new Thread(() -> {
                     try {
-                        Thread.sleep(2500); // 2.5 saniye bekle
+                        Thread.sleep(2500);
                         client.execute(() -> {
+                            if (client.player != null) {
+                                client.player.sendMessage(Text.literal("§a[AuraNetwork] §7Sunucuya dogrulama anahtari gonderildi!"), false);
+                            }
                             if (client.getNetworkHandler() != null) {
                                 client.getNetworkHandler().sendCommand("merdoauth " + token.trim());
                             }
@@ -25,7 +28,16 @@ public class AuraNetworkMod implements ClientModInitializer {
                     }
                 }).start();
             } else {
-                System.out.println("[AuraNetworkMod] Token bulunamadi, normal giris yapiliyor.");
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(2500);
+                        client.execute(() -> {
+                            if (client.player != null) {
+                                client.player.sendMessage(Text.literal("§c[AuraNetwork] §7Launcher'dan sifre (token) girmediginiz icin dogrulama yapilamadi!"), false);
+                            }
+                        });
+                    } catch (Exception e) {}
+                }).start();
             }
         });
     }
