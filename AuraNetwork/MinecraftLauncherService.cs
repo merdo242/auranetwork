@@ -181,7 +181,7 @@ public class MinecraftLauncherService
             }
 
             // --- Chat Heads Modunu kur ---
-            string chatHeadsName = "chat_heads-0.15.2-fabric-1.21.6.jar";
+            string chatHeadsName = "chat_heads-0.15.2-fabric-1.21.jar";
             string chatHeadsPath = Path.Combine(modsDir, chatHeadsName);
             if (!File.Exists(chatHeadsPath))
             {
@@ -191,7 +191,7 @@ public class MinecraftLauncherService
                 try
                 {
                     using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(2) };
-                    var bytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/Wb5oqrBJ/versions/hI0RfEtM/chat_heads-0.15.2-fabric-1.21.6.jar").GetAwaiter().GetResult();
+                    var bytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/Wb5oqrBJ/versions/O34Q4oXE/chat_heads-0.15.2-fabric-1.21.jar").GetAwaiter().GetResult();
                     File.WriteAllBytes(chatHeadsPath, bytes);
                 }
                 catch { }
