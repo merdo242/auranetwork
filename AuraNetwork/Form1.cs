@@ -295,15 +295,29 @@ public partial class Form1 : Form
 
 
 
+    // Gömülü kaynak stream'i döndürür
+    private static System.IO.Stream? GetEmbeddedStream(string resourceName)
+    {
+        var asm = System.Reflection.Assembly.GetExecutingAssembly();
+        // Tam ad: AuraNetwork.Resources.logo_large_new.png
+        string fullName = $"AuraNetwork.Resources.{resourceName}";
+        return asm.GetManifestResourceStream(fullName);
+    }
+
     private void StartBackgroundMusic()
     {
         try
         {
-            string musicFile = Path.Combine(
-                Path.GetDirectoryName(Application.ExecutablePath) ?? AppDomain.CurrentDomain.BaseDirectory,
-                "Resources", "bg_music.mp3");
+            // Önce gömülü kaynaktan geçici dosyaya yaz
+            using var stream = GetEmbeddedStream("bg_music.mp3");
+            if (stream == null) return;
 
-            if (!File.Exists(musicFile)) return;
+            string tempMp3 = Path.Combine(Path.GetTempPath(), "auranw_bg_music.mp3");
+            if (!File.Exists(tempMp3))
+            {
+                using var fs = File.Create(tempMp3);
+                stream.CopyTo(fs);
+            }
 
             var type = Type.GetTypeFromProgID("WMPlayer.OCX");
             if (type == null) return;
@@ -311,7 +325,7 @@ public partial class Form1 : Form
             _musicPlayer = Activator.CreateInstance(type);
             _musicPlayer.settings.volume   = _settingsService.Settings.MusicVolume;
             _musicPlayer.settings.setMode("loop", true);
-            _musicPlayer.URL = musicFile;
+            _musicPlayer.URL = tempMp3;
         }
         catch { }
     }
@@ -519,7 +533,14 @@ public partial class Form1 : Form
 
         // --- Small circular logo (40x40) ---
         if (_largeLogo == null)
-            try { _largeLogo = Image.FromFile(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "logo_large_new.png")); } catch { }
+        {
+            try
+            {
+                using var s = GetEmbeddedStream("logo_large_new.png");
+                if (s != null) _largeLogo = Image.FromStream(s);
+            }
+            catch { }
+        }
 
         int iconSize = 40;
         int iconX = x + 8;
@@ -613,7 +634,12 @@ public partial class Form1 : Form
         // Draw background image if available
         if (_mainBgImage == null)
         {
-            try { _mainBgImage = Image.FromFile(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "news_bg.jpg")); } catch { }
+            try
+            {
+                using var s = GetEmbeddedStream("news_bg.jpg");
+                if (s != null) _mainBgImage = Image.FromStream(s);
+            }
+            catch { }
         }
 
         using var path = GetRoundedRectanglePath(new Rectangle(0, 0, panel.Width - 1, panel.Height - 1), 12);

@@ -248,7 +248,15 @@ public class SplashForm : Form
 
         // --- Small logo (40x40) ---
         if (_largeLogo == null)
-            try { _largeLogo = Image.FromFile(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "logo_large_new.png")); } catch { }
+        {
+            try
+            {
+                var asm = System.Reflection.Assembly.GetExecutingAssembly();
+                using var s = asm.GetManifestResourceStream("AuraNetwork.Resources.logo_large_new.png");
+                if (s != null) _largeLogo = Image.FromStream(s);
+            }
+            catch { }
+        }
 
         int iconSize = 40;
         int iconX = x + 8;

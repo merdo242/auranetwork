@@ -9,10 +9,10 @@
     <AssemblyName>AuraNetwork</AssemblyName>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <!-- Assembly/File version for updater checks -->
-    <Version>8.29</Version>
-    <AssemblyVersion>8.29.0.0</AssemblyVersion>
-    <FileVersion>8.29.0.0</FileVersion>
-    <InformationalVersion>8.29</InformationalVersion>
+    <Version>8.30</Version>
+    <AssemblyVersion>8.30.0.0</AssemblyVersion>
+    <FileVersion>8.30.0.0</FileVersion>
+    <InformationalVersion>8.30</InformationalVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,22 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Resources\bg_music.mp3">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-    </Content>
-    <Content Include="Resources\logo_small.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-    </Content>
-    <Content Include="Resources\logo_large_new.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-    </Content>
-    <Content Include="Resources\news_bg.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-    </Content>
+    <EmbeddedResource Include="Resources\bg_music.mp3" />
+    <EmbeddedResource Include="Resources\logo_small.png" />
+    <EmbeddedResource Include="Resources\logo_large_new.png" />
+    <EmbeddedResource Include="Resources\news_bg.jpg" />
   </ItemGroup>
 
 </Project>
