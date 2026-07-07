@@ -197,6 +197,23 @@ public class MinecraftLauncherService
                 catch { }
             }
 
+            // --- Simple RPC Modunu kur ---
+            string rpcName = "SimpleRPC-4.1.2.jar";
+            string rpcPath = Path.Combine(modsDir, rpcName);
+            if (!File.Exists(rpcPath))
+            {
+                var oldRpcVersions = Directory.GetFiles(modsDir, "SimpleRPC-*.jar");
+                foreach (var old in oldRpcVersions) { try { File.Delete(old); } catch { } }
+                onProgress?.Invoke("Discord RPC modu indiriliyor...");
+                try
+                {
+                    using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(2) };
+                    var bytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/ObXSoyrn/versions/K1WFXmS7/SimpleRPC-4.1.2.jar").GetAwaiter().GetResult();
+                    File.WriteAllBytes(rpcPath, bytes);
+                }
+                catch { }
+            }
+
             // --- AuraNWBridge Modunu kur ---
             var oldMods = new[] { "auranetwork-*.jar", "merdobridge-*.jar", "chickenclient-*.jar" };
             foreach (var pattern in oldMods)
