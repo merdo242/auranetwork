@@ -1,4 +1,4 @@
-﻿using CmlLib.Core;
+using CmlLib.Core;
 using CmlLib.Core.Auth;
 using CmlLib.Core.ProcessBuilder;
 
@@ -360,6 +360,37 @@ public class MinecraftLauncherService
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.EnvironmentVariables["AURA_TOKEN"] = password;
 
+            // --- Mod Yöneticisi: Devre Dışı Bırakılan Modları Uygula ---
+            string disabledModsFile = Path.Combine(path.BasePath, "disabled_mods.txt");
+            if (File.Exists(disabledModsFile))
+            {
+                try
+                {
+                    var disabledModsList = new System.Collections.Generic.HashSet<string>(File.ReadAllLines(disabledModsFile).Select(l => l.Trim()));
+                    var allMods = Directory.GetFiles(modsDir, "*.*").Where(f => f.EndsWith(".jar") || f.EndsWith(".disabled"));
+                    foreach (var modFile in allMods)
+                    {
+                        string fileName = Path.GetFileName(modFile);
+                        if (fileName.Contains("auranetwork") || fileName.Contains("merdobridge") || fileName.Contains("chickenclient") || fileName.Contains("fabric-api"))
+                            continue;
+
+                        string modKey = fileName.Replace(".jar", "").Replace(".disabled", "");
+                        bool shouldBeDisabled = disabledModsList.Contains(modKey);
+                        bool isCurrentlyDisabled = fileName.EndsWith(".disabled");
+
+                        if (shouldBeDisabled && !isCurrentlyDisabled)
+                        {
+                            File.Move(modFile, Path.Combine(modsDir, modKey + ".disabled"));
+                        }
+                        else if (!shouldBeDisabled && isCurrentlyDisabled)
+                        {
+                            File.Move(modFile, Path.Combine(modsDir, modKey + ".jar"));
+                        }
+                    }
+                }
+                catch { }
+            }
+
             process.Start();
 
             // Wait a short amount of time to see if it crashes immediately (e.g. Java version mismatch)
@@ -489,3 +520,4 @@ public class MinecraftLauncherService
 }
 
 public sealed record LauncherResult(bool Success, string Message);
+
