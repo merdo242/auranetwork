@@ -197,6 +197,23 @@ public class MinecraftLauncherService
                 catch { }
             }
 
+            // --- CraterLib (Simple RPC için gerekli) ---
+            string craterLibName = "CraterLib-Fabric-26.2-3.1.2.jar";
+            string craterLibPath = Path.Combine(modsDir, craterLibName);
+            if (!File.Exists(craterLibPath))
+            {
+                var oldCraterLibVersions = Directory.GetFiles(modsDir, "CraterLib-*.jar");
+                foreach (var old in oldCraterLibVersions) { try { File.Delete(old); } catch { } }
+                onProgress?.Invoke("CraterLib (RPC kütüphanesi) indiriliyor...");
+                try
+                {
+                    using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(2) };
+                    var bytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/Nn8Wasaq/versions/YS1XJpDW/CraterLib-Fabric-26.2-3.1.2.jar").GetAwaiter().GetResult();
+                    File.WriteAllBytes(craterLibPath, bytes);
+                }
+                catch { }
+            }
+
             // --- Simple RPC Modunu kur ---
             string rpcName = "SimpleRPC-4.1.2.jar";
             string rpcPath = Path.Combine(modsDir, rpcName);
