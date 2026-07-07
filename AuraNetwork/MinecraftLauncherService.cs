@@ -138,6 +138,31 @@ public class MinecraftLauncherService
                     // Hata olursa en azından oyuna devam etsin, sessiz kalalım
                 }
             }
+            // --- Punchy (FPA) Modunu kur ---
+            string punchyName = "punchy-2.6.1-fabric-1.21.1.jar";
+            string punchyPath = Path.Combine(modsDir, punchyName);
+            if (!File.Exists(punchyPath))
+            {
+                // Eski sürümleri sil
+                var oldPunchyVersions = Directory.GetFiles(modsDir, "punchy-*-fabric-*.jar");
+                foreach (var old in oldPunchyVersions)
+                {
+                    try { File.Delete(old); } catch { }
+                }
+
+                onProgress?.Invoke("Punchy (FPA) modu indiriliyor...");
+                try
+                {
+                    using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(2) };
+                    var punchyBytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/8aoMKplv/versions/qPyD1d9r/punchy-2.6.1-fabric-1.21.1.jar").GetAwaiter().GetResult();
+                    File.WriteAllBytes(punchyPath, punchyBytes);
+                }
+                catch
+                {
+                    // Hata olursa sessiz kal
+                }
+            }
+
             // --- AuraNWBridge Modunu kur ---
             var oldMods = new[] { "auranetwork-*.jar", "merdobridge-*.jar", "chickenclient-*.jar" };
             foreach (var pattern in oldMods)
