@@ -21,6 +21,10 @@ public class GameMenuScreenMixin extends Screen {
     private void addClientSettingsButton(CallbackInfo ci) {
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Client Ayarlari"), button -> {
             this.client.setScreen(new AuraSettingsScreen(this));
-        }).dimensions(this.width / 2 - 102, this.height / 4 + 144 - 16, 204, 20).build());
+        }).dimensions(this.width / 2 - 102, this.height / 4 + 144 - 16, 100, 20).build());
+
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("Modlar"), button -> {
+            this.client.setScreen(new com.aura.bridge.gui.AuraModsScreen(this));
+        }).dimensions(this.width / 2 + 2, this.height / 4 + 144 - 16, 100, 20).build());
     }
 }
