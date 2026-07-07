@@ -163,6 +163,40 @@ public class MinecraftLauncherService
                 }
             }
 
+            // --- Chat Animation Modunu kur ---
+            string chatAnimName = "chatanimation-fabric-1.3.1+mc1.21.jar";
+            string chatAnimPath = Path.Combine(modsDir, chatAnimName);
+            if (!File.Exists(chatAnimPath))
+            {
+                var oldChatAnimVersions = Directory.GetFiles(modsDir, "chatanimation-*.jar");
+                foreach (var old in oldChatAnimVersions) { try { File.Delete(old); } catch { } }
+                onProgress?.Invoke("Chat Animation modu indiriliyor...");
+                try
+                {
+                    using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(2) };
+                    var bytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/DnNYdJsx/versions/4jzApw0F/chatanimation-fabric-1.3.1%2Bmc1.21.jar").GetAwaiter().GetResult();
+                    File.WriteAllBytes(chatAnimPath, bytes);
+                }
+                catch { }
+            }
+
+            // --- Chat Heads Modunu kur ---
+            string chatHeadsName = "chat_heads-0.15.2-fabric-1.21.6.jar";
+            string chatHeadsPath = Path.Combine(modsDir, chatHeadsName);
+            if (!File.Exists(chatHeadsPath))
+            {
+                var oldChatHeadsVersions = Directory.GetFiles(modsDir, "chat_heads-*.jar");
+                foreach (var old in oldChatHeadsVersions) { try { File.Delete(old); } catch { } }
+                onProgress?.Invoke("Chat Heads modu indiriliyor...");
+                try
+                {
+                    using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(2) };
+                    var bytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/Wb5oqrBJ/versions/hI0RfEtM/chat_heads-0.15.2-fabric-1.21.6.jar").GetAwaiter().GetResult();
+                    File.WriteAllBytes(chatHeadsPath, bytes);
+                }
+                catch { }
+            }
+
             // --- AuraNWBridge Modunu kur ---
             var oldMods = new[] { "auranetwork-*.jar", "merdobridge-*.jar", "chickenclient-*.jar" };
             foreach (var pattern in oldMods)
