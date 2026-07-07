@@ -227,3 +227,4 @@ public class UpdateResponse
     public string DownloadUrl   { get; set; } = string.Empty;
     public string Changelog     { get; set; } = string.Empty;
 }
+
