@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -9,10 +9,10 @@
     <AssemblyName>AuraNetwork</AssemblyName>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <!-- Assembly/File version for updater checks -->
-    <Version>8.40</Version>
-    <AssemblyVersion>8.40.0.0</AssemblyVersion>
-    <FileVersion>8.40.0.0</FileVersion>
-    <InformationalVersion>8.40</InformationalVersion>
+    <Version>8.41</Version>
+    <AssemblyVersion>8.41.0.0</AssemblyVersion>
+    <FileVersion>8.41.0.0</FileVersion>
+    <InformationalVersion>8.41</InformationalVersion>
   </PropertyGroup>
 
   <ItemGroup>
