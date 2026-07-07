@@ -1,5 +1,5 @@
 {
   "LatestVersion": "8.28",
-  "DownloadUrl": "https://github.com/merdo242/auranetwork/releases/download/v8.28/AuraNetwork_Installer.exe",
+  "DownloadUrl": "https://raw.githubusercontent.com/merdo242/auranetwork/main/installer/AuraNetwork_Installer.exe",
   "Changelog": "- Canli chat sistemi kaldirildi.\n- Performans iyilestirmeleri yapildi."
 }
