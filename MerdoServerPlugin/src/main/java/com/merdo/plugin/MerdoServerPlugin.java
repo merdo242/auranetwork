@@ -224,6 +224,6 @@ public class MerdoServerPlugin extends JavaPlugin implements Listener {
             }
         }
 
-        Bukkit.broadcastMessage("§e§l✨ §b" + player.getName() + " §eAuraNW Client ayrıcalığıyla sunucuya katıldı!");
+        Bukkit.broadcastMessage("§e§l✨ §b" + player.getName() + " §eAura network client ile katıldı!");
     }
 }
