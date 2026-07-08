@@ -1,4 +1,4 @@
-﻿using CmlLib.Core;
+using CmlLib.Core;
 using CmlLib.Core.Auth;
 using CmlLib.Core.ProcessBuilder;
 
@@ -138,29 +138,31 @@ public class MinecraftLauncherService
                     // Hata olursa en azından oyuna devam etsin, sessiz kalalım
                 }
             }
-            // --- Punchy (FPA) Modunu kur ---
-            string punchyName = "punchy-2.6.1-fabric-1.21.1.jar";
-            string punchyPath = Path.Combine(modsDir, punchyName);
-            if (!File.Exists(punchyPath))
+            
+            // --- First-Person Model Modunu kur (Punchy yerine) ---
+            string firstPersonName = "firstperson-fabric-2.4.4-mc1.21.1.jar";
+            string firstPersonPath = Path.Combine(modsDir, firstPersonName);
+            if (!File.Exists(firstPersonPath) && !File.Exists(firstPersonPath + ".disabled"))
             {
-                // Eski sürümleri sil
-                var oldPunchyVersions = Directory.GetFiles(modsDir, "punchy-*-fabric-*.jar");
-                foreach (var old in oldPunchyVersions)
+                // Eski sürümleri (veya punchy'yi) sil
+                var oldFPMVersions = Directory.GetFiles(modsDir, "firstperson-*.jar").Concat(Directory.GetFiles(modsDir, "punchy-*.jar"));
+                foreach (var old in oldFPMVersions)
                 {
                     try { File.Delete(old); } catch { }
                 }
+                
+                // .disabled punchy dosyalari varsa temizle
+                var disabledPunchy = Directory.GetFiles(modsDir, "punchy-*.disabled");
+                foreach (var old in disabledPunchy) { try { File.Delete(old); } catch { } }
 
-                onProgress?.Invoke("Punchy (FPA) modu indiriliyor...");
+                onProgress?.Invoke("First-Person Model indiriliyor...");
                 try
                 {
                     using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(2) };
-                    var punchyBytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/8aoMKplv/versions/qPyD1d9r/punchy-2.6.1-fabric-1.21.1.jar").GetAwaiter().GetResult();
-                    File.WriteAllBytes(punchyPath, punchyBytes);
+                    var fpmBytes = client.GetByteArrayAsync("https://cdn.modrinth.com/data/joPjFTev/versions/S5e9J0xU/firstperson-fabric-2.4.4-mc1.21.1.jar").GetAwaiter().GetResult();
+                    File.WriteAllBytes(firstPersonPath, fpmBytes);
                 }
-                catch
-                {
-                    // Hata olursa sessiz kal
-                }
+                catch { }
             }
 
             // --- Chat Animation Modunu kur ---
