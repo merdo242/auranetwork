@@ -1,229 +1,159 @@
 package com.merdo.plugin;
 
-import fr.xephi.authme.api.v3.AuthMeApi;
-import fr.xephi.authme.events.LoginEvent;
-import fr.xephi.authme.events.RegisterEvent;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.Node;
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import java.io.File;
-
-import net.luckperms.api.LuckPerms;
-import net.luckperms.api.LuckPermsProvider;
-import net.luckperms.api.model.user.User;
-
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class MerdoServerPlugin extends JavaPlugin implements Listener {
 
-    private final Set<UUID> merdoClients = new HashSet<>();
-    private AuthMeApi authMeApi;
-    private HttpServer httpServer;
-
     @Override
     public void onEnable() {
-        saveDefaultConfig();
-        this.getServer().getPluginManager().registerEvents(this, this);
-        this.authMeApi = AuthMeApi.getInstance();
-        setupEconomy();
-        getLogger().info("MerdoServerPlugin aktif edildi!");
-        
-        startHttpServer();
-    }
-
-    private net.milkbowl.vault.economy.Economy econ = null;
-    private boolean setupEconomy() {
-        if (getServer().getPluginManager().getPlugin("Vault") == null) {
-            return false;
-        }
-        org.bukkit.plugin.RegisteredServiceProvider<net.milkbowl.vault.economy.Economy> rsp = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-        if (rsp == null) {
-            return false;
-        }
-        econ = rsp.getProvider();
-        return econ != null;
+        getServer().getPluginManager().registerEvents(this, this);
+        getLogger().info("MerdoServerPlugin enabled! (LimboAuth Edition)");
+        getLogger().info("VIP synchronizer is active.");
     }
 
     @Override
     public void onDisable() {
-        stopHttpServer();
-        getLogger().info("MerdoServerPlugin devre disi!");
+        getLogger().info("MerdoServerPlugin disabled!");
     }
 
-    private void startHttpServer() {
-        try {
-            int port = getConfig().getInt("http-port", 8880);
-            httpServer = HttpServer.create(new InetSocketAddress(port), 0);
-            httpServer.createContext("/check", new HttpHandler() {
-                @Override
-                public void handle(HttpExchange exchange) throws IOException {
-                    String query = exchange.getRequestURI().getQuery();
-                    String username = null;
-                    if (query != null) {
-                        for (String param : query.split("&")) {
-                            String[] pair = param.split("=");
-                            if (pair.length > 1 && pair[0].equalsIgnoreCase("username")) {
-                                username = pair[1];
-                                break;
-                            }
-                        }
-                    }
-
-                    boolean registered = false;
-                    String role = "OYUNCU";
-                    if (username != null && !username.trim().isEmpty()) {
-                        String cleanUser = username.trim();
-                        registered = authMeApi.isRegistered(cleanUser);
-                        if (registered) {
-                            try {
-                                LuckPerms api = LuckPermsProvider.get();
-                                java.util.UUID uuid = api.getUserManager().lookupUniqueId(cleanUser).join();
-                                if (uuid != null) {
-                                    User user = api.getUserManager().loadUser(uuid).join();
-                                    if (user != null) {
-                                        String prefix = user.getCachedData().getMetaData().getPrefix();
-                                        
-                                        // If prefix is null (e.g. offline user or inherited), try from their primary group
-                                        if (prefix == null || prefix.trim().isEmpty()) {
-                                            net.luckperms.api.model.group.Group group = api.getGroupManager().getGroup(user.getPrimaryGroup());
-                                            if (group != null) {
-                                                prefix = group.getCachedData().getMetaData().getPrefix();
-                                                if (prefix == null || prefix.trim().isEmpty()) {
-                                                    prefix = group.getDisplayName(); // fallback to display name if prefix doesn't exist
-                                                }
-                                            }
-                                        }
-
-                                        if (prefix != null && !prefix.trim().isEmpty()) {
-                                            role = prefix.replaceAll("(?i)[&§][0-9a-fk-or]", "")
-                                                         .replaceAll("(?i)[&§]#[0-9a-f]{6}", "")
-                                                         .replaceAll("(?i)<#[0-9a-f]{6}>", "")
-                                                         .replaceAll("[\\[\\]]", "")
-                                                         .trim();
-                                        } else {
-                                            role = user.getPrimaryGroup();
-                                        }
-                                        if (role.equalsIgnoreCase("default")) role = "OYUNCU";
-                                    }
-                                }
-                            } catch (Exception ignored) { }
-                        }
-                    }
-
-                    double balance = 0.0;
-                    if (registered && econ != null && username != null) {
-                        org.bukkit.OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(username.trim());
-                        if (offlinePlayer != null) {
-                            balance = econ.getBalance(offlinePlayer);
-                        }
-                    }
-
-                    String response = "{\"registered\":" + registered + ", \"role\":\"" + role.toUpperCase() + "\", \"balance\":" + balance + "}";
-                    exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
-                    byte[] responseBytes = response.getBytes("UTF-8");
-                    exchange.sendResponseHeaders(200, responseBytes.length);
-                    OutputStream os = exchange.getResponseBody();
-                    os.write(responseBytes);
-                    os.close();
-                }
-            });
-            httpServer.setExecutor(null);
-            httpServer.start();
-            getLogger().info("HTTP Sunucusu port " + port + " uzerinde baslatildi.");
-        } catch (Exception e) {
-            getLogger().severe("HTTP Sunucusu baslatilamadi: " + e.getMessage());
-        }
-    }
-
-    private void stopHttpServer() {
-        if (httpServer != null) {
-            try {
-                httpServer.stop(0);
-                getLogger().info("HTTP Sunucusu durduruldu.");
-            } catch (Exception e) {
-                getLogger().severe("HTTP Sunucusu durdurulurken hata: " + e.getMessage());
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (command.getName().equalsIgnoreCase("aurajoin")) {
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+                Bukkit.broadcastMessage("§e§l✨ §b" + player.getName() + " §eAura network client ile katıldı!");
             }
+            return true;
         }
+        return true;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onCommand(PlayerCommandPreprocessEvent event) {
-        if (event.getMessage().startsWith("/merdoauth ")) {
-            event.setCancelled(true);
-            String password = event.getMessage().substring(11).trim();
-            Player player = event.getPlayer();
-            
-            merdoClients.add(player.getUniqueId());
-
-            if (!authMeApi.isAuthenticated(player)) {
-                if (authMeApi.isRegistered(player.getName())) {
-                    if (authMeApi.checkPassword(player.getName(), password)) {
-                        authMeApi.forceLogin(player);
-                        handleMerdoLogin(player);
-                    } else {
-                        player.kickPlayer("§cAuraNW Client şifreniz sunucudaki şifrenizle eşleşmiyor!");
-                    }
-                } else {
-                    player.performCommand("register " + password + " " + password);
-                }
-            } else {
+    @EventHandler(priority = EventPriority.LOW)
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        Bukkit.getScheduler().runTaskLaterAsynchronously(this, () -> {
+            if (player.isOnline()) {
                 handleMerdoLogin(player);
             }
-        }
-    }
-
-    @EventHandler
-    public void onLogin(LoginEvent event) {
-        if (merdoClients.contains(event.getPlayer().getUniqueId())) {
-            handleMerdoLogin(event.getPlayer());
-        }
-    }
-
-    @EventHandler
-    public void onRegister(RegisterEvent event) {
-        if (merdoClients.contains(event.getPlayer().getUniqueId())) {
-            handleMerdoLogin(event.getPlayer());
-        }
-    }
-
-    @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        merdoClients.remove(event.getPlayer().getUniqueId());
+        }, 40L); // 2 seconds delay
     }
 
     private void handleMerdoLogin(Player player) {
-        if (!merdoClients.contains(player.getUniqueId())) return;
-        merdoClients.remove(player.getUniqueId());
+        String username = player.getName();
+        String apiToken = "2b4b4566f103b44b82d477fcbb2123512e20b3327d6d371d34f07a4a2b217031"; 
+        
+        try {
+            URL url = new URL("https://auranw.com/api/get_user_info.php?username=" + username + "&token=" + apiToken);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(5000);
 
-        File dataFile = new File(getDataFolder(), "data.yml");
-        FileConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
-        String uuidStr = player.getUniqueId().toString();
+            int responseCode = conn.getResponseCode();
+            if (responseCode == 200) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                String inputLine;
+                StringBuilder response = new StringBuilder();
 
-        if (!data.getBoolean("rewards." + uuidStr, false)) {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + player.getName() + " parent addtemp vip 30d");
-            data.set("rewards." + uuidStr, true);
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                String json = response.toString();
+                boolean success = false;
+                if (json.contains("\"success\":true") || json.contains("\"success\": true")) {
+                    success = true;
+                }
+                
+                if (success) {
+                    String role = extractJsonValue(json, "role");
+                    String expiryStr = extractJsonValue(json, "expiry");
+                    
+                    Bukkit.getScheduler().runTask(this, () -> {
+                        updatePlayerRole(player, role, expiryStr);
+                    });
+                } else {
+                    getLogger().warning("API returned failure for " + username + ": " + json);
+                }
+            } else {
+                getLogger().warning("Failed to connect to web API for " + username + ". Response code: " + responseCode);
+            }
+        } catch (Exception e) {
+            getLogger().warning("Error checking VIP status for " + username + ": " + e.getMessage());
+        }
+    }
+
+    private String extractJsonValue(String json, String key) {
+        String searchKey = "\"" + key + "\":\"";
+        int startIndex = json.indexOf(searchKey);
+        if (startIndex == -1) {
+            searchKey = "\"" + key + "\":";
+            startIndex = json.indexOf(searchKey);
+            if (startIndex == -1) return null;
+            startIndex += searchKey.length();
+            int endIndex = json.indexOf(",", startIndex);
+            if (endIndex == -1) endIndex = json.indexOf("}", startIndex);
+            if (endIndex == -1) return null;
+            return json.substring(startIndex, endIndex).trim();
+        }
+        startIndex += searchKey.length();
+        int endIndex = json.indexOf("\"", startIndex);
+        if (endIndex == -1) return null;
+        return json.substring(startIndex, endIndex);
+    }
+
+    private void updatePlayerRole(Player player, String roleName, String expiryStr) {
+        if (roleName == null || roleName.isEmpty() || roleName.equals("null")) {
+            return;
+        }
+
+        long expiryUnix = 0;
+        if (expiryStr != null && !expiryStr.isEmpty() && !expiryStr.equals("null")) {
             try {
-                data.save(dataFile);
-            } catch (IOException e) {
-                getLogger().severe("Could not save data.yml");
+                expiryUnix = Long.parseLong(expiryStr);
+            } catch (NumberFormatException e) {
+                getLogger().warning("Invalid expiry time format for " + player.getName() + ": " + expiryStr);
             }
         }
 
-        Bukkit.broadcastMessage("§e§l✨ §b" + player.getName() + " §eAura network client ile katıldı!");
+        try {
+            LuckPerms luckPerms = LuckPermsProvider.get();
+            User user = luckPerms.getUserManager().getUser(player.getUniqueId());
+            if (user != null) {
+                String[] allVipRoles = {"mvip+", "mvip", "vip+", "vip"};
+                for (String vipRole : allVipRoles) {
+                    user.data().remove(Node.builder("group." + vipRole).build());
+                }
+
+                Node roleNode;
+                if (expiryUnix > 0) {
+                    roleNode = Node.builder("group." + roleName).expiry(expiryUnix).build();
+                } else {
+                    roleNode = Node.builder("group." + roleName).build();
+                }
+                user.data().add(roleNode);
+                luckPerms.getUserManager().saveUser(user);
+                getLogger().info("Successfully applied role " + roleName + " to " + player.getName());
+            }
+        } catch (Exception e) {
+            getLogger().warning("Error applying LuckPerms role to " + player.getName() + ": " + e.getMessage());
+        }
     }
 }

@@ -32,6 +32,14 @@ public class AuraNetworkMod implements ClientModInitializer {
                                                 client.getNetworkHandler().sendCommand("login " + token.trim());
                                             }
                                         });
+                                        
+                                        // Ana sunucuya gectikten sonra giris mesajini attirmak icin aurajoin komutu gonderilir
+                                        Thread.sleep(2500);
+                                        client.execute(() -> {
+                                            if (client.getNetworkHandler() != null) {
+                                                client.getNetworkHandler().sendCommand("aurajoin");
+                                            }
+                                        });
                                     } catch (Exception ignored) {}
                                 }).start();
                             }

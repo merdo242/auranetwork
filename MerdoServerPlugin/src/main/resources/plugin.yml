@@ -2,9 +2,12 @@
 version: 1.0
 main: com.merdo.plugin.MerdoServerPlugin
 api-version: 1.13
-depend: [AuthMe, LuckPerms]
-description: Merdo Launcher Auth and VIP Integration
+depend: [LuckPerms]
+description: Merdo Launcher VIP Integration
 commands:
-  merdoauth:
-    description: Internal command for AuraNW Launcher authentication
-    usage: /merdoauth <password>
+  login:
+    description: Dummy login command
+  register:
+    description: Dummy register command
+  aurajoin:
+    description: Client mod join command
