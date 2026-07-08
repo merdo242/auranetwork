@@ -5,8 +5,6 @@ import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -30,18 +28,6 @@ public class MerdoServerPlugin extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         getLogger().info("MerdoServerPlugin disabled!");
-    }
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (command.getName().equalsIgnoreCase("aurajoin")) {
-            if (sender instanceof Player) {
-                Player player = (Player) sender;
-                Bukkit.broadcastMessage("§e§l✨ §b" + player.getName() + " §eAura network client ile katıldı!");
-            }
-            return true;
-        }
-        return true;
     }
 
     @EventHandler(priority = EventPriority.LOW)

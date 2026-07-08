@@ -4,10 +4,3 @@ main: com.merdo.plugin.MerdoServerPlugin
 api-version: 1.13
 depend: [LuckPerms]
 description: Merdo Launcher VIP Integration
-commands:
-  login:
-    description: Dummy login command
-  register:
-    description: Dummy register command
-  aurajoin:
-    description: Client mod join command

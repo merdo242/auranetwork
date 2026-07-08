@@ -3,11 +3,16 @@ package com.aura.bridge;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.text.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AuraNetworkMod implements ClientModInitializer {
+    public static final Logger LOGGER = LoggerFactory.getLogger("auranetworkmod");
+
     @Override
     public void onInitializeClient() {
-        System.out.println("[AuraNetworkMod] Aura Network Mod yuklendi!"); AuraClientSettings.load();
+        System.out.println("[AuraNetworkMod] Aura Network Mod yuklendi!");
+        AuraClientSettings.load();
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             String token = System.getenv("AURA_TOKEN");
@@ -16,12 +21,9 @@ public class AuraNetworkMod implements ClientModInitializer {
                     try {
                         Thread.sleep(2500);
                         client.execute(() -> {
-                            if (client.player != null) {
-                                // client.player.sendMessage(Text.literal("§a[AuraNetwork] §7Sunucuya dogrulama anahtari gonderildi!"), false);
-                            }
                             if (client.getNetworkHandler() != null) {
                                 // LimboAuth ve standart auth pluginleri icin sirayla kayit ve giris komutlarini yolla
-                                client.getNetworkHandler().sendCommand("register " + token.trim() + " " + token.trim());
+                                client.getNetworkHandler().sendChatCommand("register " + token.trim() + " " + token.trim());
                                 
                                 // Biraz bekleyip login komutunu gonder (register'in islenmesi icin kucuk bir gecikme)
                                 new Thread(() -> {
@@ -29,7 +31,7 @@ public class AuraNetworkMod implements ClientModInitializer {
                                         Thread.sleep(300);
                                         client.execute(() -> {
                                             if (client.getNetworkHandler() != null) {
-                                                client.getNetworkHandler().sendCommand("login " + token.trim());
+                                                client.getNetworkHandler().sendChatCommand("login " + token.trim());
                                             }
                                         });
                                         
@@ -37,7 +39,7 @@ public class AuraNetworkMod implements ClientModInitializer {
                                         Thread.sleep(2500);
                                         client.execute(() -> {
                                             if (client.getNetworkHandler() != null) {
-                                                client.getNetworkHandler().sendCommand("aurajoin");
+                                                client.getNetworkHandler().sendChatCommand("aurajoin");
                                             }
                                         });
                                     } catch (Exception ignored) {}
@@ -49,16 +51,7 @@ public class AuraNetworkMod implements ClientModInitializer {
                     }
                 }).start();
             } else {
-                new Thread(() -> {
-                    try {
-                        Thread.sleep(2500);
-                        client.execute(() -> {
-                            if (client.player != null) {
-                                client.player.sendMessage(Text.literal("§c[AuraNetwork] §7Launcher'dan sifre (token) girmediginiz icin dogrulama yapilamadi!"), false);
-                            }
-                        });
-                    } catch (Exception e) {}
-                }).start();
+                System.out.println("[AuraNetworkMod] Token bulunamadi, dogrulama atlandi.");
             }
         });
     }

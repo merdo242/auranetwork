@@ -1,0 +1,9 @@
+﻿{
+  "id": "auravelocity",
+  "name": "AuraVelocityPlugin",
+  "version": "1.0",
+  "authors": [
+    "AuraNetwork"
+  ],
+  "main": "com.aura.velocity.AuraVelocityPlugin"
+}
