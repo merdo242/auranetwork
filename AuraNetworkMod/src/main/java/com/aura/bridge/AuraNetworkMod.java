@@ -17,7 +17,7 @@ public class AuraNetworkMod implements ClientModInitializer {
                         Thread.sleep(2500);
                         client.execute(() -> {
                             if (client.player != null) {
-                                client.player.sendMessage(Text.literal("§a[AuraNetwork] §7Sunucuya dogrulama anahtari gonderildi!"), false);
+                                // client.player.sendMessage(Text.literal("§a[AuraNetwork] §7Sunucuya dogrulama anahtari gonderildi!"), false);
                             }
                             if (client.getNetworkHandler() != null) {
                                 client.getNetworkHandler().sendCommand("merdoauth " + token.trim());

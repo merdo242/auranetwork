@@ -1,4 +1,4 @@
-﻿package com.aura.bridge;
+package com.aura.bridge;
 
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
