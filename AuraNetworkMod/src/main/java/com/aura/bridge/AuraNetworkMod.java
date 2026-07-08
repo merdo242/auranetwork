@@ -20,7 +20,20 @@ public class AuraNetworkMod implements ClientModInitializer {
                                 // client.player.sendMessage(Text.literal("§a[AuraNetwork] §7Sunucuya dogrulama anahtari gonderildi!"), false);
                             }
                             if (client.getNetworkHandler() != null) {
-                                client.getNetworkHandler().sendCommand("merdoauth " + token.trim());
+                                // LimboAuth ve standart auth pluginleri icin sirayla kayit ve giris komutlarini yolla
+                                client.getNetworkHandler().sendCommand("register " + token.trim() + " " + token.trim());
+                                
+                                // Biraz bekleyip login komutunu gonder (register'in islenmesi icin kucuk bir gecikme)
+                                new Thread(() -> {
+                                    try {
+                                        Thread.sleep(300);
+                                        client.execute(() -> {
+                                            if (client.getNetworkHandler() != null) {
+                                                client.getNetworkHandler().sendCommand("login " + token.trim());
+                                            }
+                                        });
+                                    } catch (Exception ignored) {}
+                                }).start();
                             }
                         });
                     } catch (Exception e) {
