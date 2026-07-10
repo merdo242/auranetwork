@@ -96,8 +96,8 @@ public class MinecraftLauncherService
                 try 
                 {
                     using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(10) };
-                    var zipBytes = client.GetByteArrayAsync("https://github.com/AuraNW242/AuraNWclient/raw/main/installer/AuraNW_Fabric_1.21.1.zip").GetAwaiter().GetResult();
-                    var tempZip = Path.Combine(Path.GetTempPath(), "AuraNW_fabric_1.21.1.zip");
+                    var zipBytes = client.GetByteArrayAsync("https://github.com/merdo242/auranetwork/raw/main/installer/Merdo_Fabric_1.21.1.zip").GetAwaiter().GetResult();
+                    var tempZip = Path.Combine(Path.GetTempPath(), "Merdo_Fabric_1.21.1.zip");
                     System.IO.File.WriteAllBytes(tempZip, zipBytes);
                     System.IO.Compression.ZipFile.ExtractToDirectory(tempZip, path.BasePath, true);
                     System.IO.File.Delete(tempZip);

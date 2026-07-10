@@ -1,8 +1,7 @@
-﻿name: MerdoServerPlugin
+name: MerdoServerPlugin
 version: 1.0
 main: com.merdo.plugin.MerdoServerPlugin
 api-version: 1.13
-depend: [LuckPerms]
 description: Merdo Launcher VIP Integration
 commands:
   login:
