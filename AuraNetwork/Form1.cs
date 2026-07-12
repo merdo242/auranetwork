@@ -9,6 +9,7 @@ public partial class Form1 : Form
     private readonly AccountService _accountService = new();
     private readonly SettingsService _settingsService = new();
     private readonly MinecraftLauncherService _minecraftLauncherService;
+    private readonly FirebaseService _firebaseService = new FirebaseService();
 
     private readonly System.Windows.Forms.Timer _transitionTimer = new();
     private readonly System.Windows.Forms.Timer _launchTimer = new();
@@ -58,6 +59,7 @@ public partial class Form1 : Form
     {
         _minecraftLauncherService = new MinecraftLauncherService(_settingsService);
         InitializeComponent();
+        InitializePremiumUI();
         
         // Setup Form properties
         Text = "Aura Network - Giriş Yap";
@@ -337,6 +339,7 @@ public partial class Form1 : Form
 
     protected override void OnFormClosed(FormClosedEventArgs e)
     {
+        if (!string.IsNullOrEmpty(_currentUser)) { _firebaseService.SetUserOnline(_currentUser, false).GetAwaiter().GetResult(); }
         try { _musicPlayer?.controls.stop(); } catch { }
         base.OnFormClosed(e);
     }
@@ -979,6 +982,7 @@ public partial class Form1 : Form
 
     private void btnExit_Click(object sender, EventArgs e)
     {
+        if (!string.IsNullOrEmpty(_currentUser)) { _ = _firebaseService.SetUserOnline(_currentUser, false); } if (_pbSkinViewer != null) _pbSkinViewer.Visible = false;
         _currentUser = "";
         txtUsername.Text = "";
         txtPassword.Text = "";
@@ -1034,6 +1038,7 @@ public partial class Form1 : Form
 
     private void StartTransition()
     {
+        if (!string.IsNullOrEmpty(_currentUser)) { _ = _firebaseService.SetUserOnline(_currentUser, true); if (_pbSkinViewer != null) { _pbSkinViewer.ImageLocation = "https://starlightskins.lunareclipse.studio/render/walking/" + _currentUser + "/full"; _pbSkinViewer.Visible = true; } }
         pnlHome.Visible = true;
         Text = "Aura Network - Oyun Ekranı";
         _transitionProgress = 0;
@@ -1215,4 +1220,120 @@ public partial class Form1 : Form
         else
             AuraDialog.ShowInfo(this, message);
     }
+    private PictureBox _pbSkinViewer;
+    private Panel _pnlFriends;
+    private ListBox _lstFriends;
+    private ListBox _lstFriendRequests;
+    private TextBox _txtAddFriend;
+    private Button _btnAddFriend;
+    private Button _btnFriendsToggle;
+    private System.Windows.Forms.Timer _friendsTimer = new System.Windows.Forms.Timer();
+
+    private void InitializePremiumUI()
+    {
+        // 3D Skin Viewer
+        _pbSkinViewer = new PictureBox();
+        _pbSkinViewer.BackColor = Color.Transparent;
+        _pbSkinViewer.SizeMode = PictureBoxSizeMode.Zoom;
+        _pbSkinViewer.Size = new Size(180, 360);
+        _pbSkinViewer.Location = new Point(pnlHome.Width / 2 - 90, pnlHome.Height - 400);
+        _pbSkinViewer.Visible = false;
+        pnlHome.Controls.Add(_pbSkinViewer);
+
+        // Friends Toggle Button
+        _btnFriendsToggle = new Button();
+        _btnFriendsToggle.Text = "👥 Arkadaşlar";
+        _btnFriendsToggle.FlatStyle = FlatStyle.Flat;
+        _btnFriendsToggle.BackColor = Color.FromArgb(40, 40, 40);
+        _btnFriendsToggle.ForeColor = Color.White;
+        _btnFriendsToggle.Size = new Size(120, 35);
+        _btnFriendsToggle.Location = new Point(pnlHome.Width - 140, pnlHome.Height - 50);
+        _btnFriendsToggle.Cursor = Cursors.Hand;
+        _btnFriendsToggle.Click += (s, e) => { _pnlFriends.Visible = !_pnlFriends.Visible; if(_pnlFriends.Visible) RefreshFriends(); };
+        pnlHome.Controls.Add(_btnFriendsToggle);
+        _btnFriendsToggle.BringToFront();
+
+        // Friends Panel
+        _pnlFriends = new Panel();
+        _pnlFriends.Size = new Size(250, pnlHome.Height - 70);
+        _pnlFriends.Location = new Point(pnlHome.Width - 270, 10);
+        _pnlFriends.BackColor = Color.FromArgb(230, 25, 25, 25);
+        _pnlFriends.Visible = false;
+        pnlHome.Controls.Add(_pnlFriends);
+        _pnlFriends.BringToFront();
+
+        Label lblTitle = new Label { Text = "Arkadaşlık Sistemi", ForeColor = Color.White, Font = new Font("Segoe UI", 12, FontStyle.Bold), AutoSize = true, Location = new Point(10, 10) };
+        _pnlFriends.Controls.Add(lblTitle);
+
+        _txtAddFriend = new TextBox { Location = new Point(10, 40), Size = new Size(150, 25), BackColor = Color.FromArgb(40, 40, 40), ForeColor = Color.White, BorderStyle = BorderStyle.FixedSingle };
+        _pnlFriends.Controls.Add(_txtAddFriend);
+
+        _btnAddFriend = new Button { Text = "Ekle", Location = new Point(170, 39), Size = new Size(70, 25), FlatStyle = FlatStyle.Flat, BackColor = Color.FromArgb(50, 150, 50), ForeColor = Color.White, Cursor = Cursors.Hand };
+        _btnAddFriend.Click += async (s, e) => {
+            if(!string.IsNullOrWhiteSpace(_txtAddFriend.Text)) {
+                await _firebaseService.SendFriendRequest(_currentUser, _txtAddFriend.Text);
+                MessageBox.Show("İstek gönderildi!");
+                _txtAddFriend.Text = "";
+            }
+        };
+        _pnlFriends.Controls.Add(_btnAddFriend);
+
+        Label lblReqs = new Label { Text = "İstekler", ForeColor = Color.LightGray, Location = new Point(10, 80), AutoSize = true };
+        _pnlFriends.Controls.Add(lblReqs);
+
+        _lstFriendRequests = new ListBox { Location = new Point(10, 100), Size = new Size(230, 60), BackColor = Color.FromArgb(30, 30, 30), ForeColor = Color.White, BorderStyle = BorderStyle.None };
+        _lstFriendRequests.DoubleClick += async (s, e) => {
+            if(_lstFriendRequests.SelectedItem != null) {
+                var req = _lstFriendRequests.SelectedItem.ToString();
+                var res = MessageBox.Show($"[{req}] isteğini kabul etmek istiyor musun?", "İstek", MessageBoxButtons.YesNoCancel);
+                if(res == DialogResult.Yes) {
+                    await _firebaseService.AcceptFriendRequest(_currentUser, req);
+                    RefreshFriends();
+                } else if(res == DialogResult.No) {
+                    await _firebaseService.RejectFriendRequest(_currentUser, req);
+                    RefreshFriends();
+                }
+            }
+        };
+        _pnlFriends.Controls.Add(_lstFriendRequests);
+
+        Label lblFrs = new Label { Text = "Arkadaşlarım (Çift tıkla sil)", ForeColor = Color.LightGray, Location = new Point(10, 170), AutoSize = true };
+        _pnlFriends.Controls.Add(lblFrs);
+
+        _lstFriends = new ListBox { Location = new Point(10, 190), Size = new Size(230, _pnlFriends.Height - 200), BackColor = Color.FromArgb(30, 30, 30), ForeColor = Color.White, BorderStyle = BorderStyle.None, Font = new Font("Segoe UI", 10) };
+        _lstFriends.DoubleClick += async (s, e) => {
+            if(_lstFriends.SelectedItem != null) {
+                var fr = _lstFriends.SelectedItem.ToString().Split(' ')[0];
+                if(MessageBox.Show($"[{fr}] arkadaşlıktan çıkarılsın mı?", "Sil", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+                    await _firebaseService.RemoveFriend(_currentUser, fr);
+                    RefreshFriends();
+                }
+            }
+        };
+        _pnlFriends.Controls.Add(_lstFriends);
+
+        _friendsTimer.Interval = 10000; // 10 sec refresh
+        _friendsTimer.Tick += (s, e) => { if(_pnlFriends.Visible && !string.IsNullOrEmpty(_currentUser)) RefreshFriends(); };
+        _friendsTimer.Start();
+    }
+
+    private async void RefreshFriends()
+    {
+        if(string.IsNullOrEmpty(_currentUser)) return;
+        var reqs = await _firebaseService.GetFriendRequests(_currentUser);
+        _lstFriendRequests.Items.Clear();
+        foreach(var r in reqs) _lstFriendRequests.Items.Add(r);
+
+        var friends = await _firebaseService.GetFriendsWithStatus(_currentUser);
+        _lstFriends.Items.Clear();
+        foreach(var f in friends)
+        {
+            string status = f.Value ? "🟢 Çevrimiçi" : "🔴 Çevrimdışı";
+            _lstFriends.Items.Add($"{f.Key} - {status}");
+        }
+    }
+
+    // FIREBASE_REPLACE_HOOK_STARTTRANSITION
+    // FIREBASE_REPLACE_HOOK_BTNEXIT
+    // FIREBASE_REPLACE_HOOK_ONFORMCLOSED
 }
