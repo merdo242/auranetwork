@@ -1,4 +1,4 @@
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
@@ -1038,7 +1038,7 @@ public partial class Form1 : Form
 
     private void StartTransition()
     {
-        if (!string.IsNullOrEmpty(_currentUser)) { _ = _firebaseService.SetUserOnline(_currentUser, true); if (_pbSkinViewer != null) { _pbSkinViewer.ImageLocation = "https://starlightskins.lunareclipse.studio/render/walking/" + _currentUser + "/full"; _pbSkinViewer.Visible = true; } }
+        if (!string.IsNullOrEmpty(_currentUser)) { _ = _firebaseService.SetUserOnline(_currentUser, true); if (_pbSkinViewer != null) { _pbSkinViewer.ImageLocation = "https://mc-heads.net/body/" + _currentUser + "/400.png"; _pbSkinViewer.Visible = true; } }
         pnlHome.Visible = true;
         Text = "Aura Network - Oyun Ekranı";
         _transitionProgress = 0;
@@ -1235,10 +1235,12 @@ public partial class Form1 : Form
         _pbSkinViewer = new PictureBox();
         _pbSkinViewer.BackColor = Color.Transparent;
         _pbSkinViewer.SizeMode = PictureBoxSizeMode.Zoom;
-        _pbSkinViewer.Size = new Size(180, 360);
-        _pbSkinViewer.Location = new Point(pnlHome.Width / 2 - 90, pnlHome.Height - 400);
+        _pbSkinViewer.Size = new Size(200, 380);
+        _pbSkinViewer.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+        _pbSkinViewer.Location = new Point(410, pnlHome.Height - 420);
         _pbSkinViewer.Visible = false;
         pnlHome.Controls.Add(_pbSkinViewer);
+        _pbSkinViewer.BringToFront();
 
         // Friends Toggle Button
         _btnFriendsToggle = new Button();
@@ -1246,8 +1248,9 @@ public partial class Form1 : Form
         _btnFriendsToggle.FlatStyle = FlatStyle.Flat;
         _btnFriendsToggle.BackColor = Color.FromArgb(40, 40, 40);
         _btnFriendsToggle.ForeColor = Color.White;
-        _btnFriendsToggle.Size = new Size(120, 35);
-        _btnFriendsToggle.Location = new Point(pnlHome.Width - 140, pnlHome.Height - 50);
+        _btnFriendsToggle.Size = new Size(130, 35);
+        _btnFriendsToggle.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+        _btnFriendsToggle.Location = new Point(pnlHome.Width - 150, pnlHome.Height - 50);
         _btnFriendsToggle.Cursor = Cursors.Hand;
         _btnFriendsToggle.Click += (s, e) => { _pnlFriends.Visible = !_pnlFriends.Visible; if(_pnlFriends.Visible) RefreshFriends(); };
         pnlHome.Controls.Add(_btnFriendsToggle);
@@ -1256,6 +1259,7 @@ public partial class Form1 : Form
         // Friends Panel
         _pnlFriends = new Panel();
         _pnlFriends.Size = new Size(250, pnlHome.Height - 70);
+        _pnlFriends.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
         _pnlFriends.Location = new Point(pnlHome.Width - 270, 10);
         _pnlFriends.BackColor = Color.FromArgb(230, 25, 25, 25);
         _pnlFriends.Visible = false;
@@ -1281,7 +1285,7 @@ public partial class Form1 : Form
         Label lblReqs = new Label { Text = "İstekler", ForeColor = Color.LightGray, Location = new Point(10, 80), AutoSize = true };
         _pnlFriends.Controls.Add(lblReqs);
 
-        _lstFriendRequests = new ListBox { Location = new Point(10, 100), Size = new Size(230, 60), BackColor = Color.FromArgb(30, 30, 30), ForeColor = Color.White, BorderStyle = BorderStyle.None };
+        _lstFriendRequests = new ListBox { Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right, Location = new Point(10, 100), Size = new Size(230, 60), BackColor = Color.FromArgb(30, 30, 30), ForeColor = Color.White, BorderStyle = BorderStyle.None };
         _lstFriendRequests.DoubleClick += async (s, e) => {
             if(_lstFriendRequests.SelectedItem != null) {
                 var req = _lstFriendRequests.SelectedItem.ToString();
@@ -1300,7 +1304,7 @@ public partial class Form1 : Form
         Label lblFrs = new Label { Text = "Arkadaşlarım (Çift tıkla sil)", ForeColor = Color.LightGray, Location = new Point(10, 170), AutoSize = true };
         _pnlFriends.Controls.Add(lblFrs);
 
-        _lstFriends = new ListBox { Location = new Point(10, 190), Size = new Size(230, _pnlFriends.Height - 200), BackColor = Color.FromArgb(30, 30, 30), ForeColor = Color.White, BorderStyle = BorderStyle.None, Font = new Font("Segoe UI", 10) };
+        _lstFriends = new ListBox { Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right, Location = new Point(10, 190), Size = new Size(230, _pnlFriends.Height - 200), BackColor = Color.FromArgb(30, 30, 30), ForeColor = Color.White, BorderStyle = BorderStyle.None, Font = new Font("Segoe UI", 10) };
         _lstFriends.DoubleClick += async (s, e) => {
             if(_lstFriends.SelectedItem != null) {
                 var fr = _lstFriends.SelectedItem.ToString().Split(' ')[0];
@@ -1316,8 +1320,7 @@ public partial class Form1 : Form
         _friendsTimer.Tick += (s, e) => { if(_pnlFriends.Visible && !string.IsNullOrEmpty(_currentUser)) RefreshFriends(); };
         _friendsTimer.Start();
     }
-
-    private async void RefreshFriends()
+private async void RefreshFriends()
     {
         if(string.IsNullOrEmpty(_currentUser)) return;
         var reqs = await _firebaseService.GetFriendRequests(_currentUser);
