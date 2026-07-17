@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -16,6 +16,7 @@ public class AccountService
     private readonly List<SavedAccount> _savedAccounts = new();
     private static readonly HttpClient _httpClient = new HttpClient();
     private const string ApiBaseUrl = "http://auranetwork.com.tr/launcher_api.php";
+    private const string FirebaseBansUrl = "https://auranw-c3bf4-default-rtdb.firebaseio.com/bans";
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -87,6 +88,25 @@ public class AccountService
         {
             LogError("SaveData Hatası", ex);
         }
+    }
+
+    public async Task<bool> IsBanned(string username)
+    {
+        try
+        {
+            string url = $"{FirebaseBansUrl}/{Uri.EscapeDataString(username.ToLower())}.json?shallow=true";
+            var response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                return json != "null";
+            }
+        }
+        catch (Exception ex)
+        {
+            LogError("Firebase Ban Check Error", ex);
+        }
+        return false;
     }
 
     public async Task<bool> IsRegistered(string username)

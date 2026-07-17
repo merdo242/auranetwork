@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
@@ -857,6 +857,16 @@ public partial class Form1 : Form
             return;
         }
 
+        btnLogin.Enabled = false;
+        lblStatus.Text = "Ban durumu kontrol ediliyor...";
+        if (await _accountService.IsBanned(username))
+        {
+            btnLogin.Enabled = true;
+            lblStatus.Text = "Erişim Reddedildi.";
+            ShowMessage("Bu hesap sunucudan UZAKLAŞTIRILMIŞTIR! Launcher'a giriş yapamazsınız.", MessageBoxIcon.Error);
+            return;
+        }
+
         if (_isRegisterMode)
         {
             if (_accountService.HasReachedRegisterLimit())
@@ -933,6 +943,12 @@ public partial class Form1 : Form
     // Kayıtlı hesap butonlarından çağrılır — textbox placeholder mantığını tamamen atlatır
     private async void LoginDirect(string username, string password)
     {
+        if (await _accountService.IsBanned(username))
+        {
+            ShowMessage("Bu hesap sunucudan UZAKLAŞTIRILMIŞTIR! Launcher'a giriş yapamazsınız.", MessageBoxIcon.Error);
+            return;
+        }
+
         if (await _accountService.Login(username, password))
         {
             _currentUser = username;
