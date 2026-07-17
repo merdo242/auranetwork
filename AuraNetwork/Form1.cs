@@ -1,4 +1,4 @@
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
@@ -877,7 +877,7 @@ public partial class Form1 : Form
                 return;
             }
 
-            if (_accountService.Register(username, password))
+            if (await _accountService.Register(username, password))
             {
                 _currentUser = username;
               _currentPassword = password;
@@ -902,7 +902,7 @@ public partial class Form1 : Form
         }
         else
         {
-            if (_accountService.Login(username, password))
+            if (await _accountService.Login(username, password))
             {
                 _currentUser = username;
               _currentPassword = password;
@@ -931,9 +931,9 @@ public partial class Form1 : Form
     }
 
     // Kayıtlı hesap butonlarından çağrılır — textbox placeholder mantığını tamamen atlatır
-    private void LoginDirect(string username, string password)
+    private async void LoginDirect(string username, string password)
     {
-        if (_accountService.Login(username, password))
+        if (await _accountService.Login(username, password))
         {
             _currentUser = username;
             _currentPassword = password;

@@ -1,17 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace AuraNetwork;
 
 public class AccountService
 {
     private readonly string AppDataPath;
-    private readonly string AccountsFilePath;
     private readonly string SavedAccountsFilePath;
     private readonly string ErrorLogFilePath;
 
-    private readonly Dictionary<string, string> _accounts = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<SavedAccount> _savedAccounts = new();
+    private static readonly HttpClient _httpClient = new HttpClient();
+    private const string FirebaseBaseUrl = "https://auranw-c3bf4-default-rtdb.firebaseio.com/accounts";
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -25,7 +30,6 @@ public class AccountService
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "AuraNWLauncher"
         );
-        AccountsFilePath = Path.Combine(AppDataPath, "accounts.json");
         SavedAccountsFilePath = Path.Combine(AppDataPath, "saved_accounts.json");
         ErrorLogFilePath = Path.Combine(AppDataPath, "error.log");
 
@@ -49,20 +53,6 @@ public class AccountService
             if (!Directory.Exists(AppDataPath))
             {
                 Directory.CreateDirectory(AppDataPath);
-            }
-
-            if (File.Exists(AccountsFilePath))
-            {
-                string json = File.ReadAllText(AccountsFilePath);
-                var data = JsonSerializer.Deserialize<Dictionary<string, string>>(json, JsonOptions);
-                if (data != null)
-                {
-                    _accounts.Clear();
-                    foreach (var kvp in data)
-                    {
-                        _accounts[kvp.Key] = kvp.Value;
-                    }
-                }
             }
 
             if (File.Exists(SavedAccountsFilePath))
@@ -91,9 +81,6 @@ public class AccountService
                 Directory.CreateDirectory(AppDataPath);
             }
 
-            string accountsJson = JsonSerializer.Serialize(_accounts, JsonOptions);
-            File.WriteAllText(AccountsFilePath, accountsJson);
-
             string savedJson = JsonSerializer.Serialize(_savedAccounts, JsonOptions);
             File.WriteAllText(SavedAccountsFilePath, savedJson);
         }
@@ -103,41 +90,82 @@ public class AccountService
         }
     }
 
-    public bool Register(string username, string password)
+    private class AccountData
+    {
+        public string password { get; set; } = string.Empty;
+    }
+
+    public async Task<bool> IsRegistered(string username)
+    {
+        try
+        {
+            string url = $"{FirebaseBaseUrl}/{username}.json?shallow=true";
+            var response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                return json != "null";
+            }
+        }
+        catch (Exception ex)
+        {
+            LogError("Firebase Check Error", ex);
+        }
+        return false;
+    }
+
+    public async Task<bool> Register(string username, string password)
     {
         if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            return false;
+
+        bool isExist = await IsRegistered(username);
+        if (isExist) return false;
+
+        try
         {
+            var data = new AccountData { password = password };
+            string json = JsonSerializer.Serialize(data);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            string url = $"{FirebaseBaseUrl}/{username}.json";
+            var response = await _httpClient.PutAsync(url, content);
+
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            LogError("Firebase Register Error", ex);
             return false;
         }
+    }
 
-        if (_accounts.Count >= 3)
+    public async Task<bool> Login(string username, string password)
+    {
+        try
         {
-            return false;
+            string url = $"{FirebaseBaseUrl}/{username}.json";
+            var response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                if (json != "null")
+                {
+                    var data = JsonSerializer.Deserialize<AccountData>(json);
+                    return data != null && data.password == password;
+                }
+            }
         }
-
-        if (_accounts.ContainsKey(username))
+        catch (Exception ex)
         {
-            return false;
+            LogError("Firebase Login Error", ex);
         }
-
-        _accounts[username] = password;
-        SaveData();
-        return true;
+        return false;
     }
 
     public bool HasReachedRegisterLimit()
     {
-        return _accounts.Count >= 3;
-    }
-
-    public bool Login(string username, string password)
-    {
-        if (!_accounts.TryGetValue(username, out var storedPassword))
-        {
-            return false;
-        }
-
-        return string.Equals(storedPassword, password, StringComparison.Ordinal);
+        return _savedAccounts.Count >= 3;
     }
 
     public void SaveAccountCredential(string username, string password)
@@ -156,13 +184,6 @@ public class AccountService
     public List<SavedAccount> GetSavedAccounts()
     {
         return _savedAccounts;
-    }
-
-    public void ResetForTesting()
-    {
-        _accounts.Clear();
-        _savedAccounts.Clear();
-        SaveData();
     }
 }
 
