@@ -868,7 +868,7 @@ public partial class Form1 : Form
             btnLogin.Enabled = false;
             lblStatus.Text = "Kullanıcı adı kontrol ediliyor...";
 
-            bool isTaken = await IsUsernameTakenOnServer(username);
+            bool isTaken = await _accountService.IsRegistered(username);
             if (isTaken)
             {
                 btnLogin.Enabled = true;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AuraNetwork;
@@ -16,7 +15,7 @@ public class AccountService
 
     private readonly List<SavedAccount> _savedAccounts = new();
     private static readonly HttpClient _httpClient = new HttpClient();
-    private const string FirebaseBaseUrl = "https://auranw-c3bf4-default-rtdb.firebaseio.com/accounts";
+    private const string ApiBaseUrl = "http://auranetwork.com.tr/launcher_api.php";
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -90,26 +89,25 @@ public class AccountService
         }
     }
 
-    private class AccountData
-    {
-        public string password { get; set; } = string.Empty;
-    }
-
     public async Task<bool> IsRegistered(string username)
     {
         try
         {
-            string url = $"{FirebaseBaseUrl}/{username}.json?shallow=true";
+            string url = $"{ApiBaseUrl}?action=check&username={Uri.EscapeDataString(username)}";
             var response = await _httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
                 string json = await response.Content.ReadAsStringAsync();
-                return json != "null";
+                using var doc = JsonDocument.Parse(json);
+                if (doc.RootElement.TryGetProperty("registered", out var regProp))
+                {
+                    return regProp.GetBoolean();
+                }
             }
         }
         catch (Exception ex)
         {
-            LogError("Firebase Check Error", ex);
+            LogError("API Check Error", ex);
         }
         return false;
     }
@@ -119,46 +117,60 @@ public class AccountService
         if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             return false;
 
-        bool isExist = await IsRegistered(username);
-        if (isExist) return false;
-
         try
         {
-            var data = new AccountData { password = password };
-            string json = JsonSerializer.Serialize(data);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var content = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("username", username),
+                new KeyValuePair<string, string>("password", password)
+            });
 
-            string url = $"{FirebaseBaseUrl}/{username}.json";
-            var response = await _httpClient.PutAsync(url, content);
+            string url = $"{ApiBaseUrl}?action=register";
+            var response = await _httpClient.PostAsync(url, content);
 
-            return response.IsSuccessStatusCode;
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(json);
+                if (doc.RootElement.TryGetProperty("success", out var successProp))
+                {
+                    return successProp.GetBoolean();
+                }
+            }
         }
         catch (Exception ex)
         {
-            LogError("Firebase Register Error", ex);
-            return false;
+            LogError("API Register Error", ex);
         }
+        return false;
     }
 
     public async Task<bool> Login(string username, string password)
     {
         try
         {
-            string url = $"{FirebaseBaseUrl}/{username}.json";
-            var response = await _httpClient.GetAsync(url);
+            var content = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("username", username),
+                new KeyValuePair<string, string>("password", password)
+            });
+
+            string url = $"{ApiBaseUrl}?action=login";
+            var response = await _httpClient.PostAsync(url, content);
+
             if (response.IsSuccessStatusCode)
             {
                 string json = await response.Content.ReadAsStringAsync();
-                if (json != "null")
+                using var doc = JsonDocument.Parse(json);
+                if (doc.RootElement.TryGetProperty("success", out var successProp))
                 {
-                    var data = JsonSerializer.Deserialize<AccountData>(json);
-                    return data != null && data.password == password;
+                    return successProp.GetBoolean();
                 }
             }
         }
         catch (Exception ex)
         {
-            LogError("Firebase Login Error", ex);
+            LogError("API Login Error", ex);
         }
         return false;
     }
