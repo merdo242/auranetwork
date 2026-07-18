@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AuraNetwork;
@@ -15,8 +16,7 @@ public class AccountService
 
     private readonly List<SavedAccount> _savedAccounts = new();
     private static readonly HttpClient _httpClient = new HttpClient();
-    private const string ApiBaseUrl = "http://auranetwork.com.tr/launcher_api.php";
-    private const string FirebaseBansUrl = "https://auranw-c3bf4-default-rtdb.firebaseio.com/bans";
+    private const string FirebaseBaseUrl = "https://auranw-c3bf4-default-rtdb.firebaseio.com/accounts";
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -90,16 +90,26 @@ public class AccountService
         }
     }
 
+    private class AccountData
+    {
+        public string password { get; set; } = string.Empty;
+        public bool isBanned { get; set; } = false;
+    }
+
     public async Task<bool> IsBanned(string username)
     {
         try
         {
-            string url = $"{FirebaseBansUrl}/{Uri.EscapeDataString(username.ToLower())}.json?shallow=true";
+            string url = $"{FirebaseBaseUrl}/{username}.json";
             var response = await _httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
                 string json = await response.Content.ReadAsStringAsync();
-                return json != "null";
+                if (json != "null")
+                {
+                    var data = JsonSerializer.Deserialize<AccountData>(json, JsonOptions);
+                    return data != null && data.isBanned;
+                }
             }
         }
         catch (Exception ex)
@@ -113,21 +123,17 @@ public class AccountService
     {
         try
         {
-            string url = $"{ApiBaseUrl}?action=check&username={Uri.EscapeDataString(username)}";
+            string url = $"{FirebaseBaseUrl}/{username}.json?shallow=true";
             var response = await _httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
                 string json = await response.Content.ReadAsStringAsync();
-                using var doc = JsonDocument.Parse(json);
-                if (doc.RootElement.TryGetProperty("registered", out var regProp))
-                {
-                    return regProp.GetBoolean();
-                }
+                return json != "null";
             }
         }
         catch (Exception ex)
         {
-            LogError("API Check Error", ex);
+            LogError("Firebase Check Error", ex);
         }
         return false;
     }
@@ -137,60 +143,46 @@ public class AccountService
         if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             return false;
 
+        bool isExist = await IsRegistered(username);
+        if (isExist) return false;
+
         try
         {
-            var content = new FormUrlEncodedContent(new[]
-            {
-                new KeyValuePair<string, string>("username", username),
-                new KeyValuePair<string, string>("password", password)
-            });
+            var data = new AccountData { password = password };
+            string json = JsonSerializer.Serialize(data);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            string url = $"{ApiBaseUrl}?action=register";
-            var response = await _httpClient.PostAsync(url, content);
+            string url = $"{FirebaseBaseUrl}/{username}.json";
+            var response = await _httpClient.PutAsync(url, content);
 
-            if (response.IsSuccessStatusCode)
-            {
-                string json = await response.Content.ReadAsStringAsync();
-                using var doc = JsonDocument.Parse(json);
-                if (doc.RootElement.TryGetProperty("success", out var successProp))
-                {
-                    return successProp.GetBoolean();
-                }
-            }
+            return response.IsSuccessStatusCode;
         }
         catch (Exception ex)
         {
-            LogError("API Register Error", ex);
+            LogError("Firebase Register Error", ex);
+            return false;
         }
-        return false;
     }
 
     public async Task<bool> Login(string username, string password)
     {
         try
         {
-            var content = new FormUrlEncodedContent(new[]
-            {
-                new KeyValuePair<string, string>("username", username),
-                new KeyValuePair<string, string>("password", password)
-            });
-
-            string url = $"{ApiBaseUrl}?action=login";
-            var response = await _httpClient.PostAsync(url, content);
-
+            string url = $"{FirebaseBaseUrl}/{username}.json";
+            var response = await _httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
                 string json = await response.Content.ReadAsStringAsync();
-                using var doc = JsonDocument.Parse(json);
-                if (doc.RootElement.TryGetProperty("success", out var successProp))
+                if (json != "null")
                 {
-                    return successProp.GetBoolean();
+                    var data = JsonSerializer.Deserialize<AccountData>(json);
+                    return data != null && data.password == password;
                 }
             }
         }
         catch (Exception ex)
         {
-            LogError("API Login Error", ex);
+            LogError("Firebase Login Error", ex);
         }
         return false;
     }
